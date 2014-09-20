@@ -49,7 +49,7 @@ class WebsiteFinderSpider(scrapy.Spider):
 
         $ scrapy crawl website_finder -a seed_urls=example.com,example2.co.uk -o data.csv
 
-    (note that data is appended to data.json, so you might want to remove old file)
+    (note that data is appended to data.csv, so you might want to remove old file)
 
     Navigation algorithm is the following:
 
