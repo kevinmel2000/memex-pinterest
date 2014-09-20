@@ -1,0 +1,6 @@
+scrapy==0.24.4
+lxml==3.4.0
+service_identity
+pytest
+tldextract==1.5.0
+reppy==0.3.0
