@@ -1,0 +1,7 @@
+*.pyc
+.scrapy
+.job
+.ipynb_checkpoints
+*.egg-info/
+.idea/
+
