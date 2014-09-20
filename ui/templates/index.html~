@@ -1,0 +1,29 @@
+{% extends "layout.html" %}
+{% block content %}
+<table id="" class="table table-striped">
+  <thead>
+    <tr>
+      <th>Domain</th>
+      <th>Score</th>
+      <th>Homepage screenshot</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>www.adultwhatever.com</td>
+      <td>21</td>
+      <td>SCREENSHOT</td>
+    </tr>
+    <tr>
+      <td>www.weirdos.com</td>
+      <td>48</td>
+      <td>SCREENSHOT</td>
+    </tr>
+    <tr>
+      <td>www.pervs.com</td>
+      <td>83</td>
+      <td>SCREENSHOT</td>
+    </tr>
+  </tbody>
+</table>
+{% endblock %}

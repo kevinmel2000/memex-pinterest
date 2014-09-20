@@ -1,0 +1,21 @@
+{% extends "layout.html" %}
+{% block content %}
+<table id="" class="table table-striped">
+  <thead>
+    <tr>
+      <th></span>Domain</th>
+      <th>Score</th>
+      <th>Homepage screenshot</th>
+    </tr>
+  </thead>
+  <tbody>
+  {% for site_dic in sites %}
+      <tr>
+        <td><span class="glyphicon glyphicon-screenshot"></span>{{ site_dic["url"] }}</td>
+        <td>21</td>
+        <td>SCREENSHOT</td>
+      </tr>
+  {% endfor %}
+  </tbody>
+</table>
+{% endblock %}
