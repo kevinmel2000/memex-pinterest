@@ -86,11 +86,9 @@ class WebsiteFinderSpider(scrapy.Spider):
         self.req_count = defaultdict(int)
 
     def parse(self, response):
-        this_domain = get_domain(response.url)
 
         if 'referrer_url' in response.meta:
-            orig_domain = get_domain(response.meta['referrer_url'])
-            if orig_domain != this_domain:
+            if is_external_url(response.url, response.meta['referrer_url']):
                 # When we follow a link and it redirects to another domain
                 # consider it external even if the link url was on-site.
                 response.meta['link_depth'] = 0
