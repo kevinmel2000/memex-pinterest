@@ -4,4 +4,4 @@
 .ipynb_checkpoints
 *.egg-info/
 .idea/
-
+crawler/data
