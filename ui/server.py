@@ -2,17 +2,9 @@ from flask import Flask
 from flask import render_template, jsonify, Response
 from handlers import request_wants_json
 from mongoutils.memex_mongo_utils import MemexMongoUtils 
+from handlers import hosts_handler
 import json
 app = Flask(__name__)
-
-#webapp
-@app.route("/")
-def index():
-
-    #!should be replaced by results of query to mongo
-    domains = [{"domain" : "www.hyperiongray.com/"}, {"domain" : "eeeee.com"}]
-
-    return render_template('index.html', domains = domains)
 
 @app.route("/discovery")
 def discovery():
@@ -20,21 +12,24 @@ def discovery():
     return render_template('discovery.html')
 
 #services
-@app.route("/domains")
+@app.route("/")
+@app.route("/hosts")
 def domain():
 
-    mmu = MemexMongoUtils()
-    hosts = mmu.list_hosts()
+    hosts = hosts_handler()
 
     if request_wants_json():
         return Response(json.dumps(hosts), mimetype = "application/json")
 
     return render_template('index.html', hosts = hosts)
 
-@app.route("/urls/<domain>")
+@app.route("/urls")
+@app.route("/urls/<host>")
 def urls():
     
-    return render_template("", urls = urls)
+    return "dddddddddddddddddddd"
+
+#    return render_template("", urls = urls)
 
 if __name__ == "__main__":
 

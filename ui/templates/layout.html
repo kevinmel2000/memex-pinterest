@@ -3,10 +3,10 @@
 
 <title>Hyperion Gray Sourcefinder</title>
 
-<script src=https://code.jquery.com/jquery-1.9.1.min.js></script>
-<script src=https://code.jquery.com/ui/1.9.1/jquery-ui.min.js></script>
+<script src="{{ url_for('static', filename='js/jquery-1.9.1.min.js') }}"></script>
+<script src="{{ url_for('static', filename='js/jquery-ui.min.js') }}"></script>
 <script src="{{ url_for('static', filename='js/d3.v3.min.js') }}" charset=utf-8></script>
-<link href=https://code.jquery.com/ui/1.9.1/themes/smoothness/jquery-ui.css rel=stylesheet>
+<link href="{{ url_for('static', filename='css/jquery-ui.css') }}" rel=stylesheet>
 <link href="{{ url_for('static', filename='css/bootstrap.min.css') }}" rel=stylesheet>
 <link href="{{ url_for('static', filename='css/d3.slider.css') }}" rel=stylesheet>
 <link href="{{ url_for('static', filename='css/hg.css') }}" rel=stylesheet>
@@ -54,7 +54,7 @@
 
 </div>
 
-</div id="content">
+<div id="content">
 {% block content %}
 {% endblock %}
 </div>

@@ -1,0 +1,41 @@
+{% extends "layout.html" %}
+{% block content %}
+<table id="" class="table table-striped">
+  <thead>
+    <tr>
+      <th></span>Domain</th>
+      <th>Score</th>
+      <th>Number of URLs</th>
+      <th>Homepage screenshot</th>
+    </tr>
+  </thead>
+  <tbody>
+  <div id="test"></div>
+  {% for host_dic in hosts %}
+      <tr onclick="loadData('{{ host_dic['host'] }}');">
+        <td><span class="glyphicon glyphicon-screenshot"></span>&nbsp{{ host_dic["host"] }}</td>
+        <td>{{ host_dic["host_score"] }}</td>
+        <td>{{ host_dic["num_urls"] }}</td>
+        <td>SCREENSHOT</td>
+      </tr>
+  {% endfor %}
+  </tbody>
+</table>
+<script>
+function loadData(host) {
+
+   alert(host);
+   $.ajax({
+
+     type: "GET",
+     url: '/urls',
+     success: function(data) {
+           // data is ur summary
+          $('div#' + host).html(data);
+     }
+
+   });
+}
+
+</script>
+{% endblock %}

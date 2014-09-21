@@ -1,6 +1,7 @@
 import csv
 from pymongo import MongoClient
 import traceback
+from random import randrange
 
 class MemexMongoUtils(object):
 
@@ -27,25 +28,31 @@ class MemexMongoUtils(object):
         if init_db:
             self.urlinfo_collection.ensure_index("url", unique = True, drop_dups = True)
 
-    def list_hosts(self):
+    def list_urls(self):
 
-        docs = self.urlinfo_collection.distinct("host")
+        docs = self.urlinfo_collection.find(fields = {"url" : 1, "host" : 1, "score" : 1, "html" : 1})
+
         return list(docs)
 
     def insert_test_data(self, test_fn = "test_sites.csv"):
 
         with open(test_fn) as testfile:
             reader = csv.DictReader(testfile)
+
             for url_dic in reader:
                 try:
+                    if not "score" in url_dic:
+                        url_dic["score"] = randrange(100)
+
                     self.urlinfo_collection.save(url_dic)
+
                 except:
                     #doc with same url exists, skip                                                                                                                                                               
                     pass
 
 if __name__ == "__main__":
 
-#    mmu = MemexMongoUtils(init_db = True)
-#    mmu.insert_test_data()
-    mmu = MemexMongoUtils()
-    print mmu.list_hosts()
+    mmu = MemexMongoUtils(init_db = True)
+    mmu.insert_test_data()
+    for host_doc in mmu.list_hosts():
+        print host_doc
