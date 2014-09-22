@@ -1,0 +1,14 @@
+{% for host_dic in hosts %}
+{% if host_dic["host"] %}
+
+<article class="white-panel" id="{{ host_dic["host"] }}">
+<span class="glyphicon glyphicon-ok-circle" style="cursor: pointer;"></span>
+<span class="glyphicon glyphicon-remove-circle" style="cursor: pointer; cursor: hand;"></span>
+<img src="http://www.mediademon.com/wp-content/uploads/2013/07/Blog-Post-Imagery5.png" alt="ALT">
+<h1><a href="/urls/{{ host_dic["host"] }}">Host: {{ host_dic["host"] }}<br /></a></h1>
+<p>Number of Urls Crawled: {{ host_dic["num_urls"] }}</p>
+<p>Score: {{ host_dic["host_score"] }}</p>
+</article>
+
+{% endif %}
+{% endfor %}

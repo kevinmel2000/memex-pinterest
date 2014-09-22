@@ -1,0 +1,29 @@
+{% extends "layout.html" %}
+{% block content %}
+<table id="" class="table table-striped" style="margin-top:50px;">
+  <thead>
+    <tr>
+      <th>URL</th>
+      <th>Host</th>
+      <th>Score</th>
+      <th>Crawl At</th>
+      <th>Seed</th>
+      <th>Title</th>
+      <th>Screenshot</th>
+    </tr>
+  </thead>
+  <tbody>
+  {% for url_dic in urls %}
+      <tr>
+        <td><span class="glyphicon glyphicon-screenshot"></span>&nbsp;<a href="{{ url_dic["url"] }}">{{ url_dic["url"][:40] }}</a></td>
+        <td>{{ url_dic["host"] }}</td>
+        <td>{{ url_dic["score"] }}</td>
+        <td>{{ url_dic["crawled_at"] }}</td>
+        <td>{{ url_dic["is_seed"] }}</td>
+        <td>{{ url_dic["title"] }}</td>
+        <td>SCREENSHOT</td>
+      </tr>
+  {% endfor %}
+  </tbody>
+</table>
+{% endblock %}

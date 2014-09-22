@@ -1,46 +1,109 @@
 {% extends "layout.html" %}
 {% block content %}
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<title>Example of Twitter Bootstrap 3 Grid System</title>
-<link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">
-<link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap-theme.min.css">
-<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
-<script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js"></script>
-<style type="text/css">
-    p{
-        padding: 50px;
-        border-style: solid;
-        font-size: 12px;
-        font-weight: bold;
-        text-align: center;
-        background-image: url(http://www.randomwebsite.com/images/head.jpg);
-        background-size: 100px 100px;
-        /*background: #f2f2f2;*/
-    }
-</style>
-</head>
-<body>
-  <div class="container">
-    <div class="row">
-      {% for host_dic in hosts %}
-        {% if host_dic["host"] %}
-          
-          <div class="col-sm-6 col-md-4 col-lg-3">
-           <p>
-	     <span style="background:red;">	   
-	       Host: {{ host_dic['host'][:15] }}<br />
-	       Num Urls: {{ host_dic["num_urls"] }}<br />
-	       Score: {{ host_dic["host_score"] }}<br />
-             </span>
-	   </p>
-	  </div>
 
-	{% endif %}
-      {% endfor %}
-    </div>
-  </div>
+<head>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="http://netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css">
+<style>
+  body {
+    background: #E9E9E9;
+  }
+#blog-landing {
+    margin-top: 81px;
+    position: relative;
+    max-width: 100%;
+    width: 100%;
+  }
+img {
+width: 100%;
+max-width: 100%;
+height: auto;
+}
+.white-panel {
+position: absolute;
+background: white;
+box-shadow: 0px 1px 2px rgba(0,0,0,0.3);
+padding: 10px;
+}
+.white-panel h1 {
+font-size: 1em;
+}
+.white-panel h1 a {
+color: #A92733;
+}
+.white-panel:hover {
+box-shadow: 1px 1px 10px rgba(0,0,0,0.5);
+margin-top: -5px;
+-webkit-transition: all 0.3s ease-in-out;
+-moz-transition: all 0.3s ease-in-out;
+-o-transition: all 0.3s ease-in-out;
+transition: all 0.3s ease-in-out;
+}
+</style>
+
+<link href="http://www.jqueryscript.net/css/jquerysctipttop.css" rel="stylesheet" type="text/css">
+</head>
+<!-- NAVBAR
+================================================== -->
+
+<body>
+<div class="jquery-script-ads"><script type="text/javascript">
+
+</script>
+</div>
+<div class="jquery-script-clear"></div>
+</div>
+</div>
+<!--<h1 style="margin-top:150px" align="center">Hyperion Gray SourceFinder</h1>-->
+<div class="container marketing">
+<section id="blog-landing"></section>
+</div>
+
+<!-- Bootstrap core JavaScript
+    ================================================== --> 
+<!-- Placed at the end of the document so the pages load faster --> 
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
+<script src="{{ url_for('static', filename='js/pinterest_grid.js') }}"></script> 
+
+<script>
+        $(document).ready(function() {
+
+            $('#blog-landing').pinterest_grid({
+                no_columns: 4,
+                padding_x: 10,
+                padding_y: 10,
+                margin_bottom: 50,
+                single_column_breakpoint: 700
+            });
+	    loadMore();
+        });
+</script>
 </body>
-</html>                  
+<script>
+var current_page = 0;
+
+function loadMore(page)
+{
+   console.log("More loaded");
+   $.get("/hosts/" + current_page, function( host_html ) {
+     $("section#blog-landing").append(host_html);
+     $(window).bind('scroll', bindScroll);
+   });
+
+}
+
+function bindScroll(){
+   if($(window).scrollTop() + $(window).height() > $(document).height() - 100) {
+       $(window).unbind('scroll');
+       current_page = current_page + 1;
+       loadMore();
+       //alert(current_page);
+   }
+}
+ 
+$(window).scroll(bindScroll);
+</script>
+</html>
 {% endblock %}

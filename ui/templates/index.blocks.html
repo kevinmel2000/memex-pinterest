@@ -1,0 +1,46 @@
+{% extends "layout.html" %}
+{% block content %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<title>Example of Twitter Bootstrap 3 Grid System</title>
+<link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">
+<link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap-theme.min.css">
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+<script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js"></script>
+<style type="text/css">
+    p{
+        padding: 50px;
+        border-style: solid;
+        font-size: 12px;
+        font-weight: bold;
+        text-align: center;
+        background-image: url(http://www.randomwebsite.com/images/head.jpg);
+        background-size: 100px 100px;
+        /*background: #f2f2f2;*/
+    }
+</style>
+</head>
+<body>
+  <div class="container">
+    <div class="row">
+      {% for host_dic in hosts %}
+        {% if host_dic["host"] %}
+          
+          <div class="col-sm-6 col-md-4 col-lg-3">
+           <p>
+	     <span style="background:red;">	   
+	       Host: {{ host_dic['host'][:15] }}<br />
+	       Num Urls: {{ host_dic["num_urls"] }}<br />
+	       Score: {{ host_dic["host_score"] }}<br />
+             </span>
+	   </p>
+	  </div>
+
+	{% endif %}
+      {% endfor %}
+    </div>
+  </div>
+</body>
+</html>                  
+{% endblock %}

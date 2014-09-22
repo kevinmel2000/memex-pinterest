@@ -1,5 +1,6 @@
 from flask import request
 from mongoutils.memex_mongo_utils import MemexMongoUtils
+import json
 import itertools
 
 def request_wants_json():
@@ -10,33 +11,36 @@ def request_wants_json():
         request.accept_mimetypes[best] > \
         request.accept_mimetypes['text/html']
 
-
-def hosts_handler():
+def hosts_handler(page = 1):
     """Put together host documents for use with hosts endpoint """
 
     mmu = MemexMongoUtils()
-    hosts = mmu.list_urls()
-    for host in hosts:
-        host.pop("_id")
 
-    host_dics = []
-    for key, group in itertools.groupby(hosts, lambda item: item["host"]):
-        host_dic = {}
-        group_list = list(group)
-        host_dic["host"] = key
-        host_dic["num_urls"] = len(group_list)
-
-        #calculate score, normalized
-        host_score = 0
-        for url_dic in group_list:
-            host_score += int(url_dic["score"])
-
-        host_score = int(host_score / host_dic["num_urls"])
-        host_dic["host_score"] = host_score
-
-        host_dics.append(host_dic)
+    #!process host records
+    #!THIS WON'T SCALE
+    mmu.process_host_data()
+    host_dics = mmu.list_hosts(page = page)
+    for host_dic in host_dics:
+        host_dic.pop("_id")
 
     return host_dics
 
+def urls_handler(host = None):
+    """Put together host documents for use with hosts endpoint """
+
+    mmu = MemexMongoUtils()
+    url_dics = mmu.list_urls(host = host)
+
+    for url_dic in url_dics:
+        url_dic.pop("_id")
+
+    return url_dics
+
 if __name__ == "__main__":
-    print hosts_handler()
+#    for x in hosts_handler():
+#        print x["host"]
+
+    for x in hosts_handler(page = 3):
+        print x["host"]
+#    for x in urls_handler():
+#        print x["url"]
