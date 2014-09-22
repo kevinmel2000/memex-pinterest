@@ -135,7 +135,7 @@ public class WordCountMapper extends MapReduceBase implements Mapper<Object, Tex
 	}
 
 	private int score(Map<String, Integer> matches) throws IOException {
-		int score = 0;
+		int score = 1;
 		for (Entry<String, Integer> entry : matches.entrySet()) {
 			score *= WeightedKeyword.getDefinedWeightedWords().get(entry.getKey()) * entry.getValue();
 		}
