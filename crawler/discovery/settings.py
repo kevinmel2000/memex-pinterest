@@ -18,8 +18,8 @@ DOWNLOADER_MIDDLEWARES = {
 ROBOTS_CRAWLDELAY_ENABLED = True
 AUTOTHROTTLE_ENABLED = False  # it doesn't play well with RobotsCrawlDelayMiddleware
 
-DEPTH_STATS_VERBOSE = True
 MEMUSAGE_ENABLED = True
+DEPTH_STATS_VERBOSE = True
 DEPTH_PRIORITY = True
 DEPTH_LIMIT = 6  # make sure to adjust this when changing depth-related spider attributes
 AJAXCRAWL_ENABLED = True

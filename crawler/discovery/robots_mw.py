@@ -125,7 +125,7 @@ class RobotsCrawlDelayMiddleware(object):
         if delay != slot.delay:
             log.msg("Adjusting delay for %s: %0.2f -> %0.2f" % (key, slot.delay, delay), logging.DEBUG)
             slot.delay = delay
-            self.crawler.stats.set_value('robots.txt/crawl-delay/%s' % key, delay)
+        self.crawler.stats.set_value('robots.txt/crawl-delay/%s' % key, delay)
 
     def _get_slot(self, request_or_response, spider):
         return self.crawler.engine.downloader._get_slot(request_or_response, spider)
