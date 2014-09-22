@@ -10,7 +10,7 @@ import org.apache.hadoop.thirdparty.guava.common.collect.Maps;
 
 public class WeightedKeyword {
 
-	private static final String KEYWORDS = "/home/tomas/Work/work/Proyecto/memex/git/memex-hackathon-1/common-crawl/src/com/hyperiongray/s3wordcount/data/keywords";
+	private static final String KEYWORDS = "/home/tomas/Work/work/Proyecto/memex/git/memex-hackathon-1/common-crawl/src/com/hyperiongray/s3wordcount/data/keywords/keywords";
 	private static Map<String, Integer> definedWeightedWords;
 
 	public static synchronized Map<String, Integer> getDefinedWeightedWords2() {
@@ -35,7 +35,7 @@ public class WeightedKeyword {
 			definedWeightedWords = Maps.newHashMap();
 			for(String line :lines){
 				String[] split = line.split(",");
-				definedWeightedWords.put(split[0], Integer.valueOf(split[1]));
+				definedWeightedWords.put(split[0].trim(), Integer.valueOf(split[1]));
 			}
 		}
 		return definedWeightedWords;

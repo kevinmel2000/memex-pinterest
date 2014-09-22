@@ -44,6 +44,7 @@ import org.jets3t.service.model.S3Object;
 
 public class WordCountMapper extends MapReduceBase implements Mapper<Object, Text, Text, IntWritable> {
 
+
 	public void map(Object key, Text value, OutputCollector<Text, IntWritable> outputCollector, Reporter reporter) throws IOException {
 
 		// We're accessing a publicly available bucket so don't need to fill in our credentials
@@ -99,14 +100,14 @@ public class WordCountMapper extends MapReduceBase implements Mapper<Object, Tex
 				Map<String, Integer> matchedContents = this.matchContent(content);
 				int score = score(matchedContents);
 
-				if(score>20)
+				if(score>0)
 					outputCollector.collect(new Text(url), new IntWritable(score));
 
 				//				Map<Text,Text> map = Maps.newHashMap();
 				//				map.put(new Text("score"), new Text(String.valueOf(score)));
 				//				outputCollector.collect(new Text(url), map);
 
-				if (i++ > 1000)
+				if (i++ > 10000)
 					break;
 			}
 		} catch (S3ServiceException e) {
@@ -121,12 +122,14 @@ public class WordCountMapper extends MapReduceBase implements Mapper<Object, Tex
 		for (String keyword : WeightedKeyword.getDefinedWeightedWords().keySet()) {
 			Pattern pattern = Pattern.compile(keyword, Pattern.CASE_INSENSITIVE);
 			Matcher matcher = pattern.matcher(content);
-			int counter = 0;
-			while (matcher.find()) {
-				counter++;
-			}
-			if (counter > 0)
-				matches.put(keyword, counter);
+//			int counter = 0;
+//			while (matcher.find()) {
+//				counter++;
+//			}
+//			if (counter > 0)
+//				matches.put(keyword, counter);
+			if (matcher.find())
+				matches.put(keyword, 1);
 		}
 		return matches;
 	}
@@ -134,7 +137,7 @@ public class WordCountMapper extends MapReduceBase implements Mapper<Object, Tex
 	private int score(Map<String, Integer> matches) throws IOException {
 		int score = 0;
 		for (Entry<String, Integer> entry : matches.entrySet()) {
-			score += WeightedKeyword.getDefinedWeightedWords().get(entry.getKey()) * entry.getValue();
+			score *= WeightedKeyword.getDefinedWeightedWords().get(entry.getKey()) * entry.getValue();
 		}
 		return score;
 	}

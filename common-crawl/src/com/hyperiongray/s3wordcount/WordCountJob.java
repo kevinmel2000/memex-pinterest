@@ -17,16 +17,18 @@ import com.hyperiongray.examples.google.AnagramJob;
 
 public class WordCountJob {
 
+	private static final String OUTPUT_DIR = "/home/tomas/Work/work/Proyecto/memex/git/memex-hackathon-1/common-crawl/src/com/hyperiongray/s3wordcount/data/output";
+
 	public static void main(String[] args) throws Exception {
 
-		File file = new File("/home/tomas/Work/work/Proyecto/memex/git/cc-warc-examples/src/com/hyperiongray/s3wordcount/data/output");
+		File file = new File(OUTPUT_DIR);
 		FileUtils.deleteQuietly(file);
 		
 		JobConf conf = new JobConf(AnagramJob.class);
 		conf.setJobName("s3wordcount");
 
 		conf.setMapperClass(WordCountMapper.class);
-		conf.setNumMapTasks(1);
+		conf.setNumMapTasks(3);
 
 		conf.setReducerClass(WordCountReducer.class);
 		conf.setNumReduceTasks(1);
