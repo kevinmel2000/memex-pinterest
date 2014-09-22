@@ -99,7 +99,8 @@ public class WordCountMapper extends MapReduceBase implements Mapper<Object, Tex
 				Map<String, Integer> matchedContents = this.matchContent(content);
 				int score = score(matchedContents);
 
-				outputCollector.collect(new Text(url), new IntWritable(score));
+				if(score>20)
+					outputCollector.collect(new Text(url), new IntWritable(score));
 
 				//				Map<Text,Text> map = Maps.newHashMap();
 				//				map.put(new Text("score"), new Text(String.valueOf(score)));
