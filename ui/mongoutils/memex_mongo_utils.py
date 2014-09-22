@@ -57,9 +57,9 @@ class MemexMongoUtils(object):
             
         return list(docs)
 
-    def list_all_urls(self):
+    def list_all_urls(self, sort_by = "host"):
 
-        docs = self.urlinfo_collection.find()
+        docs = self.urlinfo_collection.find().sort(sort_by, 1)
 
         return list(docs)
 
