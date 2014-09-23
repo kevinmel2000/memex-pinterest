@@ -43,24 +43,26 @@ import org.jets3t.service.S3Service;
 import org.jets3t.service.S3ServiceException;
 import org.jets3t.service.impl.rest.httpclient.RestS3Service;
 import org.jets3t.service.model.S3Object;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class WordCountOnlyMapper extends MapReduceBase implements Mapper<Object, Text, NullWritable, Text> {
+	private static final Logger logger = LoggerFactory.getLogger(WordCountOnlyMapper.class);
 
 	private static final int LOWER_SCORE_THRESHOLD = 5;
 
 	private static final Pattern pattern = Pattern.compile("<title>(.+?)</title>", Pattern.CASE_INSENSITIVE);
 	private OutputParser outputParser = new OutputParser();
 	private WeightedKeyword weightedKeyword;
-	
+
 	public void configure(JobConf job) {
-		 String keywordsfileContent = job.get("keywordsFileContent");
-		 weightedKeyword = new WeightedKeyword(keywordsfileContent);
+		String keywordsfileContent = job.get("keywordsFileContent");
+		weightedKeyword = new WeightedKeyword(keywordsfileContent);
 	}
 
-
-//    protected void setup(org.apache.hadoop.mapreduce.Mapper.Context context) {
-//
-//    }
+	// protected void setup(org.apache.hadoop.mapreduce.Mapper.Context context) {
+	//
+	// }
 	public void map(Object key, Text value, OutputCollector<NullWritable, Text> outputCollector, Reporter reporter) throws IOException {
 
 		// We're accessing a publicly available bucket so don't need to fill in
@@ -71,7 +73,7 @@ public class WordCountOnlyMapper extends MapReduceBase implements Mapper<Object,
 
 			// Let's grab a file out of the CommonCrawl S3 bucket
 			String fn = value.toString();
-			System.out.println(fn);
+			logger.info(fn);
 
 			S3Object f = s3s.getObject("aws-publicdatasets", fn, null, null, null, null, null, null);
 
@@ -80,20 +82,21 @@ public class WordCountOnlyMapper extends MapReduceBase implements Mapper<Object,
 			ar = WARCReaderFactory.get(fn, f.getDataInputStream(), true);
 
 		} catch (S3ServiceException e) {
-			e.printStackTrace();
+			logger.error("S3 connection Failed", e);
 			throw new RuntimeException(e);
 		}
 
 		// Once we have an ArchiveReader, we can work through each of the
 		// records it contains
 		int i = 0;
-		System.out.println("Started" + new Date());
+		logger.info("Started" + new Date());
 		for (ArchiveRecord r : ar) {
 
+			String url = "";
 			try {
 				// The header file contains information such as the type of
 				// record, size, creation time, and URL
-				String url = r.getHeader().getUrl();
+				url = r.getHeader().getUrl();
 				String crawledDate = r.getHeader().getDate();
 				if (url == null)
 					continue;
@@ -110,7 +113,7 @@ public class WordCountOnlyMapper extends MapReduceBase implements Mapper<Object,
 						if (r != null)
 							r.close();
 					} catch (Exception e) {
-						System.out.println(e);
+						logger.error("reading inputstream Failed", e);
 					}
 				}
 				// Note: potential optimization would be to have a large buffer
@@ -124,20 +127,22 @@ public class WordCountOnlyMapper extends MapReduceBase implements Mapper<Object,
 				int score = score(matches);
 
 				if (score > LOWER_SCORE_THRESHOLD) {
-					System.out.println("****************************************");
-					System.out.println("URL: " + url + " Score: " + score + " Detail: " + matches);
+
+					logger.info("****************************************");
+					logger.info("URL: " + url + " Score: " + score + " Detail: " + matches);
 					// outputCollector.collect(new IntWritable(score), new Text(url));
 					outputCollector.collect(NullWritable.get(),
 							new Text(outputParser.parse(this.getTitle(content), url, crawledDate, score, matches)));
 				}
-				System.out.println(i);
-				if (i++ > 1000000) {
-					System.out.println("Finished " + new Date());
+				logger.debug(new Integer(i).toString());
+
+				if (i++ > 100) {
+					logger.info("Finished " + new Date());
 					break;
 				}
 
 			} catch (Exception e) {
-				System.out.println(e);
+				logger.error("url failed " + url, e);
 			}
 		}
 
