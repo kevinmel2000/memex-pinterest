@@ -123,10 +123,10 @@ public class WordCountMapper extends MapReduceBase implements Mapper<Object, Tex
 	public Map<String, Integer> matchContent(String content) throws IOException {
 		Map<String, Integer> matches = Maps.newHashMap();
 		for (String keyword : WeightedKeyword.getDefinedWeightedWords().keySet()) {
-			 String escapedKeyword = java.util.regex.Matcher.quoteReplacement(keyword);
-			 escapedKeyword = Pattern.quote(escapedKeyword);
+//			 String escapedKeyword = java.util.regex.Matcher.quoteReplacement(keyword);
+			String escapedKeyword = Pattern.quote(keyword);
 			
-			Pattern pattern = Pattern.compile("\\w" + escapedKeyword + "\\w", Pattern.CASE_INSENSITIVE);
+			Pattern pattern = Pattern.compile("\\b" + escapedKeyword +"\\b", Pattern.CASE_INSENSITIVE);
 			Matcher matcher = pattern.matcher(content);
 //			int counter = 0;
 //			while (matcher.find()) {

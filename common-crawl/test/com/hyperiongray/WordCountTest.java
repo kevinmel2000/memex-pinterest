@@ -27,8 +27,8 @@ public class WordCountTest {
 			dealnews.com	{http://dealnews.com/c196/Home-Garden/=60}
 			docs.oracle.com	{http://docs.oracle.com/cd/E18283_01/appdev.112/e16760/toc.htm=125}
 */
-//		String url = "http://nymag.com/daily/intelligencer/2013/04/barry-diller-newsweek-was-a-mistake.html";
-		String url = "http://charlibella.rare-playmate.com/faq-32431-bbbjtcim.php";
+		String url = "http://nymag.com/daily/intelligencer/2013/04/barry-diller-newsweek-was-a-mistake.html";
+//		String url = "http://charlibella.rare-playmate.com/faq-32431-bbbjtcim.php";
 			
 		String content = httpConnector.getContent(url);
 		try {
