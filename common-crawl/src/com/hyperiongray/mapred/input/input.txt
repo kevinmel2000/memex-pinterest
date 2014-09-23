@@ -1,0 +1,1347 @@
+Memex
+Room actions
+Mikhail Korobov
+Sep-18 5:21 PM
+I'm not sure that wordcount on links from existing websites will be that helpful - is it common for these websites to be connected via direct links to each other, and if they are connected is there a new information? We should probably check that before going this route
+Alejandro Caceres
+Sep-18 5:21 PM
+yeah, that's a very good point
+Alejandro Caceres
+Sep-18 5:22 PM
+the answer is: I have no idea
+Alejandro Caceres
+Sep-18 5:23 PM
+so we will have to either (1) figure it out before we build it or (2) build it and see how it works, since it's a relatively low effort task, it might just produce the conclusion that "this doesn't work well because of x" and that is useful data to have
+Alejandro Caceres
+Sep-18 5:23 PM
+OR we can find something better to do
+Amanda Towler
+Sep-18 5:23 PM
+I think it will depend on the site
+Alejandro Caceres
+Sep-18 5:23 PM
+i'm not sure about that one either
+Amanda Towler
+Sep-18 5:23 PM
+for the ad sites, it is common
+Alejandro Caceres
+Sep-18 5:24 PM
+oh you know what, it would be really common on those "john review" sites that review the "performance" of the advertised services
+Amanda Towler
+Sep-18 5:24 PM
+the ad will say, my name is blah, this is what i do, check out my page on website XYZ for more pictures
+Alejandro Caceres
+Sep-18 5:24 PM
+i imagine a lot of them write the review and then link to the service they are reviewing
+Amanda Towler
+Sep-18 5:24 PM
+yeah @AlejandroCaceres that will contain links too
+Mikhail Korobov
+Sep-18 5:25 PM
+actually browser extension grows on me :) to do it properly we need to detect explicit images; detecting images with people (via Will's face detector?) is a good approximation. The problem is that it should be done either in a browser (js) or via API calls to a separate server. And the thing is that API for detecting explicit images is useful even outside browser extension; there are some challenges to make it fast.
+Mikhail Korobov
+Sep-18 5:25 PM
+that's a good point about review websites
+Mikhail Korobov
+Sep-18 5:28 PM
+@Amanda my concern is that websites can link to each other to form a "link farm", and they can contain 99% duplicated information
+Alejandro Caceres
+Sep-18 5:29 PM
+what are you picturing for a browser extension?
+Mikhail Korobov
+Sep-18 5:31 PM
+a fun testbed for an HTTP API server that detects explicit images
+Mikhail Korobov
+Sep-18 5:32 PM
+i don't quite get an idiom in the question, sorry :)
+Alejandro Caceres
+Sep-18 5:32 PM
+no no that makes sense, one thing to keep in mind though: a lot of these places actually don't have a lot of explicit images in them
+Alejandro Caceres
+Sep-18 5:33 PM
+a lot of them will just say sort of cryptic things about services and weird terms that have coded meanings
+Mikhail Korobov
+Sep-18 5:34 PM
+yes, explicit content is just one piece in a puzzle
+Mikhail Korobov
+Sep-18 5:34 PM
+maybe I should check more websites from the initial list to get a better idea about what we're working with
+Alejandro Caceres
+Sep-18 5:36 PM
+that makes sense, yeah explicit content can be a piece of the puzzle you're right. Only reason I am hesitant to do too much of it in this hack-a-thon is that we want to establish ourselves as the crawling/scraping team
+Mikhail Korobov
+Sep-18 5:37 PM
+i see
+Alejandro Caceres
+Sep-18 5:37 PM
+so I want to make sure we deliver stuff that is going to be most useful in that space
+Mikhail Korobov
+Sep-18 5:37 PM
+and this makes sense
+Alejandro Caceres
+Sep-18 5:37 PM
+there's a ton of teams doing analysis, specifically image analysis, that will probably have some really sophisticated stuff
+Alejandro Caceres
+Sep-18 5:39 PM
+actually the location stuff doesn't fall well into that either
+Alejandro Caceres
+Sep-18 5:39 PM
+(i am being told by amanda and tomas)
+Mikhail Korobov
+Sep-18 5:43 PM
+I think that at ScrapingHub crawling is not sophisticated, it is just polished. We're going in circles: crawling is already done in the prototype, and it is not good to rewrite it, so we're trying to do something else while still establishing ourselves as a crawling/scraping team
+Alejandro Caceres
+Sep-18 5:45 PM
+yep, that's right
+Amanda Towler
+Sep-18 5:48 PM
+I think the two word-count ideas are pretty solid
+Alejandro Caceres
+Sep-18 5:48 PM
+yeah i think that's where we're gravitating towards
+Amanda Towler
+Sep-18 5:48 PM
+they both relate to the objective "find more relevant sites"
+Amanda Towler
+Sep-18 5:48 PM
+they are complimentary
+Amanda Towler
+Sep-18 5:49 PM
+they can be done pretty quickly but are still technically impressive
+Alejandro Caceres
+Sep-18 5:51 PM
+@Tomas on common crawl, @Mikhail and @AlejandroCaceres and @Mateusz on a crawler service to find the number of sex ad terms in a site + GUI to look at the results
+Mikhail Korobov
+Sep-18 5:51 PM
+agreed
+Amanda Towler
+Sep-18 5:51 PM
+we don't have to start coding just yet, so let's put these two projects in the "Yes" bin and we'll come up with a few more tomorrow
+Alejandro Caceres
+Sep-18 5:51 PM
+yeah, i think these two are more than enough most likely
+Mikhail Korobov
+Sep-18 5:52 PM
+are there other people participating in coding?
+Amanda Towler
+Sep-18 5:52 PM
+Next week we will have @Mark and @Will here in person
+Amanda Towler
+Sep-18 5:53 PM
+and hopefully yourself!
+Alejandro Caceres
+Sep-18 5:53 PM
+yeah, but we want to have something solid by Monday
+Amanda Towler
+Sep-18 5:54 PM
+By "solid" you mean a concrete plan
+Alejandro Caceres
+Sep-18 5:54 PM
+umm
+Amanda Towler
+Sep-18 5:54 PM
+and some code
+Alejandro Caceres
+Sep-18 5:54 PM
+no, i'd like to have some working code
+Mikhail Korobov
+Sep-18 5:54 PM
+some solid working code?
+Amanda Towler
+Sep-18 5:54 PM
+haha yes, you speak English better than we do
+Will Hickie
+3:45 PM
+I have a toolkit I use, and it try's a bunch of different models to determine which looks best (random forests, NN, boosting, linear classifier, etc..)
+Friday September 19, 2014
+Will Hickie
+3:43 PM
+Yes. And other things.  Behavior analysis.
+Friday September 19, 2014
+Mikhail Korobov
+3:41 PM
+neural networks are very successful in image processing - is it what you've used them for?
+Friday September 19, 2014
+Mikhail Korobov
+3:38 PM
+I think that for a prototype some simple & inspectable classifier could be better; with linear classifer we can use just word counts and check which weights are important - and e.g. compare them with terms provided by experts, this might provide some insights
+Friday September 19, 2014
+Will Hickie
+3:36 PM
+Maybe something we can investigate later. Once we have our own data.
+Friday September 19, 2014
+Will Hickie
+3:35 PM
+I use them, but never for document classification.
+Friday September 19, 2014
+Mikhail Korobov
+3:34 PM
+my experience with neural networks is very limited; I took an online course and read several papers, but they are not in my toolbelt
+Friday September 19, 2014
+Mikhail Korobov
+3:33 PM
+@Will I haven't used them in practice
+Friday September 19, 2014
+Will Hickie
+3:32 PM
+Ah. Okay.  Are yu familiar with deep belief networks?  They're another unsupervised algorithm.
+Friday September 19, 2014
+Mikhail Korobov
+3:30 PM
+@Will http://en.wikipedia.org/wiki/Latent_semantic_indexing
+Friday September 19, 2014
+Mikhail Korobov
+3:30 PM
+django admin also saves you from writing UI code, CSS/HTML / table rendering / auth is for free :) But you're right that such kind of systems are easy to build with any reasonable tool; Flask is fine.
+Friday September 19, 2014
+Will Hickie
+3:30 PM
+@Mikhail what is LSI?
+Friday September 19, 2014
+Amanda Towler
+3:29 PM
+brb
+Friday September 19, 2014
+Amanda Towler
+3:28 PM
+Bridge number: 1-866-803-2146
+Participant Number: 21572302#
+Friday September 19, 2014
+Amanda Towler
+3:28 PM
+DAily sync phone call now:
+Friday September 19, 2014
+Alejandro Caceres
+3:27 PM
+think we can do it?
+Friday September 19, 2014
+Alejandro Caceres
+3:27 PM
+anyway specifics like that aside
+Friday September 19, 2014
+Alejandro Caceres
+3:27 PM
+which actually gives you sorting + search reasonably easily
+Friday September 19, 2014
+Alejandro Caceres
+3:26 PM
+i was basically just going to write a Flask + Mongo application
+Friday September 19, 2014
+Mikhail Korobov
+3:26 PM
+given that we store data in some DB that is supported by django ORM
+Friday September 19, 2014
+Alejandro Caceres
+3:26 PM
+but it's a micro-framework so i have to write all of that stuff
+Friday September 19, 2014
+Alejandro Caceres
+3:26 PM
+oh yeah? i was starting to use Flask already
+Friday September 19, 2014
+Mikhail Korobov
+3:25 PM
+you can enable an "interesting/not interesting" checkbox in a list of found items in a couple lines of code
+Friday September 19, 2014
+Mikhail Korobov
+3:25 PM
+for such quick interfaces I usually use django admin :) it gets you editing & sorting & search for free
+Friday September 19, 2014
+Alejandro Caceres
+3:24 PM
+but if you think we can do it, i am totally up for it
+Friday September 19, 2014
+Alejandro Caceres
+3:24 PM
+i'm just worried that writing the API endpoints + API calls from the client side to train the system may get a bit time consuming for us
+Friday September 19, 2014
+Mikhail Korobov
+3:24 PM
+classifier returns a probability, so we can save all data
+Friday September 19, 2014
+Alejandro Caceres
+3:24 PM
+your idea works really well with this actually, because interesting and not interesting could be used to train the system
+Friday September 19, 2014
+Alejandro Caceres
+3:23 PM
+i was just picturing "not interesting" will discard website, interesting will be saved somewhere for later review or something like that
+Friday September 19, 2014
+Alejandro Caceres
+3:23 PM
+exactly. we want to create a browser interface that will display the websites found via a crawl in an intuitive way. And mark them as "interesting" or "not interesting" based on scoring
+Friday September 19, 2014
+Mikhail Korobov
+3:23 PM
+i see, so we're building a tool for analyst, not just a tool to extract the data for analyst, got it
+Friday September 19, 2014
+Alejandro Caceres
+3:22 PM
+we don't want to just grab a bunch of data and put it in a spreadsheet, or, you're right, we are just creating a bunch of data for them to go through
+Friday September 19, 2014
+Alejandro Caceres
+3:21 PM
+there is a browser user interface component we are building to this
+Friday September 19, 2014
+Alejandro Caceres
+3:21 PM
+ah so one thing i think you may be missing
+Friday September 19, 2014
+Mikhail Korobov
+3:21 PM
+such classification can be more useful for commoncrawl though
+Friday September 19, 2014
+Mikhail Korobov
+3:21 PM
+but there only so much websites we can discover
+Friday September 19, 2014
+Mikhail Korobov
+3:20 PM
+ah, that's more than a hour
+Friday September 19, 2014
+Mikhail Korobov
+3:20 PM
+for (1) google spreadsheet is fine
+Friday September 19, 2014
+Mikhail Korobov
+3:20 PM
+i also have a concern - is the analyst work really a bottleneck? if we can discover e.g. 1000 websites using our crawling approach, and it takes 10s to mark a website as interesting/not interesting by human, we'll save less than an hour of work after jumping through all the hoops
+Friday September 19, 2014
+Alejandro Caceres
+3:19 PM
+(1) is my main concern
+Friday September 19, 2014
+Alejandro Caceres
+3:19 PM
+and (2) it starts moving slightly into the domain of others, there are a *lot* of machine learning people here. This is less of a concern because it has a lot of elements of crawling and scraping as well
+Friday September 19, 2014
+Alejandro Caceres
+3:18 PM
+my two concerns: (1) we have to build a very simple and intuitive UI that interacts with this, I'm not familiar with how we will be doing this. Will you be building  a web service I can use to mark something as interesting or not interesting? Will you have to build a database of this information? This sounds like it might put us over the timeline
+Friday September 19, 2014
+Mikhail Korobov
+3:18 PM
+we won't sentence anyone with this classifier, its goal is to just remove some noise :)
+Friday September 19, 2014
+Alejandro Caceres
+3:17 PM
+yeah that makes sense
+Friday September 19, 2014
+Mikhail Korobov
+3:17 PM
+we don't need to detect HT here; I think that just marking pages as "totally not interesting /possibly interesting" is also fine for a demo
+Friday September 19, 2014
+Alejandro Caceres
+3:17 PM
+two concerns I have:
+Friday September 19, 2014
+Amanda Towler
+3:17 PM
+ok
+Friday September 19, 2014
+Alejandro Caceres
+3:17 PM
+and they can train it from there
+Friday September 19, 2014
+Alejandro Caceres
+10:43 AM
+Edit to the "Plan" section. We will base our work on the assumption that we can write a scoring function comprising of weighted values to certain words that indicate potential sex trafficking. Forget that  "at least one other attribute" sentence
+Friday September 19, 2014
+Alejandro Caceres
+10:40 AM
+Plan: we aim to make the process of identifying new sites with potential sex trafficking a faster, more automated process. 
+We're going to try two approaches to this and see how it works out for us. We're going to base our work on the hack-a-thon on the assumption
+that advertisements for sex have a higher occurrence of words related to describing sex workers and at least one other
+attribute involving contacting someone (phone number, email) for sex. We will take two approaches to identifying sites:
+
+1) Undirected extraction and analysis of Common Crawl data over Hadoop- We'll take the common crawl data and conduct 
+a weighted count of the words on the page, giving words more likely to be of interest to us (determined via manual
+analysis of common sex worker terms). These will be presented on a simple GUI that gives the following to the user: (a)
+the "sex trafficking likelihood score" for a specific domain, a bit of context information about where each word was found 
+(for example we can dump 25-30 characters around where the word was matched), and the ability for a user to mark these
+as "interesting" or "not interesting" to them.
+
+2) Directed crawling and extraction/analysis of live web data using scrapy spiders - The goal will be similar to the
+above with one key difference: we'll be working with live data on the web. The goal here will be to allow a user to
+make a quick but *somewhat informed* decision on whether a website is worth taking a closer look at. The system should be
+able to crawl and perform extraction and analysis of a website with based on terms of interest (the same ones as used in item (1)).
+The end result should be three things: (a) a web service that allows a user to specify a set of urls,
+crawl them (looking for additional domains and URLs), and return the same thing as in (1), in a nice JSON format. That is, we aim to return the "sex trafficking likelihood score"
+as well as context information around the matched keywords and (b) A pretty GUI that is able to be used to specify a set of urls 
+you'd like to crawl to discover new stuff and score (c) we'd like to run this on a subset of the URLs already discovered
+by the current system (manually).
+
+Some other notes:
+
+- We need to crawl very politely (respect crawl delay in robots.txt, we don't have to respect anything else in there)
+
+- We can't hit the already existing sites all at once or quickly (see above)
+
+- The above are two totally separate systems, just with similar concepts, the first will use Java to write
+  mapper/reducer to analyze the data the second will be Scrapy-based Daemon
+
+- Data storage will be in MongoDB, any objections!?
+
+Who does what:
+
+- Amanda will be working on the scoring for the individual terms, provide accounts to whatever we need (AWS etc.)
+
+- Tomas will work on the Hadoop jobs and additional code for item (1) <--- including Java page scoring code
+
+- Mikhail will work on the crawling and extraction for item (2) <--- does not include page scoring, see below item
+  Bonus: do something useful with Splash, it doesn't matter what but it would be cool to have some browser functionality
+  in here since we talked about it in our presentation. I know it seems arbitrary, but this is as much about trying
+  to establish ourselves as a team with a purpose as it is about the code
+
+- Alejandro will translate Amanda's scoring stuff into a Python scoring function (input page content, output score and context information),
+  Alejandro will get MongoDB up and running and work on the GUI code.
+
+- For everyone: make sure code is written such that the analysis we are doing can be extended or switched out for
+  other types of analysis. Content should go to a module for analysis, this is most important.
+
+Anyone think we can't get this done or need to reduce the scope?
+Show full text
+Friday September 19, 2014
+Alejandro Caceres
+10:40 AM
+now the moment you've all been waiting for:
+Friday September 19, 2014
+Tomas Fornara
+9:26 AM
+hello everybody
+Friday September 19, 2014
+Alejandro Caceres
+9:25 AM
+good morning !
+Friday September 19, 2014
+Amanda Towler
+9:25 AM
+(or evening... or middle of the night...)
+Friday September 19, 2014
+Amanda Towler
+9:25 AM
+Good Morning everyone!
+Friday September 19, 2014
+Alejandro Caceres
+Sep-18 6:21 PM
+yeah for sure! the hardest part is always figuring out what to build, once we have that the rest is easy
+Mikhail Korobov
+Sep-18 6:18 PM
+it was a nice brainstorm, thank you - it seems things are becoming clear
+Mikhail Korobov
+Sep-18 6:17 PM
+great, I'll try to think about it all in a "background mode" once again
+Alejandro Caceres
+Sep-18 6:17 PM
+thanks for helping us brainstorm
+Alejandro Caceres
+Sep-18 6:17 PM
+we are wrapping up here and will have more concrete stuff tomorrow
+Alejandro Caceres
+Sep-18 6:16 PM
+dang, yeah feel free to jump offline anytime
+Mikhail Korobov
+Sep-18 6:16 PM
+4am, my sleep habits are broken, but I'll go offline soon :)
+Amanda Towler
+Sep-18 6:15 PM
+ok
+Amanda Towler
+Sep-18 6:15 PM
+hahaha
+Alejandro Caceres
+Sep-18 6:15 PM
+what time is it for you over there?
+Mikhail Korobov
+Sep-18 6:15 PM
+@Amanda video can be great from time to time, but 95%+ text is fine - time zones, you know, my wife is sleeping so voice is not a good option :)
+Mikhail Korobov
+Sep-18 6:11 PM
+yes, so there is no an easy answer
+Alejandro Caceres
+Sep-18 6:11 PM
+right yeah that makes sense, it would depend on what you're trying to get at
+Mikhail Korobov
+Sep-18 6:11 PM
+e.g. disqus comments
+Mikhail Korobov
+Sep-18 6:10 PM
+some information can be available without js executed while other may require js
+Mikhail Korobov
+Sep-18 6:10 PM
+this depends on information you want to extract
+Alejandro Caceres
+Sep-18 6:09 PM
+it seems like it'd be a fun project, to try to build something that reasonably reliably guesses if Splash would be effective or needed
+Alejandro Caceres
+Sep-18 6:09 PM
+yeah, that makes sense
+Mikhail Korobov
+Sep-18 6:08 PM
+if there are e.g. 100 websites and there is a spider for each website it is easier to answer 100 yes/no questions manually, there is not a lot of things to automate
+Mikhail Korobov
+Sep-18 6:07 PM
+for "broad" crawls it may be possible to decide automatically if splash is needed or not, but we haven't done this
+Mikhail Korobov
+Sep-18 6:06 PM
+(but i don't recall compared to what the page changes)
+Mikhail Korobov
+Sep-18 6:06 PM
+in one project i've seen a code that makes a request to Splash if page changes to make a screenshot
+Mikhail Korobov
+Sep-18 6:06 PM
+:) regarding Splash: I'm not a heavy *user* of Splash, but other guys are; it seems that we often use it for "focused" crawls when domains are known and you know for sure if it is required or not.
+Alejandro Caceres
+Sep-18 6:03 PM
+nevermind my commentary
+Alejandro Caceres
+Sep-18 6:03 PM
+you said you shouldn't have
+Alejandro Caceres
+Sep-18 6:03 PM
+oh wait
+Alejandro Caceres
+Sep-18 6:03 PM
+haha dude, you should *always* wear the brown sweater. You know better than to not wear it!
+Alejandro Caceres
+Sep-18 6:02 PM
+when you actually implement it for customers, how do you determine if Splash is useful for rendering of a page? Is this possible to do somewhat reliably automatically (if splash needed, request from splash, else use scrapy core)?
+Mikhail Korobov
+Sep-18 6:02 PM
+@AlejandroCaceres feel free to ask anything
+Mikhail Korobov
+Sep-18 6:01 PM
+i shouldn't have worn a brown sweater and shouldn't have told "advanced research" to the consul - he decided I'm kind of scientist and this makes visa processing 10x long
+Amanda Towler
+Sep-18 6:01 PM
+we can enable video chat too
+Alejandro Caceres
+Sep-18 6:01 PM
+@Mikhail quick question about Splash
+Amanda Towler
+Sep-18 6:01 PM
+but at least you are going to be involved with us here
+Amanda Towler
+Sep-18 6:01 PM
+(sadtroll)
+Alejandro Caceres
+Sep-18 6:00 PM
+ah that sucks
+Mikhail Korobov
+Sep-18 5:59 PM
+ehh, there are still no good news about my visa; currently tickets are for 20 Sep, but I'll have to change or cancel them again if there won't be any updates tomorrow. I think there is ~25% chance for me to come; don't count on it much
+Alejandro Caceres
+Sep-18 5:56 PM
+hipchat emojis: http://hipchat-emoticons.nyh.name/
+Alejandro Caceres
+Sep-18 5:56 PM
+(goodnews)
+Amanda Towler
+Sep-18 5:55 PM
+just to be clear
+Mikhail Korobov
+Sep-18 5:55 PM
+:P
+Amanda Towler
+Sep-18 5:55 PM
+that is what next week is dedicated to
+Amanda Towler
+Sep-18 5:55 PM
+BUT we don't have to have a fully functioning system by Monday
+Alejandro Caceres
+Sep-18 5:54 PM
+haha yeah
+Alejandro Caceres
+Sep-18 5:54 PM
+haha yeah
+Amanda Towler
+Sep-18 5:55 PM
+BUT we don't have to have a fully functioning system by Monday
+that is what next week is dedicated to
+Mikhail Korobov
+Sep-18 5:55 PM
+:p
+Amanda Towler
+Sep-18 5:55 PM
+just to be clear
+Alejandro Caceres
+Sep-18 5:56 PM
+(goodnews)
+hipchat emojis: http://hipchat-emoticons.nyh.name/
+Mikhail Korobov
+Sep-18 5:59 PM
+ehh, there are still no good news about my visa; currently tickets are for 20 Sep, but I'll have to change or cancel them again if there won't be any updates tomorrow. I think there is ~25% chance for me to come; don't count on it much
+Alejandro Caceres
+Sep-18 6:00 PM
+ah that sucks
+Amanda Towler
+Sep-18 6:01 PM
+(sadtroll)
+but at least you are going to be involved with us here
+Alejandro Caceres
+Sep-18 6:01 PM
+@Mikhail quick question about Splash
+Amanda Towler
+Sep-18 6:01 PM
+we can enable video chat too
+Mikhail Korobov
+Sep-18 6:01 PM
+i shouldn't have worn a brown sweater and shouldn't have told "advanced research" to the consul - he decided I'm kind of scientist and this makes visa processing 10x long
+@AlejandroCaceres feel free to ask anything
+Alejandro Caceres
+Sep-18 6:02 PM
+when you actually implement it for customers, how do you determine if Splash is useful for rendering of a page? Is this possible to do somewhat reliably automatically (if splash needed, request from splash, else use scrapy core)?
+haha dude, you should *always* wear the brown sweater. You know better than to not wear it!
+oh wait
+you said you shouldn't have
+nevermind my commentary
+Mikhail Korobov
+Sep-18 6:06 PM
+:) regarding Splash: I'm not a heavy *user* of Splash, but other guys are; it seems that we often use it for "focused" crawls when domains are known and you know for sure if it is required or not.
+in one project i've seen a code that makes a request to Splash if page changes to make a screenshot
+(but i don't recall compared to what the page changes)
+for "broad" crawls it may be possible to decide automatically if splash is needed or not, but we haven't done this
+if there are e.g. 100 websites and there is a spider for each website it is easier to answer 100 yes/no questions manually, there is not a lot of things to automate
+Alejandro Caceres
+Sep-18 6:09 PM
+yeah, that makes sense
+it seems like it'd be a fun project, to try to build something that reasonably reliably guesses if Splash would be effective or needed
+Mikhail Korobov
+Sep-18 6:10 PM
+this depends on information you want to extract
+some information can be available without js executed while other may require js
+e.g. disqus comments
+Alejandro Caceres
+Sep-18 6:11 PM
+right yeah that makes sense, it would depend on what you're trying to get at
+Mikhail Korobov
+Sep-18 6:11 PM
+yes, so there is no an easy answer
+Mikhail Korobov
+Sep-18 6:15 PM
+@Amanda video can be great from time to time, but 95%+ text is fine - time zones, you know, my wife is sleeping so voice is not a good option :)
+Amanda Towler
+Sep-18 6:15 PM
+hahaha
+Alejandro Caceres
+Sep-18 6:15 PM
+what time is it for you over there?
+Amanda Towler
+Sep-18 6:15 PM
+ok
+Mikhail Korobov
+Sep-18 6:16 PM
+4am, my sleep habits are broken, but I'll go offline soon :)
+Alejandro Caceres
+Sep-18 6:16 PM
+dang, yeah feel free to jump offline anytime
+we are wrapping up here and will have more concrete stuff tomorrow
+thanks for helping us brainstorm
+Mikhail Korobov
+Sep-18 6:17 PM
+great, I'll try to think about it all in a "background mode" once again
+it was a nice brainstorm, thank you - it seems things are becoming clear
+Alejandro Caceres
+Sep-18 6:21 PM
+yeah for sure! the hardest part is always figuring out what to build, once we have that the rest is easy
+Friday September 19, 2014
+Amanda Towler
+9:25 AM
+Good Morning everyone!
+(or evening... or middle of the night...)
+Alejandro Caceres
+9:25 AM
+good morning !
+Tomas Fornara
+9:26 AM
+hello everybody
+Alejandro Caceres
+10:40 AM
+now the moment you've all been waiting for:
+Plan: we aim to make the process of identifying new sites with potential sex trafficking a faster, more automated process. 
+We're going to try two approaches to this and see how it works out for us. We're going to base our work on the hack-a-thon on the assumption
+that advertisements for sex have a higher occurrence of words related to describing sex workers and at least one other
+attribute involving contacting someone (phone number, email) for sex. We will take two approaches to identifying sites:
+
+1) Undirected extraction and analysis of Common Crawl data over Hadoop- We'll take the common crawl data and conduct 
+a weighted count of the words on the page, giving words more likely to be of interest to us (determined via manual
+analysis of common sex worker terms). These will be presented on a simple GUI that gives the following to the user: (a)
+the "sex trafficking likelihood score" for a specific domain, a bit of context information about where each word was found 
+(for example we can dump 25-30 characters around where the word was matched), and the ability for a user to mark these
+as "interesting" or "not interesting" to them.
+
+2) Directed crawling and extraction/analysis of live web data using scrapy spiders - The goal will be similar to the
+above with one key difference: we'll be working with live data on the web. The goal here will be to allow a user to
+make a quick but *somewhat informed* decision on whether a website is worth taking a closer look at. The system should be
+able to crawl and perform extraction and analysis of a website with based on terms of interest (the same ones as used in item (1)).
+The end result should be three things: (a) a web service that allows a user to specify a set of urls,
+crawl them (looking for additional domains and URLs), and return the same thing as in (1), in a nice JSON format. That is, we aim to return the "sex trafficking likelihood score"
+as well as context information around the matched keywords and (b) A pretty GUI that is able to be used to specify a set of urls 
+you'd like to crawl to discover new stuff and score (c) we'd like to run this on a subset of the URLs already discovered
+by the current system (manually).
+
+Some other notes:
+
+- We need to crawl very politely (respect crawl delay in robots.txt, we don't have to respect anything else in there)
+
+- We can't hit the already existing sites all at once or quickly (see above)
+
+- The above are two totally separate systems, just with similar concepts, the first will use Java to write
+  mapper/reducer to analyze the data the second will be Scrapy-based Daemon
+
+- Data storage will be in MongoDB, any objections!?
+
+Who does what:
+
+- Amanda will be working on the scoring for the individual terms, provide accounts to whatever we need (AWS etc.)
+
+- Tomas will work on the Hadoop jobs and additional code for item (1) <--- including Java page scoring code
+
+- Mikhail will work on the crawling and extraction for item (2) <--- does not include page scoring, see below item
+  Bonus: do something useful with Splash, it doesn't matter what but it would be cool to have some browser functionality
+  in here since we talked about it in our presentation. I know it seems arbitrary, but this is as much about trying
+  to establish ourselves as a team with a purpose as it is about the code
+
+- Alejandro will translate Amanda's scoring stuff into a Python scoring function (input page content, output score and context information),
+  Alejandro will get MongoDB up and running and work on the GUI code.
+
+- For everyone: make sure code is written such that the analysis we are doing can be extended or switched out for
+  other types of analysis. Content should go to a module for analysis, this is most important.
+
+Anyone think we can't get this done or need to reduce the scope?
+Show full text
+Alejandro Caceres
+10:43 AM
+Edit to the "Plan" section. We will base our work on the assumption that we can write a scoring function comprising of weighted values to certain words that indicate potential sex trafficking. Forget that  "at least one other attribute" sentence
+Welcome!
+You joined the room
+Alejandro Caceres
+12:19 PM
+everyone participating in the hackathon: please send me your github username
+https://github.com/acaceres2176/memex-hackathon-1.git
+git@github.com:acaceres2176/memex-hackathon-1.git
+where we'll store our code
+Alejandro Caceres
+12:22 PM
+additional info: we're going to use Python 2.7.x for Python version, please make sure code is commented and easy to follow!
+for Java, Tomas can do whatever he wants :-)
+Amanda Towler
+12:31 PM
+@atowler
+Amanda Towler
+1:20 PM
+@Tomas http://www.washingtonpost.com/blogs/going-out-guide/wp/2014/09/18/7-things-to-do-in-the-d-c-area-on-...
+Alejandro Caceres
+1:31 PM
+another thing: this one is for @Will . We were just told by one of the people that built the initial system that a really useful thing  would be to have a web service they can hit that answers the question "does this image contain a face". So just a simple boolean, if you can pass that quick and dirty facial recognition stuff, give me usage and I can build a service from it that would be a nice icing on the cake
+Address: 5557 Lemeley Rd NW
+City: Concord
+State: North Carolina (NC)
+ZIP code: 28027
+ 
+1:31 PM
+Will Hickie joined the room.
+Alejandro Caceres
+1:32 PM
+or if you have time and want to build a quick and simple service that would be fine of course - up to you!
+Will Hickie
+1:32 PM
+@AlejandroCaceres okay. Want me to send you some code?
+Alejandro Caceres
+1:32 PM
+sure!
+umm we have a github repo, do you have a github account?
+Will Hickie
+1:33 PM
+I do.  
+Give me a bit and I'll send you my info.  
+Alejandro Caceres
+1:33 PM
+i figure we can use that to share code if that's OK with you
+ok perfect
+i can give you access to the repo we are using and we can  just use that to share stuff
+Will Hickie
+1:40 PM
+Sounds good.
+Amanda Towler
+1:46 PM
+@Will @AlejandroCaceres Specifically images where the face is cropped out, blurred, or obstructed by an icon, a mask, a shadow, etc. as these are all potential indicators that the person in the picture may be a trafficked victim.  Codewise this is still a boolean yes-no question but just some context.
+Will Hickie
+2:12 PM
+@Amanda blurred is possible, but cropped out or obstructed is another matter. This requires a new detector,and that takes more than a weekend. :)
+Alejandro Caceres
+2:17 PM
+yeah for sure, for this hack-a-thon it's definitely enough to just detect "if see yes, return true, if not return false"
+if see face*
+ 
+2:21 PM
+Mikhail Korobov joined the room.
+ 
+2:25 PM
+Will Hickie left the room.
+Alejandro Caceres
+2:25 PM
+hi Mikhail!
+Mikhail Korobov
+2:26 PM
+hey @AlejandroCaceres! I'm finally online :)
+have you started already?
+Alejandro Caceres
+2:26 PM
+awesome, let me fill you in
+we just started
+we spent the morning and a bit of the afternoon talking to one of the guys here about our idea
+he liked it, he said he is curious to see what we get out of it and that it is something they have been talking about doing for about a year but haven't had the chance
+he also gave us some small tweaks that we can make on the "analytics" (word count) portion of it to make it more likely to be useful
+Mikhail Korobov
+2:28 PM
+We had lots of ideas, which one he liked?
+Alejandro Caceres
+2:28 PM
+oh right
+Mikhail Korobov
+2:28 PM
+re Splash: I think we can take screenshots of the websites we found and present them in GUI; they can be useful for quickly discarding or prioritizing websites without visiting them.
+I also have some ideas regarding scores, let's compare them
+Alejandro Caceres
+2:29 PM
+he liked: (1) the common crawl stuff and (2) the directed crawling thing where we crawl additional websites and do the same analytics as we are doing with common crawl stuff
+wow that's a great idea!
+(the splash stuff)
+Alejandro Caceres
+2:31 PM
+so re. the scoring, we are picturing something pretty simple. We have some additional stuff that he thought we could focus on to make it more useful. He said that if we concentrated more on terms that indicate that an underage female is involved, it will greatly improve our odds of our stuff being useful
+he made the point that apparently using terms that mean an underaged person is involved is very exclusive to trafficking (by definition), so this will help a lot to filter out just porn and other stuff like that
+as far as the coding side of that, we were picturing a simple scoring system for the terms, so we just assign a weight to each term and use that to score a page
+Mikhail Korobov
+2:33 PM
+detecting trafficking is a more ambitiuos task than detecting possibly useful websites
+Alejandro Caceres
+2:33 PM
+true
+Mikhail Korobov
+2:33 PM
+to detect a website that is possibly useful you likely can fetch its index page and maybe several other pages
+but if we are to find trafficking-related pages we should fetch all the pages because these terms are likely to be rare
+it looks more like ads classification task than website discovery task
+Alejandro Caceres
+2:35 PM
+it's a little bit of both, i think
+the website discovery part is useful because they need to find new places where the ads are being posted, but yeah essentially the rest is ads classification
+Mikhail Korobov
+2:36 PM
+as for the scores, an usual ML approach is to assign scores automatically. Get examples of "interesting" webpages, then get examples of "uninteresting" webpages, extract terms from there, count them, check which terms are common and assign weights based on that
+Alejandro Caceres
+2:37 PM
+so the idea is that we can point something to a website that is likely to link out to sites with prostitution ads (like prostitute service review sites) and give them an intuitive way to view potentially relevant pages discovered from that crawling
+gotcha, do you think we have time for that?
+Mikhail Korobov
+2:45 PM
+It is a very easy & standard ML task, scikit-learn is great for such problems. From the programming perspective it is not any harder than doing manual scores (tools are great); extra effort is just to to build an initial dataset. The "problem" is that it is what other teams are doing; if you want to find trafficking ads it is essentially an ads classifier - I recall there was a team with a presentation who does exactly that. But if you want to find *possibly* useful websites (separate porn/trafficking/escort/ad list/... websites from websites that are not like that at all) then it seems other teams are not doing that.
+Alejandro Caceres
+2:47 PM
+that makes a lot of sense
+so in order to make the training set much easier
+why don't we just train it with ads, we have tons and tons of those. We don't have to solve the question of whether they are human trafficking or not just yet, if we find sex ads of all sorts that will be enough
+Mikhail Korobov
+2:49 PM
+yes, exactly, and use this info to help with the discovery of new websites
+Alejandro Caceres
+2:49 PM
+yep
+perfect.
+Mikhail Korobov
+2:50 PM
+we'll need to also find negative example (i.e. ads that are not interesting)
+Alejandro Caceres
+2:50 PM
+makes sense
+Mikhail Korobov
+2:53 PM
+there are gotchas, as usual :)
+Mikhail Korobov
+2:56 PM
+for example, if we train a classifier to find pages that are similar to escort ads, then follow a link and a link is to the main page of ad listing website then the classifier will tell us that the page we are at is not a page of an escort ad (it isn't)
+Amanda Towler
+2:56 PM
+@Mikhail my question is: similar *how*
+similar text? Keywords? similar html / css structure? similar.... use of a particular character (e.g. ~)
+Mikhail Korobov
+2:58 PM
+@Amanda is your question about how can we detect if a page is a page with an escort ad?
+or about how can we navigate from a main page of a website to an ad page if we don't know website structure?
+Alejandro Caceres
+2:59 PM
+i think it's more about how we can detect if a page is a page with an escort ad
+so if we train it with a data set to find "similar" pages as the data set, what does "similar" mean in this case
+Mikhail Korobov
+3:01 PM
+@Amanda usual approach is to try to come up with different "features" (keywords - which can be just all words found on all pages, presence of particular chars, etc) and check which of them are important based on data we have
+Mikhail Korobov
+3:04 PM
+the problem is usually formulated not about "being similar", but about being of one class or another, but there are approaches where you don't need "negative" examples
+Mikhail Korobov
+3:05 PM
+we can use your lists of terms as "features"; this can actually be helpful
+feature is something that machine tries to assign a score based on training examples
+Alejandro Caceres
+3:08 PM
+That seems like a reasonable approach. So what makes a good training set?
+Mikhail Korobov
+3:11 PM
+a good training set is a list of related webpages that we discover using our crawling system, each with "interesting/not interesting" label assigned by human
+.. if our end goal is to detect if a linked webpage is interesting or not
+Alejandro Caceres
+3:14 PM
+ok, so let's do this
+Amanda Towler
+3:14 PM
+So all of this is good, but I don't think we can rely on having the "human label" part during the hack-a-thon
+Alejandro Caceres
+3:14 PM
+yeah that was my concern as well
+Amanda Towler
+3:15 PM
+so we can do everything up to that point
+Mikhail Korobov
+3:15 PM
+we can also try an unsupervised approach (outlier detection) - fetch all "interesting" pages (an existing website list), run LSI on them and use OneClassSVM to check if new pages are similar to these or not
+what's the problem with "human label" part?
+Amanda Towler
+3:16 PM
+I just don't think we can assume that we will have someone available to do that part
+unless we do it, but we're not HT experts
+Alejandro Caceres
+3:16 PM
+i think that is actually OK
+because eventually it will go in front of an HT expert
+and they can train it from there
+Amanda Towler
+3:17 PM
+ok
+Alejandro Caceres
+3:17 PM
+two concerns I have:
+Mikhail Korobov
+3:17 PM
+we don't need to detect HT here; I think that just marking pages as "totally not interesting /possibly interesting" is also fine for a demo
+Alejandro Caceres
+3:17 PM
+yeah that makes sense
+Mikhail Korobov
+3:18 PM
+we won't sentence anyone with this classifier, its goal is to just remove some noise :)
+Alejandro Caceres
+3:18 PM
+my two concerns: (1) we have to build a very simple and intuitive UI that interacts with this, I'm not familiar with how we will be doing this. Will you be building  a web service I can use to mark something as interesting or not interesting? Will you have to build a database of this information? This sounds like it might put us over the timeline
+and (2) it starts moving slightly into the domain of others, there are a *lot* of machine learning people here. This is less of a concern because it has a lot of elements of crawling and scraping as well
+(1) is my main concern
+Mikhail Korobov
+3:20 PM
+i also have a concern - is the analyst work really a bottleneck? if we can discover e.g. 1000 websites using our crawling approach, and it takes 10s to mark a website as interesting/not interesting by human, we'll save less than an hour of work after jumping through all the hoops
+for (1) google spreadsheet is fine
+ah, that's more than a hour
+but there only so much websites we can discover
+such classification can be more useful for commoncrawl though
+Alejandro Caceres
+3:21 PM
+ah so one thing i think you may be missing
+there is a browser user interface component we are building to this
+we don't want to just grab a bunch of data and put it in a spreadsheet, or, you're right, we are just creating a bunch of data for them to go through
+Mikhail Korobov
+3:23 PM
+i see, so we're building a tool for analyst, not just a tool to extract the data for analyst, got it
+Alejandro Caceres
+3:23 PM
+exactly. we want to create a browser interface that will display the websites found via a crawl in an intuitive way. And mark them as "interesting" or "not interesting" based on scoring
+i was just picturing "not interesting" will discard website, interesting will be saved somewhere for later review or something like that
+your idea works really well with this actually, because interesting and not interesting could be used to train the system
+Mikhail Korobov
+3:24 PM
+classifier returns a probability, so we can save all data
+Alejandro Caceres
+3:24 PM
+i'm just worried that writing the API endpoints + API calls from the client side to train the system may get a bit time consuming for us
+but if you think we can do it, i am totally up for it
+Mikhail Korobov
+3:25 PM
+for such quick interfaces I usually use django admin :) it gets you editing & sorting & search for free
+you can enable an "interesting/not interesting" checkbox in a list of found items in a couple lines of code
+Alejandro Caceres
+3:26 PM
+oh yeah? i was starting to use Flask already
+but it's a micro-framework so i have to write all of that stuff
+Mikhail Korobov
+3:26 PM
+given that we store data in some DB that is supported by django ORM
+Alejandro Caceres
+3:26 PM
+i was basically just going to write a Flask + Mongo application
+which actually gives you sorting + search reasonably easily
+anyway specifics like that aside
+think we can do it?
+ 
+3:28 PM
+Will Hickie joined the room.
+Amanda Towler
+3:28 PM
+DAily sync phone call now:
+Bridge number: 1-866-803-2146
+Participant Number: 21572302#
+brb
+Will Hickie
+3:30 PM
+@Mikhail what is LSI?
+Mikhail Korobov
+3:30 PM
+django admin also saves you from writing UI code, CSS/HTML / table rendering / auth is for free :) But you're right that such kind of systems are easy to build with any reasonable tool; Flask is fine.
+@Will http://en.wikipedia.org/wiki/Latent_semantic_indexing
+Will Hickie
+3:32 PM
+Ah. Okay.  Are yu familiar with deep belief networks?  They're another unsupervised algorithm.
+Mikhail Korobov
+3:33 PM
+@Will I haven't used them in practice
+Mikhail Korobov
+3:34 PM
+my experience with neural networks is very limited; I took an online course and read several papers, but they are not in my toolbelt
+Will Hickie
+3:35 PM
+I use them, but never for document classification.
+Will Hickie
+3:36 PM
+Maybe something we can investigate later. Once we have our own data.
+Mikhail Korobov
+3:38 PM
+I think that for a prototype some simple & inspectable classifier could be better; with linear classifer we can use just word counts and check which weights are important - and e.g. compare them with terms provided by experts, this might provide some insights
+Mikhail Korobov
+3:41 PM
+neural networks are very successful in image processing - is it what you've used them for?
+Will Hickie
+3:43 PM
+Yes. And other things.  Behavior analysis.
+Will Hickie
+3:45 PM
+I have a toolkit I use, and it try's a bunch of different models to determine which looks best (random forests, NN, boosting, linear classifier, etc..)
+Mikhail Korobov
+3:48 PM
+yes, that's useful; scikit-learn also can do that. It seems we won't have much training data, so it seems that most gains would be from extra data annotation and careful feature design, not from switching of the ML methods. In addition to that text data is very sparse, and it is usually quite hard to beat a logistic regression / linear svm baseline.
+Mikhail Korobov
+3:48 PM
+yes, that's useful; scikit-learn also can do that. It seems we won't have much training data, so it seems that most gains would be from extra data annotation and careful feature design, not from switching of the ML methods. In addition to that text data is very sparse, and it is usually quite hard to beat a logistic regression / linear svm baseline.
+Will Hickie
+3:49 PM
+Kk
+Mikhail Korobov
+3:57 PM
+@AlejandroCaceres could you give me an access to the repo? Do we have it?
+Alejandro Caceres
+3:57 PM
+ah yes it's ready, what's your github info?
+Mikhail Korobov
+3:57 PM
+and where is the system going to be deployed?
+Alejandro Caceres
+3:58 PM
+oh
+you sent it to me already
+sorry
+i had missed it
+Mikhail Korobov
+3:58 PM
+my github is kmike
+Alejandro Caceres
+3:59 PM
+done
+Mikhail Korobov
+3:59 PM
+confirmed
+Alejandro Caceres
+3:59 PM
+the system will be deployed probably on my laptop or something like that
+then eventually the Memex test environment
+Mikhail Korobov
+4:00 PM
+so no need to 'fab push' or something like that for me, just push the code to the repo?
+Will Hickie
+4:01 PM
+@AlejandroCaceres my github is whickie
+Alejandro Caceres
+4:01 PM
+nah just put it up on the repo, i'll take care of the rest
+cool, you're added now too
+Mikhail Korobov
+4:06 PM
+hey, I've received VPN data from Steven Barmoy, and credentials should be the same as for the Wiki, but a stupid question: what is an URL of the Wiki?
+Amanda Towler
+4:06 PM
+not a stupid question :)
+https://memexproxy.com/wiki
+i think that is it
+Mikhail Korobov
+4:07 PM
+hmm, it is not opening for me
+ 
+4:07 PM
+Will Hickie left the room.
+Mikhail Korobov
+4:07 PM
+maybe it is available only inside a VPN
+but the email says that instruction on how to setup VNP are at https://memexproxy.com
+s/VNP/VPN
+Amanda Towler
+4:08 PM
+so you can't even get to memexproxy.com
+Alejandro Caceres
+4:08 PM
+yeah, memexproxy.com should be available to you
+Mikhail Korobov
+4:08 PM
+yep, and I can't get to memexproxy.com
+Alejandro Caceres
+4:09 PM
+i know why it isn't
+they mentioned that they block very large IP address spaces (entire countries)
+I suspect Russian IP space or a part of it got cut for some reason :-(
+Mikhail Korobov
+4:10 PM
+ah, cool :) is there anything immediately useful in the wiki?
+Alejandro Caceres
+4:10 PM
+it's good to browse to get a better understanding of the domain of HT and other people's presentations
+nothing critical for the hack-a-thon i'd say
+Mikhail Korobov
+4:11 PM
+ok
+Alejandro Caceres
+4:11 PM
+we should do a test with a proxy or something at some point and make sure that is the issue
+Amanda Towler
+4:12 PM
+yeah if there is anything you need from there we will pull it down, copy-paste, etc.
+Mikhail Korobov
+4:13 PM
+ok, that's fine
+Mikhail Korobov
+4:15 PM
+i can get memexproxy.com index page using curl from a Hetzner server (in Germany)
+Alejandro Caceres
+4:22 PM
+ah perfect
+Mikhail Korobov
+4:23 PM
+@AlejandroCaceres if we run everything from you laptop could you share its characteristics - OS, RAM available?
+they also said scraping from inside DARPA is not a good idea; how would we run spiders?
+Alejandro Caceres
+4:25 PM
+Ah good question, sorry I think I mislead you, the scraping spiders and services around that will be on AWS
+actually
+everything will be on AWS
+not on my laptop
+we will give you full access to the environment, so you can pretty much build on whatever you'd like
+Mikhail Korobov
+4:27 PM
+ah, great
+Alejandro Caceres
+4:27 PM
+in general: let's build everything on Ubuntu, Python 2.7.x and not use machines that are too huge. Sorry long answer to your simple question
+and if you prefer CentOS or some other weirdo linux that's fine too, we don't have to stick to ubuntu
+Mikhail Korobov
+4:28 PM
+that's reasonable. How huge is too huge?
+I'm more comfortable with Debian/Ubuntu
+@Tomas might need a huge huge :)
+Alejandro Caceres
+4:29 PM
+haha oh yeah, Tomas is using EMR, he will be using some huge stuff
+overall just nothing that is going to cost us a ton
+Mikhail Korobov
+4:29 PM
+ok, got it
+Alejandro Caceres
+4:30 PM
+yeah just don't spin up like 10 XXXXXLarge and leave them up for a week, haha
+other than that it's all good
+Mikhail Korobov
+4:32 PM
+there are spot instances that are great for short but heavy computations; I recall spinning 128GB RAM & 16 core CPU instance for a several cents per hour to do some computations that were too long on a laptop :)
+we don't need them here though
+Alejandro Caceres
+4:40 PM
+cool, so i think we're good on what we're going to build yeah?
+Mikhail Korobov
+4:45 PM
+let's write it down once again
+Alejandro Caceres
+4:46 PM
+Basically I believe my UI will need to hit a REST services that will: take as input the URL I am trying to crawl from (a seed or seeds), return success and then index your weird ML Russian scientist analytics/scoring as MongoDB docs. This is so a user can enter a starting point for the crawl, hit a button, and send it to the crawler for new discovery and scoring. I will take it from there and build a document retrieval service for Mongo DB info
+Alejandro Caceres
+4:47 PM
+does that seem reasonable? Did I miss anything?
+Mikhail Korobov
+4:48 PM
+that's exactly what I was thinking of
+what is document retrieval service?
++ there should be Splash stuff
+Alejandro Caceres
+4:48 PM
+ooh yeah i forgot about splash
+so you can just index the splash stuff in Mongo too
+Mikhail Korobov
+4:49 PM
+i'm not too familiar with mongo; I just put some json objects to it and that's all?
+Alejandro Caceres
+4:51 PM
+yeah that's correct, you basically can just build a python dictionary and use pymongo to insert it in just a few lines of code: http://api.mongodb.org/python/current/tutorial.html
+Mikhail Korobov
+4:52 PM
+we have one more unsolved question, about the scoring in commoncrawl
+Alejandro Caceres
+4:52 PM
+we don't have to use mongo either, we can use something else if you want, it just seems like a pretty simple way to do things
+ah yeah
+oh one more question i still have to answer: the document retrieval service is just a really simple API endpoint that i'll write to retrieve documents from Mongo in an ordered way
+to help with pagination and ordering of results and stuff
+so regarding the scoring in commoncrawl
+Alejandro Caceres
+4:54 PM
+I think we are just going to take our initial very simple approach, that is just for a time saving standpoint. Neither Tomas nor I are too familiar with ML libraries and he has to write Hadoop mapreduce stuff which will be a bit more time consuming, so the simpler the better on that one
+plus it's in Java so we can't just reuse the python stuff that you write
+Mikhail Korobov
+5:00 PM
+There is a couple of ways of how the results from ML part can be integrated - maybe Java code can call a console utility, or maybe we can use data learned by a slightly simplified model to make predictions in Java. Scoring code is really-really simple for linear models; the prediction in logistic regression is just like "if keyword in text: score += scores[keyword]", if the final score is positive the answer is "yes", if it is negative the answer is "no"; then you can apply a simple formula to the score to make results fit [0,1] range to make them look like a probability (and they will be a probabilities).
+Mikhail Korobov
+5:01 PM
+..so it makes sense to start with a simplest approach and then check if it will be easy to plug other scoring function before running a full-scale MR job
+Alejandro Caceres
+5:02 PM
+yeah, that seems reasonable
+java code calling a console utility is also definitely a possibility
+Mikhail Korobov
+5:09 PM
+ok, I'll start coding the crawling part then
+Alejandro Caceres
+5:10 PM
+awesome, sounds good, when you get a chance if you could shoot me the format that you're picturing for your JSON that'd be a good help so I can get a bit of test data while building the UI
+and getting all the sorts and orders figured out for the document service endpoint
+Mikhail Korobov
+5:13 PM
+there is 2 types of data
+first is websites and the second is webpages
+Mikhail Korobov
+5:14 PM
+when we visit a related website it might be a good idea to crawl some more links, not just an indexed page; the same applies to seed urls
+or maybe I'm overthinking it
+the idea is that information about a website can be aggregated from the info about its webpages
+Alejandro Caceres
+5:15 PM
+no no you're right. I was thinking that you'd pretty much only have to deal with the web pages, but index the host of each web page for me
+Mikhail Korobov
+5:16 PM
+ok, and then the aggregation / ordering will be done in the UI
+Alejandro Caceres
+5:16 PM
+exactly
+Mikhail Korobov
+5:16 PM
+great
+Alejandro Caceres
+5:16 PM
+your job is complicated enough
+Amanda Towler
+5:18 PM
+UPDATE from the keyword research
+I've only gotten through 20 keywords in a list of 200+
+BUT
+and most of them are useless
+I happened on one keyword that is a gold mine
+so, I think we are on to something here with keyword + commoncrawl
+Alejandro Caceres
+5:19 PM
+that's awesome
+Mikhail Korobov
+5:20 PM
+great!
+Alejandro Caceres
+5:20 PM
+yeah i think the way you are doing it is smart: amanda is checking out the effectiveness of keyword by putting it into google and seeing how long it takes her to find a relevant result
+Mikhail Korobov
+5:22 PM
+what about these fields: "url", "host", "depth", "crawled_at", "html", "referrer_link_text", "referrer_url", "screenshot", "score", "page title"; screenshots won't be available for all pages (and maybe the full html also)
+depth == 0 means it is the first page crawled on this domain
+Alejandro Caceres
+5:23 PM
+that's perfect
+Mikhail Korobov
+5:23 PM
+i might put other crazy fields like 'lda topics" if there will be time
+Alejandro Caceres
+5:24 PM
+haha ok, feel free if you end up having extra time
+and also feel free to remove if it will save time as well
+Mikhail Korobov
+5:24 PM
+ok
+Alejandro Caceres
+5:25 PM
+I'll put up an AWS box for us to work on as well, I can handle the Mongo install and administration stuff (creation of the doc collection) and can pass you the info
+Mikhail Korobov
+5:25 PM
+ah, and I don't think we'll be following robots.txt rules :)
+Alejandro Caceres
+5:25 PM
+ooooh i forgot to mention that one
+hopefully it won't be too much of a pain in the ass, but can you follow crawl-delay pretty easily?
+Mikhail Korobov
+5:26 PM
+an AWS box with a working Mongo would be great! Could you put the actions to create doc collection to a script?
+Alejandro Caceres
+5:26 PM
+that's the only one they asked us to follow
+sure, i can do that
+Mikhail Korobov
+5:26 PM
+ok, got it, I'll implement that
+how do you prefer to store the screenshots?
+Mikhail Korobov
+5:28 PM
+hmm, if we'll be taking screenshots of a first pages anyways then we can get js-processed front pages for free
+Alejandro Caceres
+5:29 PM
+yeah, that's true
+so you might as well use that when you store the HTML
+and do your other stuff
+Mikhail Korobov
+5:30 PM
+should we respect all robots.txt rules? or is it only about download Crawl-delay?
+Alejandro Caceres
+5:30 PM
+only crawl-delay
+i would say we explicitly want to not respect other rules
+so just crawl delay should be fine, and that's only because DARPA asked us to
+normally i'd say just fire away
+Mikhail Korobov
+5:31 PM
+ok
+i wanted to store raw html in case we'll be implementing an UI for marking pages as useful/not useful
+to "freeze" what users find useful/not useful: pages can change in time, and it will be easier to process them this way
+Alejandro Caceres
+5:34 PM
+cool, yeah that works for me
+this is exciting, we're starting to actually do something on this project.
+after months and months of talking about it
+Mikhail Korobov
+5:35 PM
+:cheers:
+Alejandro Caceres
+5:36 PM
+i'll have an extra beer in your absence today!
+Amanda Towler
+5:43 PM
+BTW we will be online this weekend
+if anyone has questions
+or is trying to catch yp
+*up
+Alejandro Caceres
+5:44 PM
+oh and commit often! i will probably be working some this weekend so i'd definitely like to see the code even if it's not functional yet

@@ -86,6 +86,8 @@ class RobotsCrawlDelayMiddleware(object):
         return cls(crawler)
 
     def process_request(self, request, spider):
+        if request.meta.get('dont_process_robots'):
+            return
         rules = self.robotstxt(request, spider)
         self._adjust_delay(rules, request, spider)
 
@@ -93,7 +95,11 @@ class RobotsCrawlDelayMiddleware(object):
         url = urlparse_cached(request)
         if url.netloc not in self._robot_rules:
             self._robot_rules[url.netloc] = None
-            req = Request(get_robotstxt_url(url), priority=self.DOWNLOAD_PRIORITY)
+            req = Request(
+                get_robotstxt_url(url),
+                priority=self.DOWNLOAD_PRIORITY,
+                meta={'dont_process_robots': True}
+            )
             dfd = self.crawler.engine.download(req, spider)
             dfd.addCallback(self._parse_robots, spider=spider)
         return self._robot_rules[url.netloc]
@@ -128,4 +134,7 @@ class RobotsCrawlDelayMiddleware(object):
         self.crawler.stats.set_value('robots.txt/crawl-delay/%s' % key, delay)
 
     def _get_slot(self, request_or_response, spider):
+        # If response is cached, request.meta.get('download_slot')
+        # will be None, but we still want to adjust the delay.
+        # A new slot is created in this case.
         return self.crawler.engine.downloader._get_slot(request_or_response, spider)
