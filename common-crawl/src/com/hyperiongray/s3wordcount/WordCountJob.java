@@ -15,11 +15,9 @@ import org.apache.hadoop.mapred.TextOutputFormat;
 
 public class WordCountJob {
 
-	private static final String OUTPUT_DIR = "/home/tomas/Work/work/Proyecto/memex/git/memex-hackathon-1/common-crawl/src/com/hyperiongray/s3wordcount/data/output";
-
 	public static void main(String[] args) throws Exception {
 
-		File file = new File(OUTPUT_DIR);
+		File file = new File(args[1]);
 		FileUtils.deleteQuietly(file);
 		
 		JobConf conf = new JobConf();

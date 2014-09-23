@@ -22,6 +22,7 @@ package com.hyperiongray.s3wordcount;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.Date;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.regex.Matcher;
@@ -44,8 +45,9 @@ import org.jets3t.service.model.S3Object;
 
 public class WordCountOnlyMapper extends MapReduceBase implements Mapper<Object, Text, NullWritable, Text> {
 
+	private static final int LOWER_SCORE_THRESHOLD = 5;
+
 	private static final Pattern pattern = Pattern.compile("<title>(.+?)</title>", Pattern.CASE_INSENSITIVE);
-	private static final int LOWER_SCORE_THRESHOLD = -1;
 	private OutputParser outputParser = new OutputParser();
 
 	public void map(Object key, Text value, OutputCollector<NullWritable, Text> outputCollector, Reporter reporter) throws IOException {
@@ -74,6 +76,7 @@ public class WordCountOnlyMapper extends MapReduceBase implements Mapper<Object,
 		// Once we have an ArchiveReader, we can work through each of the
 		// records it contains
 		int i = 0;
+		System.out.println("Started" + new Date());
 		for (ArchiveRecord r : ar) {
 
 			try {
@@ -110,14 +113,15 @@ public class WordCountOnlyMapper extends MapReduceBase implements Mapper<Object,
 				int score = score(matches);
 
 				if (score > LOWER_SCORE_THRESHOLD) {
-					System.out.println("URL: " + url + " Score: " + score + " Detail: " + matches);
 					System.out.println("****************************************");
+					System.out.println("URL: " + url + " Score: " + score + " Detail: " + matches);
 					// outputCollector.collect(new IntWritable(score), new Text(url));
 					outputCollector.collect(NullWritable.get(),
 							new Text(outputParser.parse(this.getTitle(content), url, crawledDate, score, matches)));
 				}
-
-				if (i++ > 10) {
+				System.out.println(i);
+				if (i++ > 10000) {
+					System.out.println("Finished " + new Date());
 					break;
 				}
 
