@@ -28,7 +28,7 @@ public class WordCountJob {
 		conf.setJobName("s3wordcount");
 
 		conf.setMapperClass(WordCountOnlyMapper.class);
-		conf.setNumMapTasks(10);
+		conf.setNumMapTasks(1);
 
 //		conf.setReducerClass(WordCountReducer.class);
 //		conf.setNumReduceTasks(1);
@@ -36,8 +36,8 @@ public class WordCountJob {
 		conf.setInputFormat(TextInputFormat.class);
 		conf.setOutputFormat(TextOutputFormat.class);
 		
-		conf.setOutputKeyClass(Text.class);
-		conf.setOutputValueClass(IntWritable.class);
+		conf.setOutputKeyClass(IntWritable.class);
+		conf.setOutputValueClass(Text.class);
 
 		FileInputFormat.setInputPaths(conf, new Path(args[0]));
 		FileOutputFormat.setOutputPath(conf, new Path(args[1]));

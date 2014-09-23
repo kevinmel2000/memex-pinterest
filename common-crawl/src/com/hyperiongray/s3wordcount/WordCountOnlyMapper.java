@@ -44,8 +44,9 @@ import org.jets3t.service.model.S3Object;
 
 public class WordCountOnlyMapper extends MapReduceBase implements Mapper<Object, Text, IntWritable, Text> {
 
-	private static final int LOWER_SCORE_THRESHOLD = 5;
-
+	private static final int LOWER_SCORE_THRESHOLD = 3;
+	private OutputParser outputParser = new OutputParser();
+	
 	public void map(Object key, Text value, OutputCollector<IntWritable, Text> outputCollector, Reporter reporter) throws IOException {
 
 		// We're accessing a publicly available bucket so don't need to fill in
@@ -78,6 +79,7 @@ public class WordCountOnlyMapper extends MapReduceBase implements Mapper<Object,
 				// The header file contains information such as the type of
 				// record, size, creation time, and URL
 				String url = r.getHeader().getUrl();
+				String crawledDate = r.getHeader().getDate();
 				if (url == null)
 					continue;
 
@@ -103,16 +105,18 @@ public class WordCountOnlyMapper extends MapReduceBase implements Mapper<Object,
 				// it?
 				String content = new String(os.toString());
 
-				Map<String, Integer> matchedContents = this.matchContent(content);
-				int score = score(matchedContents);
+				Map<String, Integer> matches = this.matchContent(content);
+				int score = score(matches);
+				String title = "to-do";
 
-				System.out.println("URL: " + url + " Score: " + score + " Detail: " + matchedContents);
 				if (score > LOWER_SCORE_THRESHOLD) {
+					System.out.println("URL: " + url + " Score: " + score + " Detail: " + matches);
 					System.out.println("****************************************");
-					outputCollector.collect(new IntWritable(score), new Text(url));
+//					outputCollector.collect(new IntWritable(score), new Text(url));
+					outputCollector.collect(new IntWritable(score), new Text(outputParser.parse(title, url, crawledDate, score, matches)));
 				}
 
-				if (i++ > 10000) {
+				if (i++ > 10) {
 					break;
 				}
 
@@ -131,7 +135,6 @@ public class WordCountOnlyMapper extends MapReduceBase implements Mapper<Object,
 				if (matcher.find())
 					matches.put(entry.getKey(), 1);
 			}
-
 		}
 		return matches;
 	}
