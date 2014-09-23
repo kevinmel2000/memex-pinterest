@@ -44,9 +44,10 @@ import org.jets3t.service.model.S3Object;
 
 public class WordCountOnlyMapper extends MapReduceBase implements Mapper<Object, Text, NullWritable, Text> {
 
-	private static final int LOWER_SCORE_THRESHOLD = 3;
+	private static final Pattern pattern = Pattern.compile("<title>(.+?)</title>", Pattern.CASE_INSENSITIVE);
+	private static final int LOWER_SCORE_THRESHOLD = -1;
 	private OutputParser outputParser = new OutputParser();
-	
+
 	public void map(Object key, Text value, OutputCollector<NullWritable, Text> outputCollector, Reporter reporter) throws IOException {
 
 		// We're accessing a publicly available bucket so don't need to fill in
@@ -107,13 +108,13 @@ public class WordCountOnlyMapper extends MapReduceBase implements Mapper<Object,
 
 				Map<String, Integer> matches = this.matchContent(content);
 				int score = score(matches);
-				String title = "to-do";
 
 				if (score > LOWER_SCORE_THRESHOLD) {
 					System.out.println("URL: " + url + " Score: " + score + " Detail: " + matches);
 					System.out.println("****************************************");
-//					outputCollector.collect(new IntWritable(score), new Text(url));
-					outputCollector.collect(NullWritable.get(), new Text(outputParser.parse(title, url, crawledDate, score, matches)));
+					// outputCollector.collect(new IntWritable(score), new Text(url));
+					outputCollector.collect(NullWritable.get(),
+							new Text(outputParser.parse(this.getTitle(content), url, crawledDate, score, matches)));
 				}
 
 				if (i++ > 10) {
@@ -147,4 +148,16 @@ public class WordCountOnlyMapper extends MapReduceBase implements Mapper<Object,
 		}
 		return score;
 	}
+
+	public String getTitle(String content) {
+		Matcher matcher = pattern.matcher(content);
+		String result;
+		if (matcher.find()) {
+			result = matcher.group(1);
+		} else {
+			result = "";
+		}
+		return result;
+	}
+
 }
