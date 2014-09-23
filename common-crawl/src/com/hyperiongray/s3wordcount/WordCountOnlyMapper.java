@@ -34,6 +34,7 @@ import org.apache.hadoop.mapred.MapReduceBase;
 import org.apache.hadoop.mapred.Mapper;
 import org.apache.hadoop.mapred.OutputCollector;
 import org.apache.hadoop.mapred.Reporter;
+import org.apache.hadoop.mapreduce.Mapper.Context;
 import org.apache.hadoop.thirdparty.guava.common.collect.Maps;
 import org.archive.io.ArchiveReader;
 import org.archive.io.ArchiveRecord;
@@ -49,9 +50,16 @@ public class WordCountOnlyMapper extends MapReduceBase implements Mapper<Object,
 
 	private static final Pattern pattern = Pattern.compile("<title>(.+?)</title>", Pattern.CASE_INSENSITIVE);
 	private OutputParser outputParser = new OutputParser();
+	private WeightedKeyword weightedKeyword;
+	
+	public void setup(Context context){
+		String keywordsfileContent = context.getConfiguration().get("keywordsFileContent");
+		weightedKeyword = new WeightedKeyword(keywordsfileContent);
+	}
 
 	public void map(Object key, Text value, OutputCollector<NullWritable, Text> outputCollector, Reporter reporter) throws IOException {
 
+		
 		// We're accessing a publicly available bucket so don't need to fill in
 		// our credentials
 		ArchiveReader ar;
@@ -135,7 +143,7 @@ public class WordCountOnlyMapper extends MapReduceBase implements Mapper<Object,
 	public Map<String, Integer> matchContent(String content) throws IOException {
 		Map<String, Integer> matches = Maps.newHashMap();
 		if (!content.isEmpty() && content.length() > 50) {
-			for (Entry<String, Pattern> entry : WeightedKeyword.getKeywordPattern().entrySet()) {
+			for (Entry<String, Pattern> entry : weightedKeyword.getKeywordPattern().entrySet()) {
 				Matcher matcher = entry.getValue().matcher(content);
 				if (matcher.find())
 					matches.put(entry.getKey(), 1);
@@ -148,7 +156,7 @@ public class WordCountOnlyMapper extends MapReduceBase implements Mapper<Object,
 	public int score(Map<String, Integer> matches) throws IOException {
 		int score = 1;
 		for (Entry<String, Integer> entry : matches.entrySet()) {
-			score *= WeightedKeyword.getDefinedWeightedWords().get(entry.getKey()) * entry.getValue();
+			score *= weightedKeyword.getDefinedWeightedWords().get(entry.getKey()) * entry.getValue();
 		}
 		return score;
 	}

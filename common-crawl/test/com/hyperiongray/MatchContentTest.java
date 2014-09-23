@@ -5,11 +5,11 @@ import java.util.Map;
 
 import org.junit.Test;
 
-import com.hyperiongray.s3wordcount.WordCountMapper;
+import com.hyperiongray.s3wordcount.WordCountOnlyMapper;
 
 public class MatchContentTest {
 
-	private WordCountMapper instance = new WordCountMapper();
+	private WordCountOnlyMapper instance = new WordCountOnlyMapper();
 
 	@Test
 	public void matchContentTest() {
