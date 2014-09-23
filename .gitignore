@@ -5,3 +5,5 @@
 *.egg-info/
 .idea/
 crawler/data
+.classpath
+.project
