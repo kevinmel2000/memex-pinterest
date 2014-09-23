@@ -96,10 +96,15 @@
 				<artifactId>maven-assembly-plugin</artifactId>
 				<version>2.4</version>
 				<configuration>
+<!-- 				    <archive> -->
+<!-- 				      <manifest> -->
+<!-- 				        <mainClass>fully.qualified.MainClass</mainClass> -->
+<!-- 				      </manifest> -->
+<!-- 				    </archive> -->
 					<descriptorRefs>
 						<descriptorRef>jar-with-dependencies</descriptorRef>
 					</descriptorRefs>
-					<finalName>cc-warc-examples-${project.version}</finalName>
+					<finalName>common-crawler-${project.version}</finalName>
 				</configuration>
 				<executions>
 					<execution>

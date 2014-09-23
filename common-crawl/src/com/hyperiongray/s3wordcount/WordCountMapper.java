@@ -45,7 +45,7 @@ import org.jets3t.service.model.S3Object;
 public class WordCountMapper extends MapReduceBase implements Mapper<Object, Text, Text, IntWritable> {
 
 
-	private static final int LOWER_SCORE_THRESHOLD = 20;
+	private static final int LOWER_SCORE_THRESHOLD = 5;
 
 	public void map(Object key, Text value, OutputCollector<Text, IntWritable> outputCollector, Reporter reporter) throws IOException {
 
@@ -100,16 +100,19 @@ public class WordCountMapper extends MapReduceBase implements Mapper<Object, Tex
 
 				Map<String, Integer> matchedContents = this.matchContent(content);
 				int score = score(matchedContents);
+//				System.out.print(".");
 
 				if(score> LOWER_SCORE_THRESHOLD){
+//					System.out.print("");
 					System.out.println("URL: " + url + " Score: " + score +" Detail: " + matchedContents);
+					System.out.println("****************************************");
 					outputCollector.collect(new Text(url), new IntWritable(score));
 				}
 				//				Map<Text,Text> map = Maps.newHashMap();
 				//				map.put(new Text("score"), new Text(String.valueOf(score)));
 				//				outputCollector.collect(new Text(url), map);
 
-				if (i++ > 100000)
+				if (i++ > 10000)
 					break;
 			}
 		} catch (S3ServiceException e) {
@@ -119,6 +122,7 @@ public class WordCountMapper extends MapReduceBase implements Mapper<Object, Tex
 
 	}
 
+	/*
 	//public for testing purposes
 	public Map<String, Integer> matchContent(String content) throws IOException {
 		Map<String, Integer> matches = Maps.newHashMap();
@@ -136,6 +140,19 @@ public class WordCountMapper extends MapReduceBase implements Mapper<Object, Tex
 //				matches.put(keyword, counter);
 			if (matcher.find())
 				matches.put(keyword, 1);
+		}
+		return matches;
+	}
+	*/
+	public Map<String, Integer> matchContent(String content) throws IOException {
+		Map<String, Integer> matches = Maps.newHashMap();
+		if(!content.isEmpty() && content.length()>50){
+			for (Entry<String,Pattern> entry: WeightedKeyword.getKeywordPattern().entrySet()) {
+				Matcher matcher = entry.getValue().matcher(content);
+				if (matcher.find())
+					matches.put(entry.getKey(), 1);
+			}
+			
 		}
 		return matches;
 	}

@@ -28,7 +28,7 @@ public class WordCountJob {
 		conf.setJobName("s3wordcount");
 
 		conf.setMapperClass(WordCountMapper.class);
-		conf.setNumMapTasks(1);
+		conf.setNumMapTasks(10);
 
 		conf.setReducerClass(WordCountReducer.class);
 		conf.setNumReduceTasks(1);
