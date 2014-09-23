@@ -5,12 +5,12 @@ import java.util.Map;
 
 import org.junit.Test;
 
-import com.hyperiongray.s3wordcount.WordCountMapper;
+import com.hyperiongray.s3wordcount.WordCountOnlyMapper;
 
 public class WordCountMapperTest {
 
-	private WordCountMapper instance = new WordCountMapper();
-	private HttpConnector httpConnector = new HttpConnector();
+	private WordCountOnlyMapper instance = new WordCountOnlyMapper();
+	private CustomHttpConnector httpConnector = new CustomHttpConnector();
 
 	@Test
 	public void crawlingMatchContentTest() {

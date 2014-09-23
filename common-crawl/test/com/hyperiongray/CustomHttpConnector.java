@@ -7,7 +7,7 @@ import java.net.URLConnection;
 
 import org.apache.commons.io.IOUtils;
 
-public class HttpConnector {
+public class CustomHttpConnector {
 
 	public static final String charset ="UTF-8";
 	
