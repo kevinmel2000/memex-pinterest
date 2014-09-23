@@ -14,10 +14,16 @@ NEWSPIDER_MODULE = 'discovery.spiders'
 
 DOWNLOADER_MIDDLEWARES = {
     'discovery.robots_mw.RobotsCrawlDelayMiddleware': 100,
+    'discovery.splash_ext.SplashMiddleware': 950,
 }
 ROBOTS_CRAWLDELAY_ENABLED = True
 AUTOTHROTTLE_ENABLED = False  # it doesn't play well with RobotsCrawlDelayMiddleware
+DUPEFILTER_CLASS = 'discovery.splash_ext.SplashAwareDupeFilter'  # needed by SplashMiddleware
+HTTPCACHE_STORAGE = 'discovery.splash_ext.SplashAwareFSCacheStorage'  # needed by SplashMiddleware
 
+HTTPCACHE_ENABLED = True
+
+SPLASH_PROXY_URL = 'http://127.0.0.1:8051'
 MEMUSAGE_ENABLED = True
 DEPTH_STATS_VERBOSE = True
 DEPTH_PRIORITY = True
@@ -27,9 +33,7 @@ DOWNLOAD_TIMEOUT = 20  # default was 180s
 REDIRECT_MAX_TIMES = 10  # default was 20
 CLOSESPIDER_ITEMCOUNT = 1000  # ~100 websites max; don't crawl the whole Internet
 DOWNLOAD_DELAY = 1
-
-HTTPCACHE_ENABLED = True
-HTTPCACHE_STORAGE = 'scrapy.contrib.httpcache.FilesystemCacheStorage'
+DUPEFILTER_DEBUG = True
 
 
 import logging
