@@ -28,13 +28,14 @@ public class WeightedKeyword {
 		return definedWeightedWords;
 	}
 
-	public static synchronized Map<String, Integer> getDefinedWeightedWords() throws IOException{
+	public static Map<String, Integer> getDefinedWeightedWords() throws IOException{
 		if (definedWeightedWords == null) {
 			File file = new File(KEYWORDS);
 			List<String> lines = FileUtils.readLines(file);
 			definedWeightedWords = Maps.newHashMap();
 			for(String line :lines){
 				String[] split = line.split(",");
+				//definedWeightedWords.put(split[0].trim().replaceAll("+", "\\+"), Integer.valueOf(split[1]));
 				definedWeightedWords.put(split[0].trim(), Integer.valueOf(split[1]));
 			}
 		}

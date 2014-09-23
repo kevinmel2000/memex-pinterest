@@ -45,6 +45,8 @@ import org.jets3t.service.model.S3Object;
 public class WordCountMapper extends MapReduceBase implements Mapper<Object, Text, Text, IntWritable> {
 
 
+	private static final int LOWER_SCORE_THRESHOLD = 20;
+
 	public void map(Object key, Text value, OutputCollector<Text, IntWritable> outputCollector, Reporter reporter) throws IOException {
 
 		// We're accessing a publicly available bucket so don't need to fill in our credentials
@@ -68,7 +70,6 @@ public class WordCountMapper extends MapReduceBase implements Mapper<Object, Tex
 				// The header file contains information such as the type of record, size, creation time, and URL
 				//				System.out.println("Header: " + r.getHeader());
 				String url = r.getHeader().getUrl();
-				System.out.println("URL: " + url);
 				if (url == null)
 					continue;
 
@@ -95,19 +96,20 @@ public class WordCountMapper extends MapReduceBase implements Mapper<Object, Tex
 				//				System.out.println(content);
 
 				// Pretty printing to make the output more readable
-				System.out.println("=-=-=-=-=-=-=-=-=");
+//				System.out.println("=-=-=-=-=-=-=-=-=");
 
 				Map<String, Integer> matchedContents = this.matchContent(content);
 				int score = score(matchedContents);
 
-				if(score>0)
+				if(score> LOWER_SCORE_THRESHOLD){
+					System.out.println("URL: " + url + " Score: " + score +" Detail: " + matchedContents);
 					outputCollector.collect(new Text(url), new IntWritable(score));
-
+				}
 				//				Map<Text,Text> map = Maps.newHashMap();
 				//				map.put(new Text("score"), new Text(String.valueOf(score)));
 				//				outputCollector.collect(new Text(url), map);
 
-				if (i++ > 10000)
+				if (i++ > 100000)
 					break;
 			}
 		} catch (S3ServiceException e) {
@@ -117,10 +119,14 @@ public class WordCountMapper extends MapReduceBase implements Mapper<Object, Tex
 
 	}
 
-	private Map<String, Integer> matchContent(String content) throws IOException {
+	//public for testing purposes
+	public Map<String, Integer> matchContent(String content) throws IOException {
 		Map<String, Integer> matches = Maps.newHashMap();
 		for (String keyword : WeightedKeyword.getDefinedWeightedWords().keySet()) {
-			Pattern pattern = Pattern.compile(keyword, Pattern.CASE_INSENSITIVE);
+			 String escapedKeyword = java.util.regex.Matcher.quoteReplacement(keyword);
+			 escapedKeyword = Pattern.quote(escapedKeyword);
+			
+			Pattern pattern = Pattern.compile("\\w" + escapedKeyword + "\\w", Pattern.CASE_INSENSITIVE);
 			Matcher matcher = pattern.matcher(content);
 //			int counter = 0;
 //			while (matcher.find()) {
@@ -134,7 +140,8 @@ public class WordCountMapper extends MapReduceBase implements Mapper<Object, Tex
 		return matches;
 	}
 
-	private int score(Map<String, Integer> matches) throws IOException {
+	//public for testing purposes
+	public int score(Map<String, Integer> matches) throws IOException {
 		int score = 1;
 		for (Entry<String, Integer> entry : matches.entrySet()) {
 			score *= WeightedKeyword.getDefinedWeightedWords().get(entry.getKey()) * entry.getValue();
