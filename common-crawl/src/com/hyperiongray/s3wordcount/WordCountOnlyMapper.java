@@ -127,7 +127,7 @@ public class WordCountOnlyMapper extends MapReduceBase implements Mapper<Object,
 							new Text(outputParser.parse(this.getTitle(content), url, crawledDate, score, matches)));
 				}
 				System.out.println(i);
-				if (i++ > 10000) {
+				if (i++ > 1000000) {
 					System.out.println("Finished " + new Date());
 					break;
 				}
