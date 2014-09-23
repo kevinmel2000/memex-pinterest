@@ -24,23 +24,20 @@ public class WordCountJob {
 		File file = new File(OUTPUT_DIR);
 		FileUtils.deleteQuietly(file);
 		
-		JobConf conf = new JobConf(AnagramJob.class);
+		JobConf conf = new JobConf();
 		conf.setJobName("s3wordcount");
 
-		conf.setMapperClass(WordCountMapper.class);
+		conf.setMapperClass(WordCountOnlyMapper.class);
 		conf.setNumMapTasks(10);
 
-		conf.setReducerClass(WordCountReducer.class);
-		conf.setNumReduceTasks(1);
+//		conf.setReducerClass(WordCountReducer.class);
+//		conf.setNumReduceTasks(1);
 
 		conf.setInputFormat(TextInputFormat.class);
-//		conf.setInputFormat(CombineFileInputFormat.class);
 		conf.setOutputFormat(TextOutputFormat.class);
 		
 		conf.setOutputKeyClass(Text.class);
 		conf.setOutputValueClass(IntWritable.class);
-//		HashMap<Text,Text> bla = new HashMap<Text,Text> ();
-//		conf.setOutputValueClass(bla..getClass());
 
 		FileInputFormat.setInputPaths(conf, new Path(args[0]));
 		FileOutputFormat.setOutputPath(conf, new Path(args[1]));
