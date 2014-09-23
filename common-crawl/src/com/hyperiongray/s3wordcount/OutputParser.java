@@ -14,6 +14,7 @@ public class OutputParser {
 			builder.append(getDomainName(url)).append(SEPARTOR);
 			builder.append(crawledDate).append(SEPARTOR);
 			builder.append(title).append(SEPARTOR);
+			builder.append(score).append(SEPARTOR);
 			builder.append(url).append(SEPARTOR);
 			builder.append(matches).append(SEPARTOR);
 		} catch (Exception e) {
