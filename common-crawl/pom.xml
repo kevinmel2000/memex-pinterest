@@ -159,58 +159,58 @@
 		</plugins>
 	</build>
 
-	<profiles>
-		<profile>
-			<id>release-sign-artifacts</id>
-			<activation>
-				<property>
-					<name>performRelease</name>
-					<value>true</value>
-				</property>
-			</activation>
-			<build>
-				<plugins>
-					<plugin>
-						<groupId>org.apache.maven.plugins</groupId>
-						<artifactId>maven-gpg-plugin</artifactId>
-						<version>1.4</version>
-						<configuration>
-							<passphrase>${gpg.passphrase}</passphrase>
-						</configuration>
-						<executions>
-							<execution>
-								<id>sign-artifacts</id>
-								<phase>verify</phase>
-								<goals>
-									<goal>sign</goal>
-								</goals>
-							</execution>
-						</executions>
-					</plugin>
-				</plugins>
-			</build>
-		</profile>
-	</profiles>
+<!-- 	<profiles> -->
+<!-- 		<profile> -->
+<!-- 			<id>release-sign-artifacts</id> -->
+<!-- 			<activation> -->
+<!-- 				<property> -->
+<!-- 					<name>performRelease</name> -->
+<!-- 					<value>true</value> -->
+<!-- 				</property> -->
+<!-- 			</activation> -->
+<!-- 			<build> -->
+<!-- 				<plugins> -->
+<!-- 					<plugin> -->
+<!-- 						<groupId>org.apache.maven.plugins</groupId> -->
+<!-- 						<artifactId>maven-gpg-plugin</artifactId> -->
+<!-- 						<version>1.4</version> -->
+<!-- 						<configuration> -->
+<!-- 							<passphrase>${gpg.passphrase}</passphrase> -->
+<!-- 						</configuration> -->
+<!-- 						<executions> -->
+<!-- 							<execution> -->
+<!-- 								<id>sign-artifacts</id> -->
+<!-- 								<phase>verify</phase> -->
+<!-- 								<goals> -->
+<!-- 									<goal>sign</goal> -->
+<!-- 								</goals> -->
+<!-- 							</execution> -->
+<!-- 						</executions> -->
+<!-- 					</plugin> -->
+<!-- 				</plugins> -->
+<!-- 			</build> -->
+<!-- 		</profile> -->
+<!-- 	</profiles> -->
 
-	<repositories>
-		<repository>
-			<id>cloudera</id>
-			<name>Cloudera Hadoop</name>
-			<url>https://repository.cloudera.com/artifactory/cloudera-repos/</url>
-			<layout>default</layout>
+<!-- 	<repositories> -->
+<!-- 		<repository> -->
+<!-- 			<id>cloudera</id> -->
+<!-- 			<name>Cloudera Hadoop</name> -->
+<!-- 			<url>https://repository.cloudera.com/artifactory/cloudera-repos/</url> -->
+<!-- 			<layout>default</layout> -->
 
-			<releases>
-				<enabled>true</enabled>
-				<updatePolicy>daily</updatePolicy>
-				<checksumPolicy>warn</checksumPolicy>
-			</releases>
-			<snapshots>
-				<enabled>true</enabled>
-				<updatePolicy>daily</updatePolicy>
-				<checksumPolicy>warn</checksumPolicy>
-			</snapshots>
-		</repository>
-	</repositories>
+<!-- 			<releases> -->
+<!-- 				<enabled>true</enabled> -->
+<!-- 				<updatePolicy>daily</updatePolicy> -->
+<!-- 				<checksumPolicy>warn</checksumPolicy> -->
+<!-- 			</releases> -->
+<!-- 			<snapshots> -->
+<!-- 				<enabled>true</enabled> -->
+<!-- 				<updatePolicy>daily</updatePolicy> -->
+<!-- 				<checksumPolicy>warn</checksumPolicy> -->
+<!-- 			</snapshots> -->
+<!-- 		</repository> -->
+<!-- 	</repositories> -->
 
 	<distributionManagement>
 		<repository>
