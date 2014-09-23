@@ -1,14 +1,22 @@
 # -*- coding: utf-8 -*-
 from __future__ import absolute_import
 
+import os
 import random
 import datetime
+import json
+import logging
+import base64
+from hashlib import md5
+from urllib import urlencode
+from urlparse import urljoin
 from collections import defaultdict
 
 import scrapy
 from scrapy.contrib.linkextractors import LinkExtractor
 from scrapy.contrib.loader import ItemLoader
 from scrapy.contrib.loader.processor import TakeFirst, MapCompose, Compose
+from inline_requests import inline_requests
 
 from discovery.urlutils import (
     add_scheme_if_missing,
@@ -31,7 +39,7 @@ class WebpageItem(scrapy.Item):
     link_url = scrapy.Field()            # URL of a link that lead to this page
     referrer_url = scrapy.Field()        # URL of a referrer page
     is_seed = scrapy.Field()             # this is True for pages from seed websites
-    # screenshot = scrapy.Field()
+    screenshot_path = scrapy.Field()
     # score = scrapy.Field()
 
 
@@ -71,22 +79,27 @@ class WebsiteFinderSpider(scrapy.Spider):
 
     """
     name = 'website_finder'
+    random_seed = 0
+
+    # FIXME: these limits don't take duplicates filter in account
     max_depth_seed = 2
     max_depth_external = 1
     max_internal_links_per_seed = 100
     max_external_links_per_seed_per_domain = 5
     max_external_links_per_domain = 10
-    random_seed = 0
 
-    # FIXME: these limits don't take duplicates filter in account
+    screenshot_dir = 'data/screenshots'
 
     def __init__(self, seed_urls):
         self.random = random.Random(self.random_seed)
         self.start_urls = [add_scheme_if_missing(url) for url in seed_urls.split(',')]
         self.req_count = defaultdict(int)
+        try:
+            os.makedirs(self.screenshot_dir)
+        except OSError:
+            pass
 
     def parse(self, response):
-
         if 'referrer_url' in response.meta:
             if is_external_url(response.url, response.meta['referrer_url']):
                 # When we follow a link and it redirects to another domain
@@ -122,11 +135,40 @@ class WebsiteFinderSpider(scrapy.Spider):
                     max_count=self.max_internal_links_per_seed,
                 )
 
+    @inline_requests
     def parse_external(self, response):
         """
         Parse a webpage from an external website.
         """
-        yield self._load_webpage_item(response, is_seed=False).load_item()
+
+        ld = self._load_webpage_item(response, is_seed=False)
+        # depth = response.meta.get('link_depth', 0)
+
+        try:
+            # FIXME: depth middleware shouldn't increase depth here
+            splash_resp = yield scrapy.Request(response.url, meta={
+                'splash': {
+                    'render': 'json',
+                    'html': '1',
+                    'png': '1',
+                    'wait': '2.0',
+                    'width': '640',
+                    'height': '480',
+                },
+                'download_timeout': 40,
+            })
+            data = json.loads(splash_resp.body, encoding='utf8')
+            # ld.add_value('html_rendered', data['html'])
+            screenshot_path = self._save_screenshot(get_domain(response.url), data)
+            ld.add_value('screenshot_path', screenshot_path)
+            # del data
+            # del splash_resp
+
+        except Exception as e:
+            self.log("Error rendering %s: %s" % (response.url, e), logging.ERROR)
+            raise
+
+        yield ld.load_item()
 
         for link in self._get_links(response):
             domain = get_domain(link.url)
@@ -146,6 +188,16 @@ class WebsiteFinderSpider(scrapy.Spider):
                     count_key=domain,
                     max_count=self.max_external_links_per_domain
                 )
+
+    def _save_screenshot(self, prefix, data):
+        png = base64.b64decode(data['png'])
+        fn = os.path.join(
+            self.screenshot_dir,
+            prefix + '-' + md5(png).hexdigest() + '.png'
+        )
+        with open(fn, 'wb') as fp:
+            fp.write(png)
+        return fn
 
     def _get_links(self, response):
         links = LinkExtractor().extract_links(response)
