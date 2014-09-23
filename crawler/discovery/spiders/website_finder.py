@@ -148,7 +148,6 @@ class WebsiteFinderSpider(scrapy.Spider):
             # FIXME: depth middleware shouldn't increase depth here
             splash_resp = yield scrapy.Request(response.url, meta={
                 'splash': {
-                    'render': 'json',
                     'html': '1',
                     'png': '1',
                     'wait': '2.0',
