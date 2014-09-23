@@ -57,6 +57,10 @@ public class WordCountOnlyMapper extends MapReduceBase implements Mapper<Object,
 		 weightedKeyword = new WeightedKeyword(keywordsfileContent);
 	}
 
+
+//    protected void setup(org.apache.hadoop.mapreduce.Mapper.Context context) {
+//
+//    }
 	public void map(Object key, Text value, OutputCollector<NullWritable, Text> outputCollector, Reporter reporter) throws IOException {
 
 		// We're accessing a publicly available bucket so don't need to fill in

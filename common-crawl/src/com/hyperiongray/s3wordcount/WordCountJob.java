@@ -15,17 +15,18 @@ import org.apache.hadoop.mapred.JobConf;
 import org.apache.hadoop.mapred.TextInputFormat;
 import org.apache.hadoop.mapred.TextOutputFormat;
 
-public class WordCountJob {
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+public class WordCountJob {
+    private static final Logger logger = LoggerFactory.getLogger(WordCountJob.class);
 	/*
-	 * inputs:
-	 * 0) the input file
-	 * 1) the output folder
+	 * inputs
 	 * 2) the keywords file
 	 */
 	public static void main(String[] args) throws Exception {
 
-		
+		logger.info("Hello");
 		
 		File file = new File(args[1]);
 		FileUtils.deleteQuietly(file);
