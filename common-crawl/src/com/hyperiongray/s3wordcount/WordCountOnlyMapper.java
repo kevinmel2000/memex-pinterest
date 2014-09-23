@@ -30,11 +30,11 @@ import java.util.regex.Pattern;
 
 import org.apache.hadoop.io.NullWritable;
 import org.apache.hadoop.io.Text;
+import org.apache.hadoop.mapred.JobConf;
 import org.apache.hadoop.mapred.MapReduceBase;
 import org.apache.hadoop.mapred.Mapper;
 import org.apache.hadoop.mapred.OutputCollector;
 import org.apache.hadoop.mapred.Reporter;
-import org.apache.hadoop.mapreduce.Mapper.Context;
 import org.apache.hadoop.thirdparty.guava.common.collect.Maps;
 import org.archive.io.ArchiveReader;
 import org.archive.io.ArchiveRecord;
@@ -52,14 +52,13 @@ public class WordCountOnlyMapper extends MapReduceBase implements Mapper<Object,
 	private OutputParser outputParser = new OutputParser();
 	private WeightedKeyword weightedKeyword;
 	
-	public void setup(Context context){
-		String keywordsfileContent = context.getConfiguration().get("keywordsFileContent");
-		weightedKeyword = new WeightedKeyword(keywordsfileContent);
+	public void configure(JobConf job) {
+		 String keywordsfileContent = job.get("keywordsFileContent");
+		 weightedKeyword = new WeightedKeyword(keywordsfileContent);
 	}
 
 	public void map(Object key, Text value, OutputCollector<NullWritable, Text> outputCollector, Reporter reporter) throws IOException {
 
-		
 		// We're accessing a publicly available bucket so don't need to fill in
 		// our credentials
 		ArchiveReader ar;
