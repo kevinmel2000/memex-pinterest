@@ -27,7 +27,7 @@ import java.util.Map.Entry;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.apache.hadoop.io.IntWritable;
+import org.apache.hadoop.io.NullWritable;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapred.MapReduceBase;
 import org.apache.hadoop.mapred.Mapper;
@@ -42,12 +42,12 @@ import org.jets3t.service.S3ServiceException;
 import org.jets3t.service.impl.rest.httpclient.RestS3Service;
 import org.jets3t.service.model.S3Object;
 
-public class WordCountOnlyMapper extends MapReduceBase implements Mapper<Object, Text, IntWritable, Text> {
+public class WordCountOnlyMapper extends MapReduceBase implements Mapper<Object, Text, NullWritable, Text> {
 
 	private static final int LOWER_SCORE_THRESHOLD = 3;
 	private OutputParser outputParser = new OutputParser();
 	
-	public void map(Object key, Text value, OutputCollector<IntWritable, Text> outputCollector, Reporter reporter) throws IOException {
+	public void map(Object key, Text value, OutputCollector<NullWritable, Text> outputCollector, Reporter reporter) throws IOException {
 
 		// We're accessing a publicly available bucket so don't need to fill in
 		// our credentials
@@ -113,7 +113,7 @@ public class WordCountOnlyMapper extends MapReduceBase implements Mapper<Object,
 					System.out.println("URL: " + url + " Score: " + score + " Detail: " + matches);
 					System.out.println("****************************************");
 //					outputCollector.collect(new IntWritable(score), new Text(url));
-					outputCollector.collect(new IntWritable(score), new Text(outputParser.parse(title, url, crawledDate, score, matches)));
+					outputCollector.collect(NullWritable.get(), new Text(outputParser.parse(title, url, crawledDate, score, matches)));
 				}
 
 				if (i++ > 10) {

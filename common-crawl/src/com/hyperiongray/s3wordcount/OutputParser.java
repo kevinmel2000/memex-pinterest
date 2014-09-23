@@ -11,10 +11,10 @@ public class OutputParser {
 	public String parse(String title, String url, String crawledDate,Integer score, Map<String, Integer> matches) {
 		StringBuilder builder = new StringBuilder();
 		try {
+			builder.append(score).append(SEPARTOR);
+			builder.append(title).append(SEPARTOR);
 			builder.append(getDomainName(url)).append(SEPARTOR);
 			builder.append(crawledDate).append(SEPARTOR);
-			builder.append(title).append(SEPARTOR);
-			builder.append(score).append(SEPARTOR);
 			builder.append(url).append(SEPARTOR);
 			builder.append(matches).append(SEPARTOR);
 		} catch (Exception e) {
