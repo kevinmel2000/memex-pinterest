@@ -67,6 +67,7 @@ class SplashMiddleware(object):
 
         meta = request.meta.copy()
         del meta['splash']
+        meta['_splash'] = True
 
         if self.RESPECT_SLOTS:
             # Use the same download slot to (sort of) respect download
@@ -85,8 +86,9 @@ class SplashMiddleware(object):
         )
 
     def process_response(self, request, response, spider):
-        if request.meta.get('splash'):
+        if '_splash' in request.meta:
             self.crawler.stats.inc_value('splash/response_count/%s' % response.status)
+
         return response
 
     def _get_slot_key(self, request_or_response):
