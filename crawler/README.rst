@@ -16,8 +16,11 @@ Installation
 Usage
 -----
 
-To try it,  and run
+To try it run
 
+::
+    
     scrapy crawl website_finder -a seed_urls=myurl.com -s SPLASH_URL=<YOUR_SPLASH_ADDRESS> -o data.csv
 
-Check :file:`discovery/spiders/website_finder.py` for more info.
+Check `discovery/spiders/website_finder.py <https://github.com/acaceres2176/memex-hackathon-1/blob/master/crawler/discovery/spiders/website_finder.py>`_ 
+for more info.
