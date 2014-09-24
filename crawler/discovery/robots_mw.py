@@ -65,6 +65,7 @@ class RobotsCrawlDelayMiddleware(object):
             'robots_mw.RobotsCrawlDelayMiddleware': 100,
         }
         ROBOTS_CRAWLDELAY_ENABLED = True
+        ROBOTS_CRAWLDLAY_VERBOSE = True  # enable stats
 
         # currently autothrottle doesn't play well with RobotsCrawlDelayMiddleware
         AUTOTHROTTLE_ENABLED = False
@@ -72,12 +73,12 @@ class RobotsCrawlDelayMiddleware(object):
     """
 
     DOWNLOAD_PRIORITY = 1000
-    MAX_DOWNLOAD_DELAY = 100
+    MAX_DOWNLOAD_DELAY = 60
 
     def __init__(self, crawler):
         if not crawler.settings.getbool('ROBOTS_CRAWLDELAY_ENABLED'):
             raise NotConfigured
-
+        self.verbose = crawler.settings.getbool('ROBOTS_CRAWLDELAY_VERBOSE', False)
         self.crawler = crawler
         self._robot_rules = {}  # domain => robots.txt rules object
 
@@ -131,7 +132,9 @@ class RobotsCrawlDelayMiddleware(object):
         if delay != slot.delay:
             log.msg("Adjusting delay for %s: %0.2f -> %0.2f" % (key, slot.delay, delay), logging.DEBUG)
             slot.delay = delay
-        self.crawler.stats.set_value('robots.txt/crawl-delay/%s' % key, delay)
+
+        if self.verbose:
+            self.crawler.stats.set_value('robots.txt/crawl-delay/%s' % key, delay)
 
     def _get_slot(self, request_or_response, spider):
         # If response is cached, request.meta.get('download_slot')
