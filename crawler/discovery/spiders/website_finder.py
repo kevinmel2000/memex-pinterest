@@ -151,8 +151,11 @@ class WebsiteFinderSpider(scrapy.Spider):
         ld = self._load_webpage_item(response, is_seed=False)
 
         if self.use_splash:
-            # FIXME: depth middleware shouldn't increase depth here
+
+            response.meta['depth'] -= 1  # XXX: a hack to keep the same depth
             splash_resp = yield self._splash_request(response.url)
+            response.meta['depth'] += 1
+
             self._process_splash_response(response, splash_resp, ld)
 
         yield ld.load_item()
