@@ -36,6 +36,7 @@ class MemexMongoUtils(object):
                 print "Dropping %s and %s" % (url_collection_name, host_collection_name)
                 db.drop_collection(url_collection_name)
                 db.drop_collection(host_collection_name)
+                db.drop_collection("seeds")
 
             except:
                 print "handled:"
@@ -136,12 +137,12 @@ class MemexMongoUtils(object):
     def insert_test_data(self, test_fn = "test_sites.csv"):
 
         self.__insert_url_test_data(test_fn = test_fn)
-        self.process_host_data()
+        self.process_host_data()        
 
 if __name__ == "__main__":
 
-    mmu = MemexMongoUtils(init_db = True, which_collection = "cc-crawl-data")
-    mmu.insert_test_data(test_fn = "cc_test_sites.csv")
+    mmu = MemexMongoUtils(which_collection = "cc-crawl-data")
+#    mmu.insert_test_data(test_fn = "cc_test_sites.csv")
 
 #    mmu = MemexMongoUtils(init_db = True, which_collection = "crawl-data")
 #    mmu.insert_test_data("test_sites.csv")
@@ -153,9 +154,9 @@ if __name__ == "__main__":
 #    for x in mmu.list_hosts(page = 1):
 #        print x
 
-#    for x in mmu.list_hosts(page = 2):
-#        print x
-#
-    for x in mmu.list_all_hosts():
+    for x in mmu.list_all_urls():
         print x
-    print len(mmu.list_all_hosts())
+#
+#    for x in mmu.list_all_hosts():
+#        print x
+#    print len(mmu.list_all_hosts())
