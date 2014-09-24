@@ -1,6 +1,9 @@
 # -*- coding: utf-8 -*-
 from __future__ import absolute_import
 import logging
+from urlparse import urljoin
+from urllib import urlencode
+import scrapy
 from scrapy import log
 
 
@@ -28,23 +31,25 @@ class SplashMiddleware(object):
     .. _Splash: https://github.com/scrapinghub/splash
 
     """
-    DEFAULT_PROXY_URL = 'http://127.0.0.1:8051'
+    DEFAULT_SPLASH_URL = 'http://127.0.0.1:8050'
     SPLASH_EXTRA_TIMEOUT = 5
+    RESPECT_SLOTS = True
 
-    def __init__(self, crawler, proxy_url):
+    def __init__(self, crawler, splash_url):
         self.crawler = crawler
-        self.proxy_url = proxy_url
+        self._splash_url = splash_url
 
     @classmethod
     def from_crawler(cls, crawler):
-        proxy_url = crawler.settings.get('SPLASH_PROXY_URL', cls.DEFAULT_PROXY_URL)
-        return cls(crawler, proxy_url)
+        url = crawler.settings.get('SPLASH_URL', cls.DEFAULT_SPLASH_URL)
+        return cls(crawler, url)
+
+    def splash_url(self, query, url, endpoint='render.json'):
+        query = query.copy()
+        query['url'] = url
+        return urljoin(self._splash_url, endpoint) + '?' + urlencode(query)
 
     def process_request(self, request, spider):
-        # FIXME: https is not supported because Splash doesn't support it
-        # in proxy mode. Switch to render.json, don't bother with headers
-        # and take care of download slots ourselves?
-
         splash_options = request.meta.get('splash')
         if not splash_options:
             return
@@ -59,7 +64,30 @@ class SplashMiddleware(object):
                     request.meta.get('download_timeout', 1e6),
                     float(value) + self.SPLASH_EXTRA_TIMEOUT
                 )
-            request.headers['X-Splash-%s' % key] = value
 
-        request.meta['proxy'] = self.proxy_url
+        meta = request.meta.copy()
+        del meta['splash']
+
+        if self.RESPECT_SLOTS:
+            # Use the same download slot to (sort of) respect download
+            # delays and concurrency options.
+            meta['download_slot'] = self._get_slot_key(request)
+
         self.crawler.stats.inc_value('splash/request_count')
+
+        return request.replace(
+            url=self.splash_url(splash_options, request.url),
+            meta=meta,
+
+            # FIXME: original HTTP headers are not respected.
+            # To respect them changes to Splash are needed.
+            headers={},
+        )
+
+    def process_response(self, request, response, spider):
+        if request.meta.get('splash'):
+            self.crawler.stats.inc_value('splash/response_count/%s' % response.status)
+        return response
+
+    def _get_slot_key(self, request_or_response):
+        return self.crawler.engine.downloader._get_slot_key(request_or_response, None)
