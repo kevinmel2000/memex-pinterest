@@ -11,10 +11,10 @@ def request_wants_json():
         request.accept_mimetypes[best] > \
         request.accept_mimetypes['text/html']
 
-def hosts_handler(page = 1):
+def hosts_handler(page = 1, which_collection = "crawl-data"):
     """Put together host documents for use with hosts endpoint """
 
-    mmu = MemexMongoUtils()
+    mmu = MemexMongoUtils(which_collection = which_collection)
 
     #!process host records
     #!THIS WON'T SCALE
@@ -25,10 +25,10 @@ def hosts_handler(page = 1):
 
     return host_dics
 
-def urls_handler(host = None):
+def urls_handler(host = None, which_collection  = "crawl-data"):
     """Put together host documents for use with hosts endpoint """
 
-    mmu = MemexMongoUtils()
+    mmu = MemexMongoUtils(which_collection = which_collection)
     url_dics = mmu.list_urls(host = host)
 
     for url_dic in url_dics:
@@ -42,5 +42,10 @@ if __name__ == "__main__":
 
     for x in hosts_handler(page = 3):
         print x["host"]
+
+    print "===================================+"
+    for x in hosts_handler(page = 3, which_collection = "cc-crawl-data"):
+        print x["host"]
+
 #    for x in urls_handler():
 #        print x["url"]

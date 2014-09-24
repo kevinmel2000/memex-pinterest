@@ -6,27 +6,47 @@ from random import randrange
 
 class MemexMongoUtils(object):
 
-    def __init__(self, init_db = False, address = "localhost", port = 27017):
+    def __init__(self, init_db = False, address = "localhost", port = 27017, which_collection = "crawl-data"):
+        """This class  initializes a Memex Mongo object and rebuilds the db collections if you want.
+
+        Warning: init_db will delete your collection when set to True
+
+        which_collection specifies whether to connect to the scrapy crawl data or common crawl data collection
+        to connect to common crawl specify this as cc-crawldata
+        """
+
+        if which_collection == "crawl-data":
+            url_collection_name = "urlinfo"
+            host_collection_name = "hostinfo"
+
+        elif which_collection == "cc-crawl-data":
+            url_collection_name = "cc-urlinfo"
+            host_collection_name = "cc-hostinfo"
+
+        else:
+            raise Exception("You have specified an invalid collection, please choose either crawl-data or cc-crawl-data for which_collection")
 
         self.client = MongoClient(address, port)
 
         db = self.client["MemexHack"]
 
         if init_db:
-            print "Got call to initialize db"
+            print "Got call to initialize db with %s %s" % (url_collection_name, host_collection_name)
             try:
-                db.drop_collection("urlinfo")
-                db.drop_collection("hostinfo")
+                print "Dropping %s and %s" % (url_collection_name, host_collection_name)
+                db.drop_collection(url_collection_name)
+                db.drop_collection(host_collection_name)
+                db.drop_collection("seeds")
 
             except:
                 print "handled:"
                 traceback.print_exc()
 
-            db.create_collection("urlinfo")
-            db.create_collection("hostinfo")
+            db.create_collection(url_collection_name)
+            db.create_collection(host_collection_name)
 
-        self.urlinfo_collection = db.urlinfo
-        self.hostinfo_collection = db.hostinfo
+        self.urlinfo_collection = db[url_collection_name]
+        self.hostinfo_collection = db[host_collection_name]
 
         #create index and drop any dupes
         if init_db:
@@ -36,9 +56,9 @@ class MemexMongoUtils(object):
     def list_urls(self, host = None, limit = 20):
 
         if not host:
-            docs = self.urlinfo_collection.find().sort("score", -1).limit(20)
+            docs = self.urlinfo_collection.find().sort("score", -1).limit(limit)
         else:
-            docs = self.urlinfo_collection.find({"host" : host}).sort("score", -1).limit(20)
+            docs = self.urlinfo_collection.find({"host" : host}).sort("score", -1).limit(limit)
 
         return list(docs)
 
@@ -77,6 +97,7 @@ class MemexMongoUtils(object):
                     self.urlinfo_collection.save(url_dic)
 
                 except:
+                    traceback.print_exc()
                     #doc with same url exists, skip
                     pass
 
@@ -113,15 +134,19 @@ class MemexMongoUtils(object):
 
         return host_dics
 
-    def insert_test_data(self):
+    def insert_test_data(self, test_fn = "test_sites.csv"):
 
-        self.__insert_url_test_data()
-        self.process_host_data()
+        self.__insert_url_test_data(test_fn = test_fn)
+        self.process_host_data()        
 
 if __name__ == "__main__":
 
-    mmu = MemexMongoUtils(init_db = True)
-    mmu.insert_test_data()
+    mmu = MemexMongoUtils(which_collection = "cc-crawl-data")
+#    mmu.insert_test_data(test_fn = "cc_test_sites.csv")
+
+#    mmu = MemexMongoUtils(init_db = True, which_collection = "crawl-data")
+#    mmu.insert_test_data("test_sites.csv")
+
 #    hosts = []
 #    for x in mmu.process_host_data():
 #        print x["host"]
@@ -129,9 +154,9 @@ if __name__ == "__main__":
 #    for x in mmu.list_hosts(page = 1):
 #        print x
 
-#    for x in mmu.list_hosts(page = 2):
-#        print x
-
-    for x in mmu.list_all_hosts():
+    for x in mmu.list_all_urls():
         print x
-    
+#
+#    for x in mmu.list_all_hosts():
+#        print x
+#    print len(mmu.list_all_hosts())

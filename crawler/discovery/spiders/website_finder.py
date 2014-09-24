@@ -57,6 +57,14 @@ class WebsiteFinderSpider(scrapy.Spider):
 
         $ scrapy crawl website_finder -a seed_urls=example.com,example2.co.uk -o data.csv
 
+    To enable HTML storage use 'save_html' argument::
+
+        $ scrapy crawl website_finder -a seed_urls=example.com -a save_html=1 -o data.csv
+
+    To disable Javascript rendering and screenshots pass 'use_splash=0' argument::
+
+        $ scrapy crawl website_finder -a seed_urls=example.com -a use_splash=0 -o data.csv
+
     (note that data is appended to data.csv, so you might want to remove old file)
 
     Navigation algorithm is the following:
@@ -80,6 +88,8 @@ class WebsiteFinderSpider(scrapy.Spider):
     """
     name = 'website_finder'
     random_seed = 0
+    save_html = None
+    use_splash = None
 
     # FIXME: these limits don't take duplicates filter in account
     max_depth_seed = 2
@@ -90,14 +100,14 @@ class WebsiteFinderSpider(scrapy.Spider):
 
     screenshot_dir = 'data/screenshots'
 
-    def __init__(self, seed_urls):
+    def __init__(self, seed_urls, save_html=0, use_splash=1, **kwargs):
+        self.save_html = bool(int(save_html))
+        self.use_splash = bool(int(use_splash))
         self.random = random.Random(self.random_seed)
         self.start_urls = [add_scheme_if_missing(url) for url in seed_urls.split(',')]
         self.req_count = defaultdict(int)
-        try:
-            os.makedirs(self.screenshot_dir)
-        except OSError:
-            pass
+        super(WebsiteFinderSpider, self).__init__(name=None, **kwargs)
+        makedir(self.screenshot_dir)
 
     def parse(self, response):
         if 'referrer_url' in response.meta:
@@ -140,33 +150,15 @@ class WebsiteFinderSpider(scrapy.Spider):
         """
         Parse a webpage from an external website.
         """
-
         ld = self._load_webpage_item(response, is_seed=False)
-        # depth = response.meta.get('link_depth', 0)
 
-        try:
-            # FIXME: depth middleware shouldn't increase depth here
-            splash_resp = yield scrapy.Request(response.url, meta={
-                'splash': {
-                    'render': 'json',
-                    'html': '1',
-                    'png': '1',
-                    'wait': '2.0',
-                    'width': '640',
-                    'height': '480',
-                },
-                'download_timeout': 40,
-            })
-            data = json.loads(splash_resp.body, encoding='utf8')
-            # ld.add_value('html_rendered', data['html'])
-            screenshot_path = self._save_screenshot(get_domain(response.url), data)
-            ld.add_value('screenshot_path', screenshot_path)
-            # del data
-            # del splash_resp
+        if self.use_splash:
 
-        except Exception as e:
-            self.log("Error rendering %s: %s" % (response.url, e), logging.ERROR)
-            raise
+            response.meta['depth'] -= 1  # XXX: a hack to keep the same depth
+            splash_resp = yield self._splash_request(response.url)
+            response.meta['depth'] += 1
+
+            self._process_splash_response(response, splash_resp, ld)
 
         yield ld.load_item()
 
@@ -189,12 +181,34 @@ class WebsiteFinderSpider(scrapy.Spider):
                     max_count=self.max_external_links_per_domain
                 )
 
+    def _splash_request(self, url):
+        return scrapy.Request(url, meta={
+            'splash': {
+                'html': '1' if self.save_html else '0',
+                'png': '1',
+                'wait': '2.0',
+                'width': '640',
+                'height': '480',
+                'timeout': '30',
+            },
+            'download_timeout': 40,
+        })
+
+    def _process_splash_response(self, response, splash_response, ld):
+        data = json.loads(splash_response.body, encoding='utf8')
+
+        screenshot_path = self._save_screenshot(get_domain(response.url), data)
+        ld.add_value('screenshot_path', screenshot_path)
+
+        if self.save_html:
+            ld.add_value('html_rendered', data['html'])
+
     def _save_screenshot(self, prefix, data):
         png = base64.b64decode(data['png'])
-        fn = os.path.join(
-            self.screenshot_dir,
-            prefix + '-' + md5(png).hexdigest() + '.png'
-        )
+        dirname = os.path.join(self.screenshot_dir, prefix)
+        makedir(dirname)
+
+        fn = os.path.join(dirname, md5(png).hexdigest() + '.png')
         with open(fn, 'wb') as fp:
             fp.write(png)
         return fn
@@ -256,8 +270,8 @@ class WebsiteFinderSpider(scrapy.Spider):
         ld.add_value('crawled_at', datetime.datetime.utcnow())
         ld.add_value('is_seed', is_seed)
 
-        # if depth == 0 or is_external:
-        #     ld.add_value('html', response.body)
+        if self.save_html:
+            ld.add_value('html', response.body_as_unicode())
 
         if 'link' in response.meta:
             link = response.meta['link']
@@ -267,3 +281,10 @@ class WebsiteFinderSpider(scrapy.Spider):
             ld.add_value('referrer_depth', response.meta['referrer_depth'])
 
         return ld
+
+
+def makedir(path):
+    try:
+        os.makedirs(path)
+    except OSError:
+        pass

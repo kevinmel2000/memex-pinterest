@@ -16,12 +16,42 @@
   {% for url_dic in urls %}
       <tr>
         <td><span class="glyphicon glyphicon-screenshot"></span>&nbsp;<a href="{{ url_dic["url"] }}">{{ url_dic["url"][:40] }}</a></td>
-        <td>{{ url_dic["host"] }}</td>
-        <td>{{ url_dic["score"] }}</td>
-        <td>{{ url_dic["crawled_at"] }}</td>
-        <td>{{ url_dic["is_seed"] }}</td>
-        <td>{{ url_dic["title"] }}</td>
-        <td>SCREENSHOT</td>
+	{% if "host" in url_dic and url_dic["host"] %}
+          <td>{{ url_dic["host"] }}</td>
+        {% else %}
+          <td></td>
+	{% endif %}
+
+	{% if "score" in url_dic and url_dic["score"] %}
+          <td>{{ url_dic["score"] }}</td>
+        {% else %}
+          <td></td>
+	{% endif %}
+
+	{% if "crawled_at" in url_dic and url_dic["crawled_at"] %}
+          <td>{{ url_dic["crawled_at"] }}</td>
+        {% else %}
+          <td></td>
+	{% endif %}
+
+	{% if "is_seed" in url_dic and url_dic["is_seed"] %}
+          <td>{{ url_dic["is_seed"] }}</td>
+        {% else %}
+          <td></td>
+	{% endif %}
+
+	{% if "title" in url_dic and url_dic["title"] %}
+          <td>{{ url_dic["title"] }}</td>
+        {% else %}
+          <td></td>
+	{% endif %}
+
+	{% if "url" in url_dic["url"] %}
+          <td><img src="http://splash.scrapinghub.com/render.png?url={{ url_dic["url"] }}&width=640&height=480"> </img></td>
+        {% else %}
+          <td></td>
+	{% endif %}
+
       </tr>
   {% endfor %}
   </tbody>
