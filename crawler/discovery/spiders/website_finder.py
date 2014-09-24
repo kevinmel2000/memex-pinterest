@@ -94,11 +94,8 @@ class WebsiteFinderSpider(scrapy.Spider):
         self.random = random.Random(self.random_seed)
         self.start_urls = [add_scheme_if_missing(url) for url in seed_urls.split(',')]
         self.req_count = defaultdict(int)
-        try:
-            os.makedirs(self.screenshot_dir)
-        except OSError:
-            pass
         super(WebsiteFinderSpider, self).__init__(name=None, **kwargs)
+        makedir(self.screenshot_dir)
 
     def parse(self, response):
         if 'referrer_url' in response.meta:
@@ -191,10 +188,10 @@ class WebsiteFinderSpider(scrapy.Spider):
 
     def _save_screenshot(self, prefix, data):
         png = base64.b64decode(data['png'])
-        fn = os.path.join(
-            self.screenshot_dir,
-            prefix + '-' + md5(png).hexdigest() + '.png'
-        )
+        dirname = os.path.join(self.screenshot_dir, prefix)
+        makedir(dirname)
+
+        fn = os.path.join(dirname, md5(png).hexdigest() + '.png')
         with open(fn, 'wb') as fp:
             fp.write(png)
         return fn
@@ -267,3 +264,10 @@ class WebsiteFinderSpider(scrapy.Spider):
             ld.add_value('referrer_depth', response.meta['referrer_depth'])
 
         return ld
+
+
+def makedir(path):
+    try:
+        os.makedirs(path)
+    except OSError:
+        pass
