@@ -23,6 +23,12 @@ HTTPCACHE_STORAGE = 'discovery.splash_ext.SplashAwareFSCacheStorage'  # needed b
 SPLASH_URL = 'http://127.0.0.1:8050'
 SPLASH_PROXY_URL = 'http://127.0.0.1:8051'
 
+# MONGO_URI = '...'
+MONGO_DB = 'MemexHack'
+ITEM_PIPELINES = {
+    'discovery.pipelines.MongoPipeline': 100,
+}
+
 HTTPCACHE_ENABLED = True
 
 MEMUSAGE_ENABLED = True
