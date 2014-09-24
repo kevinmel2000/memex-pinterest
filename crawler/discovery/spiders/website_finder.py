@@ -90,7 +90,7 @@ class WebsiteFinderSpider(scrapy.Spider):
 
     screenshot_dir = 'data/screenshots'
 
-    def __init__(self, seed_urls):
+    def __init__(self, seed_urls, **kwargs):
         self.random = random.Random(self.random_seed)
         self.start_urls = [add_scheme_if_missing(url) for url in seed_urls.split(',')]
         self.req_count = defaultdict(int)
@@ -98,6 +98,7 @@ class WebsiteFinderSpider(scrapy.Spider):
             os.makedirs(self.screenshot_dir)
         except OSError:
             pass
+        super(WebsiteFinderSpider, self).__init__(name=None, **kwargs)
 
     def parse(self, response):
         if 'referrer_url' in response.meta:
