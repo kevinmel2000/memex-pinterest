@@ -176,6 +176,28 @@ class WebsiteFinderSpider(scrapy.Spider):
                     max_count=self.max_external_links_per_domain
                 )
 
+    def _splash_request(self, url):
+        return scrapy.Request(url, meta={
+            'splash': {
+                'html': '1',
+                'png': '1',
+                'wait': '2.0',
+                'width': '640',
+                'height': '480',
+                'timeout': '30',
+            },
+            'download_timeout': 40,
+        })
+
+    def _process_splash_response(self, response, splash_response, ld):
+        data = json.loads(splash_response.body, encoding='utf8')
+
+        screenshot_path = self._save_screenshot(get_domain(response.url), data)
+        ld.add_value('screenshot_path', screenshot_path)
+
+        if self.save_html:
+            ld.add_value('html_rendered', data['html'])
+
     def _save_screenshot(self, prefix, data):
         png = base64.b64decode(data['png'])
         dirname = os.path.join(self.screenshot_dir, prefix)
@@ -243,8 +265,8 @@ class WebsiteFinderSpider(scrapy.Spider):
         ld.add_value('crawled_at', datetime.datetime.utcnow())
         ld.add_value('is_seed', is_seed)
 
-        # if depth == 0 or is_external:
-        #     ld.add_value('html', response.body)
+        if self.save_html:
+            ld.add_value('html', response.body_as_unicode())
 
         if 'link' in response.meta:
             link = response.meta['link']
