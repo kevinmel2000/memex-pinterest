@@ -1,16 +1,20 @@
 from flask import Flask
-from flask import render_template, jsonify, Response
+from flask import render_template, jsonify, Response, request
 from handlers import request_wants_json
 from mongoutils.memex_mongo_utils import MemexMongoUtils 
-from handlers import hosts_handler, urls_handler
+from handlers import hosts_handler, urls_handler, schedule_spider_handler, get_job_state_handler, schedule_spider_handler, discovery_handler
 import json
+import hashlib
 app = Flask(__name__)
 
 #ui
 @app.route("/discovery")
 def discovery():
     
-    return render_template('discovery.html')
+    seeds = discovery_handler()
+    for seed in seeds:
+        seed["url_hash"] = str(hashlib.md5(seed["url"]).hexdigest())
+    return render_template('discovery.html', seeds = seeds)
 
 @app.route("/data")
 @app.route("/")
@@ -70,7 +74,22 @@ def cc_urls(host = None):
     #change this
     return render_template("urls.html", urls = urls, use_cc_data = True)
 
+@app.route("/schedule-spider/")
+def schedule_spider():
+
+    url = request.args.get('url')
+    schedule_spider_handler(url)
+    return Response("OK")
+
+@app.route("/url-job-state/")
+def get_spider_update():
+
+    url = request.args.get('url')
+    state = get_job_state_handler(url)
+
+    return str(state)
+
 if __name__ == "__main__":
 
     app.debug = True
-    app.run('0.0.0.0')
+    app.run('0.0.0.0', threaded = True)

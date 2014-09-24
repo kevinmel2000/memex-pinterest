@@ -1,2 +1,73 @@
 {% extends "layout.html" %}
-Discover URLs
+{% block content %}
+<div class="container">
+  <form role="form">
+    <div class="row">
+      <div class="form-group">
+        <label for="code">Please enter a URL to Spider below</label>
+        <input id= "url-input" class="form-control input-lg" type="text">
+      </div>
+    </div>
+    
+    <div class="row">
+      <button type="button" class="btn btn-default" onclick="submitUrlForCrawl()">Submit</button>
+    </div>
+  </form>
+</div>
+
+<table id="" class="table table-striped" style="margin-top:50px;">
+  <thead>
+    <tr>
+      <th>URL</th>
+      <th>Crawl Status</th>
+    </tr>
+  </thead>
+  <tbody>
+	{% for seed in seeds %}
+	<tr>
+          <td>{{ seed["url"] }}</td>
+          <td id="{{ seed['url_hash'] }}">Initializing...</td>
+	</tr>
+	<script>
+	  $( document ).ready(function() {
+          getUrlCrawlStatus('{{ seed["url"] }}', '{{ seed["url_hash"] }}');
+	  });
+          setInterval(function() {
+          getUrlCrawlStatus('{{ seed["url"] }}', '{{ seed["url_hash"] }}');
+          }, 5000);
+	</script>
+
+	{% endfor %}
+  </tbody>
+</table>
+
+<script>
+function submitUrlForCrawl() {
+
+  url = document.getElementById('url-input').value
+  scrapyd_url = "/schedule-spider/?url=" + url;
+  //alert(scrapyd_url);
+  console.log("Scheduled job");
+  $.get(scrapyd_url, function( whatever ) {
+    console.log("The job was successfully scheduled")
+    location.reload()
+    //alert('success');
+  });
+}
+
+function getUrlCrawlStatus(url, url_hash) {
+
+    $("td#" + url_hash).html('<span style="text-decoration:blink">Reloading...</span>');
+    console.log("Getting status");
+    status_url = "/url-job-state/?url=" + url;
+
+  $.get(status_url, function( status ) {
+    console.log("Everything's good y'all, s'all good, s'all good");
+    $("td#" + url_hash).html(status);
+  });
+}
+
+</script>
+
+
+{% endblock %}

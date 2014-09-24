@@ -44,14 +44,18 @@ class MemexMongoUtils(object):
 
             db.create_collection(url_collection_name)
             db.create_collection(host_collection_name)
+            db.create_collection("seeds")
 
         self.urlinfo_collection = db[url_collection_name]
         self.hostinfo_collection = db[host_collection_name]
+        self.seed_collection = db["seeds"]
 
         #create index and drop any dupes
         if init_db:
             self.urlinfo_collection.ensure_index("url", unique = True, drop_dups = True)
             self.hostinfo_collection.ensure_index("host", unique = True, drop_dups = True)
+            self.seed_collection.ensure_index("url", unique = True, drop_dups = True)
+
 
     def list_urls(self, host = None, limit = 20):
 
@@ -83,6 +87,12 @@ class MemexMongoUtils(object):
 
         return list(docs)
 
+    def list_seeds(self, sort_by = "url"):
+
+        docs = self.seed_collection.find().sort(sort_by, 1)
+
+        return list(docs)
+
     def __insert_url_test_data(self, test_fn = "test_sites.csv"):
 
         with open(test_fn) as testfile:
@@ -97,6 +107,7 @@ class MemexMongoUtils(object):
                     self.urlinfo_collection.save(url_dic)
 
                 except:
+                    print url_dic
                     traceback.print_exc()
                     #doc with same url exists, skip
                     pass
@@ -137,12 +148,35 @@ class MemexMongoUtils(object):
     def insert_test_data(self, test_fn = "test_sites.csv"):
 
         self.__insert_url_test_data(test_fn = test_fn)
-        self.process_host_data()        
+        self.process_host_data()
+
+    def add_job(self, url, job_id, default_state = "Initializing"):
+
+        try:
+            seed_doc = {"url" : url, "state" : default_state, "job_id" : job_id}
+            self.seed_collection.save(seed_doc)
+        except:
+            self.seed_collection.update({"url" : url}, {'$set' : {"job_id" : job_id}})
+
+    def mark_seed_state(self, url, state):
+        
+        self.seed_collection.update({"url" : url}, {'$set': {'state': state}})
+
+    def get_seed_doc(self, url):
+
+        seed_doc = self.seed_collection.find_one({"url" : url})
+        return seed_doc
 
 if __name__ == "__main__":
 
-    mmu = MemexMongoUtils(which_collection = "cc-crawl-data")
-#    mmu.insert_test_data(test_fn = "cc_test_sites.csv")
+    mmu = MemexMongoUtils(which_collection = "crawl-data", init_db = True)
+#    mmu.add_seed("http://www.hyperiongray.com")
+#    mmu.mark_seed_state("http://www.hyperiongray.com", "Running")
+#    print mmu.get_seed_doc("http://www.hyperiongray.com")
+
+#    for x in mmu.list_seeds():
+#        print x['url'], x['job_id']
+#    mmu.insert_test_data(test_fn = "test_sites.csv")
 
 #    mmu = MemexMongoUtils(init_db = True, which_collection = "crawl-data")
 #    mmu.insert_test_data("test_sites.csv")
@@ -152,10 +186,11 @@ if __name__ == "__main__":
 #        print x["host"]
 
 #    for x in mmu.list_hosts(page = 1):
-#        print x
+#        x.pop("_id")
+#        print json.dumps(x)
 
-    for x in mmu.list_all_urls():
-        print x
+#    for x in mmu.list_all_urls():
+#        print x
 #
 #    for x in mmu.list_all_hosts():
 #        print x
