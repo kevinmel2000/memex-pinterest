@@ -33,10 +33,11 @@ public class WordCountJob {
 			FileUtils.deleteQuietly(file);
 
 			JobConf conf = new JobConf();
-			conf.setJobName("s3wordcount");
+			conf.setJarByClass(com.hyperiongray.s3wordcount.WordCountOnlyMapper.class);
+			conf.setJobName("HG");
 
 			conf.setMapperClass(WordCountOnlyMapper.class);
-			conf.setNumMapTasks(1);
+			conf.setNumMapTasks(Integer.valueOf(args[3]));
 
 			// conf.setReducerClass(WordCountReducer.class);
 			// conf.setNumReduceTasks(1);
@@ -46,7 +47,7 @@ public class WordCountJob {
 
 			conf.setOutputKeyClass(NullWritable.class);
 			conf.setOutputValueClass(Text.class);
-
+			
 			FileInputFormat.setInputPaths(conf, new Path(args[0]));
 			FileOutputFormat.setOutputPath(conf, new Path(args[1]));
 
@@ -62,7 +63,7 @@ public class WordCountJob {
 			conf.set("keywordsFileContent", keywordsFileContent);
 
 			if (args.length > 3)
-				conf.setInt("sampleSize", Integer.valueOf(args[3]));
+				conf.setInt("sampleSize", Integer.valueOf(args[4]));
 
 			// URI uri = new URI(args[2]);
 			// DistributedCache.addCacheFile(uri, conf);

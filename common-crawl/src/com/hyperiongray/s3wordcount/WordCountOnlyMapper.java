@@ -96,8 +96,10 @@ public class WordCountOnlyMapper extends MapReduceBase implements Mapper<Object,
 		logger.info("Started" + new Date());
 		for (ArchiveRecord r : ar) {
 
+			reporter.progress();
 			String url = "";
 			try {
+				
 				// The header file contains information such as the type of
 				// record, size, creation time, and URL
 				url = r.getHeader().getUrl();
@@ -138,6 +140,7 @@ public class WordCountOnlyMapper extends MapReduceBase implements Mapper<Object,
 					outputCollector.collect(NullWritable.get(),
 							new Text(outputParser.parse(this.getTitle(content), url, crawledDate, score, matches)));
 				}
+				
 				logger.debug(new Integer(i).toString());
 
 				if (i++ > sampleSize) {
