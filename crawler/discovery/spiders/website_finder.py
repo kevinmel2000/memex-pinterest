@@ -88,6 +88,8 @@ class WebsiteFinderSpider(scrapy.Spider):
     """
     name = 'website_finder'
     random_seed = 0
+    save_html = None
+    use_splash = None
 
     # FIXME: these limits don't take duplicates filter in account
     max_depth_seed = 2
@@ -182,7 +184,7 @@ class WebsiteFinderSpider(scrapy.Spider):
     def _splash_request(self, url):
         return scrapy.Request(url, meta={
             'splash': {
-                'html': '1',
+                'html': '1' if self.save_html else '0',
                 'png': '1',
                 'wait': '2.0',
                 'width': '640',
