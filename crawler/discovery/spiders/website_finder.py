@@ -57,6 +57,14 @@ class WebsiteFinderSpider(scrapy.Spider):
 
         $ scrapy crawl website_finder -a seed_urls=example.com,example2.co.uk -o data.csv
 
+    To enable HTML storage use 'save_html' argument::
+
+        $ scrapy crawl website_finder -a seed_urls=example.com -a save_html=1 -o data.csv
+
+    To disable Javascript rendering and screenshots pass 'use_splash=0' argument::
+
+        $ scrapy crawl website_finder -a seed_urls=example.com -a use_splash=0 -o data.csv
+
     (note that data is appended to data.csv, so you might want to remove old file)
 
     Navigation algorithm is the following:
@@ -90,7 +98,9 @@ class WebsiteFinderSpider(scrapy.Spider):
 
     screenshot_dir = 'data/screenshots'
 
-    def __init__(self, seed_urls, **kwargs):
+    def __init__(self, seed_urls, save_html=0, use_splash=1, **kwargs):
+        self.save_html = bool(int(save_html))
+        self.use_splash = bool(int(use_splash))
         self.random = random.Random(self.random_seed)
         self.start_urls = [add_scheme_if_missing(url) for url in seed_urls.split(',')]
         self.req_count = defaultdict(int)
@@ -138,32 +148,12 @@ class WebsiteFinderSpider(scrapy.Spider):
         """
         Parse a webpage from an external website.
         """
-
         ld = self._load_webpage_item(response, is_seed=False)
-        # depth = response.meta.get('link_depth', 0)
 
-        try:
+        if self.use_splash:
             # FIXME: depth middleware shouldn't increase depth here
-            splash_resp = yield scrapy.Request(response.url, meta={
-                'splash': {
-                    'html': '1',
-                    'png': '1',
-                    'wait': '2.0',
-                    'width': '640',
-                    'height': '480',
-                },
-                'download_timeout': 40,
-            })
-            data = json.loads(splash_resp.body, encoding='utf8')
-            # ld.add_value('html_rendered', data['html'])
-            screenshot_path = self._save_screenshot(get_domain(response.url), data)
-            ld.add_value('screenshot_path', screenshot_path)
-            # del data
-            # del splash_resp
-
-        except Exception as e:
-            self.log("Error rendering %s: %s" % (response.url, e), logging.ERROR)
-            raise
+            splash_resp = yield self._splash_request(response.url)
+            self._process_splash_response(response, splash_resp, ld)
 
         yield ld.load_item()
 
