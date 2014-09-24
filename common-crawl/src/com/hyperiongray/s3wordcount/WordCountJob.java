@@ -23,6 +23,8 @@ public class WordCountJob {
 	 */
 	public static void main(String[] args) throws Exception {
 
+		CustomHttpConnector httpConnector = new CustomHttpConnector();
+
 		try {
 
 			logger.info("Hello");
@@ -48,8 +50,19 @@ public class WordCountJob {
 			FileInputFormat.setInputPaths(conf, new Path(args[0]));
 			FileOutputFormat.setOutputPath(conf, new Path(args[1]));
 
-			String keywordsFileContent = FileUtils.readFileToString(new File(args[2]), "UTF-8");
+			String keywordsFileContent;
+			try {
+				keywordsFileContent = FileUtils.readFileToString(new File(args[2]), "UTF-8");
+				logger.info(keywordsFileContent);
+			} catch (Exception e) {
+				keywordsFileContent = httpConnector.getContent(args[2]);
+			}
+
+			//
 			conf.set("keywordsFileContent", keywordsFileContent);
+
+			if (args.length > 3)
+				conf.setInt("sampleSize", Integer.valueOf(args[3]));
 
 			// URI uri = new URI(args[2]);
 			// DistributedCache.addCacheFile(uri, conf);

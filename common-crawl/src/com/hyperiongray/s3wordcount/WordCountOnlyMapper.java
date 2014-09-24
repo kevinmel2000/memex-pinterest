@@ -40,7 +40,7 @@ import org.archive.io.ArchiveReader;
 import org.archive.io.ArchiveRecord;
 import org.archive.io.warc.WARCReaderFactory;
 import org.jets3t.service.S3Service;
-import org.jets3t.service.S3ServiceException;
+import org.jets3t.service.ServiceException;
 import org.jets3t.service.impl.rest.httpclient.RestS3Service;
 import org.jets3t.service.model.S3Object;
 import org.slf4j.Logger;
@@ -54,15 +54,19 @@ public class WordCountOnlyMapper extends MapReduceBase implements Mapper<Object,
 	private static final Pattern pattern = Pattern.compile("<title>(.+?)</title>", Pattern.CASE_INSENSITIVE);
 	private OutputParser outputParser = new OutputParser();
 	private WeightedKeyword weightedKeyword;
-
+	private Integer sampleSize;
+	
 	public void configure(JobConf job) {
 		String keywordsfileContent = job.get("keywordsFileContent");
 		weightedKeyword = new WeightedKeyword(keywordsfileContent);
+		
+		logger.info("weights:" + weightedKeyword.getDefinedWeightedWords());
+		logger.info("weights:" + weightedKeyword.getKeywordPattern());
+		
+		sampleSize = job.getInt("sampleSize",100);
+		logger.info("Running with sampleSize of:" + sampleSize);
 	}
 
-	// protected void setup(org.apache.hadoop.mapreduce.Mapper.Context context) {
-	//
-	// }
 	public void map(Object key, Text value, OutputCollector<NullWritable, Text> outputCollector, Reporter reporter) throws IOException {
 
 		// We're accessing a publicly available bucket so don't need to fill in
@@ -81,7 +85,7 @@ public class WordCountOnlyMapper extends MapReduceBase implements Mapper<Object,
 			// should be decompressed
 			ar = WARCReaderFactory.get(fn, f.getDataInputStream(), true);
 
-		} catch (S3ServiceException e) {
+		} catch (ServiceException e) {
 			logger.error("S3 connection Failed", e);
 			throw new RuntimeException(e);
 		}
@@ -136,7 +140,7 @@ public class WordCountOnlyMapper extends MapReduceBase implements Mapper<Object,
 				}
 				logger.debug(new Integer(i).toString());
 
-				if (i++ > 100) {
+				if (i++ > sampleSize) {
 					logger.info("Finished " + new Date());
 					break;
 				}

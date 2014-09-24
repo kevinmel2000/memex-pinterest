@@ -1,4 +1,4 @@
-package com.hyperiongray;
+package com.hyperiongray.s3wordcount;
 
 import java.io.IOException;
 import java.io.InputStream;

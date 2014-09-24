@@ -76,11 +76,16 @@
 			<artifactId>junit</artifactId>
 			<version>4.11</version>
 		</dependency>
-        <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-log4j12</artifactId>
-            <version>1.7.5</version>
-        </dependency>
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-log4j12</artifactId>
+			<version>1.7.5</version>
+		</dependency>
+		<dependency>
+			<groupId>net.java.dev.jets3t</groupId>
+			<artifactId>jets3t</artifactId>
+			<version>0.9.0</version>
+		</dependency>
 	</dependencies>
 
 	<build>
@@ -100,11 +105,11 @@
 				<artifactId>maven-assembly-plugin</artifactId>
 				<version>2.4</version>
 				<configuration>
-<!-- 				    <archive> -->
-<!-- 				      <manifest> -->
-<!-- 				        <mainClass>fully.qualified.MainClass</mainClass> -->
-<!-- 				      </manifest> -->
-<!-- 				    </archive> -->
+					<!-- <archive> -->
+					<!-- <manifest> -->
+					<!-- <mainClass>fully.qualified.MainClass</mainClass> -->
+					<!-- </manifest> -->
+					<!-- </archive> -->
 					<descriptorRefs>
 						<descriptorRef>jar-with-dependencies</descriptorRef>
 					</descriptorRefs>
@@ -163,38 +168,38 @@
 		</plugins>
 	</build>
 
-<!-- 	<profiles> -->
-<!-- 		<profile> -->
-<!-- 			<id>release-sign-artifacts</id> -->
-<!-- 			<activation> -->
-<!-- 				<property> -->
-<!-- 					<name>performRelease</name> -->
-<!-- 					<value>true</value> -->
-<!-- 				</property> -->
-<!-- 			</activation> -->
-<!-- 			<build> -->
-<!-- 				<plugins> -->
-<!-- 					<plugin> -->
-<!-- 						<groupId>org.apache.maven.plugins</groupId> -->
-<!-- 						<artifactId>maven-gpg-plugin</artifactId> -->
-<!-- 						<version>1.4</version> -->
-<!-- 						<configuration> -->
-<!-- 							<passphrase>${gpg.passphrase}</passphrase> -->
-<!-- 						</configuration> -->
-<!-- 						<executions> -->
-<!-- 							<execution> -->
-<!-- 								<id>sign-artifacts</id> -->
-<!-- 								<phase>verify</phase> -->
-<!-- 								<goals> -->
-<!-- 									<goal>sign</goal> -->
-<!-- 								</goals> -->
-<!-- 							</execution> -->
-<!-- 						</executions> -->
-<!-- 					</plugin> -->
-<!-- 				</plugins> -->
-<!-- 			</build> -->
-<!-- 		</profile> -->
-<!-- 	</profiles> -->
+	<!-- <profiles> -->
+	<!-- <profile> -->
+	<!-- <id>release-sign-artifacts</id> -->
+	<!-- <activation> -->
+	<!-- <property> -->
+	<!-- <name>performRelease</name> -->
+	<!-- <value>true</value> -->
+	<!-- </property> -->
+	<!-- </activation> -->
+	<!-- <build> -->
+	<!-- <plugins> -->
+	<!-- <plugin> -->
+	<!-- <groupId>org.apache.maven.plugins</groupId> -->
+	<!-- <artifactId>maven-gpg-plugin</artifactId> -->
+	<!-- <version>1.4</version> -->
+	<!-- <configuration> -->
+	<!-- <passphrase>${gpg.passphrase}</passphrase> -->
+	<!-- </configuration> -->
+	<!-- <executions> -->
+	<!-- <execution> -->
+	<!-- <id>sign-artifacts</id> -->
+	<!-- <phase>verify</phase> -->
+	<!-- <goals> -->
+	<!-- <goal>sign</goal> -->
+	<!-- </goals> -->
+	<!-- </execution> -->
+	<!-- </executions> -->
+	<!-- </plugin> -->
+	<!-- </plugins> -->
+	<!-- </build> -->
+	<!-- </profile> -->
+	<!-- </profiles> -->
 
 	<repositories>
 		<repository>

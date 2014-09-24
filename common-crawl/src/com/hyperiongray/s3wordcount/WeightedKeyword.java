@@ -15,9 +15,10 @@ public class WeightedKeyword {
 		definedWeightedWords = Maps.newHashMap();
 		for (String line : lines) {
 			String[] split = line.split(",");
-			definedWeightedWords.put(split[0].trim(), Integer.valueOf(split[1]));
-			Pattern pattern = Pattern.compile("\\b" + Pattern.quote(split[0]) + "\\b", Pattern.CASE_INSENSITIVE);
-			keywordPattern.put(split[0], pattern);
+			String key = split[0].trim();
+			definedWeightedWords.put(key, Integer.valueOf(split[1]));
+			Pattern pattern = Pattern.compile("\\b" + Pattern.quote(key) + "\\b", Pattern.CASE_INSENSITIVE);
+			keywordPattern.put(key, pattern);
 		}
 //		for (String keyword : getDefinedWeightedWords().keySet()) {
 //			String escapedKeyword = Pattern.quote(keyword);
