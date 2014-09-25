@@ -103,11 +103,11 @@ def mark_interest(interest):
 
     url = request.args.get('url')
 
-    if interest.strip().lowr() == "false":
+    if interest.strip().lower() == "false":
         interest = False
 
     elif interest.strip().lower() == "true":
-        interest = True, x["score"]
+        interest = True
 
     else:
         raise Exception("Interest must be either true or false")
