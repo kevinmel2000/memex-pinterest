@@ -4,6 +4,10 @@ To deploy updated changes to UI and Crawler code run
 
     fab push
 
+It requires git to have a remote named 'prod'; to create it locally run
+
+    fab setup_git
+
 """
 from __future__ import absolute_import
 import os
