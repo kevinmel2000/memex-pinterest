@@ -6,3 +6,4 @@ tldextract==1.5.0
 reppy==0.3.0
 scrapy-inline-requests==0.1.2
 pymongo==2.7.2
+scrapyd==1.0.1

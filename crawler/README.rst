@@ -16,6 +16,9 @@ Installation
 Usage
 -----
 
+From Console
+~~~~~~~~~~~~
+
 To try it run
 
 ::
@@ -24,3 +27,9 @@ To try it run
 
 Check `discovery/spiders/website_finder.py <https://github.com/acaceres2176/memex-hackathon-1/blob/master/crawler/discovery/spiders/website_finder.py>`_ 
 for more info.
+
+API
+~~~
+
+To expose HTTP API run ``scrapyd`` from this folder. 
+This is required for UI to work.

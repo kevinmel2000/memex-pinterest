@@ -5,6 +5,10 @@
 *.egg-info/
 .idea/
 crawler/data
+crawler/dbs
+crawler/logs
+crawler/items
+crawler/twistd.pid
 .classpath
 .project
 *.iml
