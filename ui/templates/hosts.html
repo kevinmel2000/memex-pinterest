@@ -13,7 +13,8 @@
 <span class="glyphicon glyphicon-remove-circle" style="cursor: pointer; cursor: hand;"></span>-->
 
 {% if 'hsu_screenshot_path' in host_dic and host_dic['hsu_screenshot_path'] %}
-  <img src="{{ host_dic['hsu_screenshot_path'] }}" alt="ALT">
+  {% set hsu_screenshot_path = host_dic['hsu_screenshot_path'] %}
+  <img src="{{ url_for('static', filename=hsu_screenshot_path) }}" alt="ALT">
 {% else %}
   <img src="http://www1.macys.com/img/pdp/productNotAvailable.jpg" alt="ALT">
 {% endif %}

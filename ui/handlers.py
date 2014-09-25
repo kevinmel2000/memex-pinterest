@@ -86,9 +86,9 @@ def mark_interest_handler(interest, url):
 
 if __name__ == "__main__":
 
-    print schedule_spider_handler("http://butts.com/")
-#    for x in hosts_handler(page = 3):
-#        print x["host"]
+#    print schedule_spider_handler("http://butts.com/")
+    for x in hosts_handler(page = 3):
+        print x
 
 #    print "===================================+"
 #    for x in hosts_handler(page = 3, which_collection = "cc-crawl-data"):
