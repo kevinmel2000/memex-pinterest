@@ -4,6 +4,10 @@ from scrapyutils.scrapydutil import ScrapydJob
 import json
 import itertools
 
+def get_screenshot_relative_path(real_path):
+
+    return real_path.split("static/")[1]
+
 def request_wants_json():
 
     best = request.accept_mimetypes \
@@ -21,8 +25,15 @@ def hosts_handler(page = 1, which_collection = "crawl-data"):
     #!THIS WON'T SCALE
     mmu.process_host_data()
     host_dics = mmu.list_hosts(page = page)
+
     for host_dic in host_dics:
         host_dic.pop("_id")
+        hsu = mmu.get_highest_scoring_url_with_screenshot(host_dic["host"])
+        if hsu:
+            screenshot_path = get_screenshot_relative_path(hsu['screenshot_path'])
+            host_dic["hsu_screenshot_path"] = screenshot_path
+        else:
+            host_dic["hsu_screenshot_path"] = None
 
     return host_dics
 
@@ -60,9 +71,20 @@ def discovery_handler():
     seeds = mmu.list_seeds()
     return seeds
 
+def mark_interest_handler(interest, url):
+
+    mmu = MemexMongoUtils()
+    if interest:
+        mmu.set_interest(url, True)
+
+    else:
+        #if user marks url as uninteresting, score drops to 0
+        mmu.set_interest(url, False)
+
+        #!should we be doing this?
+#        mmu.set_score(url, 0)
 
 if __name__ == "__main__":
-
 
     print schedule_spider_handler("http://butts.com/")
 #    for x in hosts_handler(page = 3):

@@ -1,8 +1,11 @@
+import random
 import itertools
 import csv
 from pymongo import MongoClient
 import traceback
 from random import randrange
+import json
+from operator import itemgetter
 
 class MemexMongoUtils(object):
 
@@ -50,6 +53,7 @@ class MemexMongoUtils(object):
         self.hostinfo_collection = db[host_collection_name]
         self.seed_collection = db["seeds"]
 
+        print db.collection_names()
         #create index and drop any dupes
         if init_db:
             self.urlinfo_collection.ensure_index("url", unique = True, drop_dups = True)
@@ -127,12 +131,13 @@ class MemexMongoUtils(object):
             host_dic["host"] = key
             host_dic["num_urls"] = len(group_list)
 
-            #calculate score, sum(individual scores)/number of urls
+            #calculate score
             host_score = 0
             for url_dic in group_list:
-                host_score += int(url_dic["score"])
+                if "score" in url_dic:
+                    if int(url_dic["score"]) > host_score:
+                        host_score = int(url_dic["score"])
 
-            host_score = int(host_score / host_dic["num_urls"])
             host_dic["host_score"] = host_score
 
             host_dics.append(host_dic)
@@ -162,14 +167,41 @@ class MemexMongoUtils(object):
         
         self.seed_collection.update({"url" : url}, {'$set': {'state': state}})
 
+    def get_highest_scoring_url_with_screenshot(self, host):
+
+        docs = list(self.urlinfo_collection.find({'$and' : [{'screenshot_path' : {"$exists" : "true"}}, {'host' : host}]}))
+        for doc in docs:
+            if not "score" in doc:
+                doc["score"] = 0
+
+        urls_sorted = sorted(docs, key=itemgetter('score'), reverse = True)
+
+        if urls_sorted:
+            return urls_sorted[0]
+        else:
+            return None
+
     def get_seed_doc(self, url):
 
         seed_doc = self.seed_collection.find_one({"url" : url})
         return seed_doc
 
+    def set_interest(self, url, interest):
+
+        self.urlinfo_collection.update({"url" : url}, {'$set' : {"interest" : interest}})
+
+    def set_score(self, url, score_set):
+        
+        self.urlinfo_collection.update({"url" : url}, {'$set' : {"score" : score_set}})
+
 if __name__ == "__main__":
 
-    mmu = MemexMongoUtils(which_collection = "crawl-data", init_db = True)
+    mmu = MemexMongoUtils(which_collection = "crawl-data")
+#    for doc in mmu.list_all_urls():
+#        mmu.set_score(doc["url"], random.randint(0,100))
+
+    print mmu.get_highest_scoring_url_with_screenshot('freebsd.orgddd')
+
 #    mmu.add_seed("http://www.hyperiongray.com")
 #    mmu.mark_seed_state("http://www.hyperiongray.com", "Running")
 #    print mmu.get_seed_doc("http://www.hyperiongray.com")
@@ -184,11 +216,10 @@ if __name__ == "__main__":
 #    hosts = []
 #    for x in mmu.process_host_data():
 #        print x["host"]
-
-#    for x in mmu.list_hosts(page = 1):
-#        x.pop("_id")
-#        print json.dumps(x)
-
+#
+#    for x in mmu.list_urls(host = "bhphotovideo.com"):
+#        print x
+#
 #    for x in mmu.list_all_urls():
 #        print x
 #

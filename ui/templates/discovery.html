@@ -57,7 +57,7 @@ function submitUrlForCrawl() {
 
 function getUrlCrawlStatus(url, url_hash) {
 
-    $("td#" + url_hash).html('<span style="text-decoration:blink">Reloading...</span>');
+    //$("td#" + url_hash).html('<span style="text-decoration:blink">Reloading...</span>');
     console.log("Getting status");
     status_url = "/url-job-state/?url=" + url;
 
