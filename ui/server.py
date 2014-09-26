@@ -4,7 +4,7 @@ from flask import Flask
 from operator import itemgetter
 from flask import render_template, jsonify, Response, request
 from handlers import request_wants_json
-from mongoutils.memex_mongo_utils import MemexMongoUtils 
+from mongoutils.memex_mongo_utils import MemexMongoUtils
 from handlers import hosts_handler, urls_handler, schedule_spider_handler, get_job_state_handler, schedule_spider_handler, discovery_handler, mark_interest_handler, get_screenshot_relative_path
 import json
 import hashlib
@@ -14,7 +14,7 @@ app = Flask(__name__)
 #ui
 @app.route("/discovery")
 def discovery():
-    
+
     seeds = discovery_handler()
     for seed in seeds:
         seed["url_hash"] = str(hashlib.md5(seed["url"]).hexdigest())
@@ -66,8 +66,9 @@ def urls(host = None):
 
     #!super hacky
     for url_dic in urls:
-        screenshot_path = url_dic["screenshot_path"]
-        url_dic["screenshot_path"] = get_screenshot_relative_path(screenshot_path)
+        screenshot_path = url_dic.get("screenshot_path")
+        if screenshot_path:
+            url_dic["screenshot_path"] = get_screenshot_relative_path(screenshot_path)
 
     return render_template("urls.html", urls = urls)
 

@@ -1,0 +1,7 @@
+lxml==3.4.0
+pymongo==2.7.2
+tqdm
+
+# numpy==1.9.0
+# scipy==0.14
+# scikit-learn==0.15.2

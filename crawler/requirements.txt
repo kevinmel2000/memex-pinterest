@@ -8,6 +8,4 @@ scrapy-inline-requests==0.1.2
 pymongo==2.7.2
 scrapyd==1.0.1
 
-# numpy==1.9.0
-# scipy==0.14
-# scikit-learn==0.15.2
+

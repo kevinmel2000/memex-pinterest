@@ -95,14 +95,16 @@ class WebsiteFinderSpider(scrapy.Spider):
 
     # FIXME: these limits don't take duplicates filter in account
     max_depth_seed = 2
-    max_depth_external = 1
+    max_depth_external = 2
     max_internal_links_per_seed = 100
     max_external_links_per_seed_per_domain = 5
     max_external_links_per_domain = 10
 
-    screenshot_dir = 'data/screenshots'
+    # screenshot_dir = 'data/screenshots'
+    screenshot_dir = '/Users/kmike/scrap/memex-hackathon-1/ui/static/images/screenshots'
 
-    def __init__(self, seed_urls, save_html=0, use_splash=1, **kwargs):
+
+    def __init__(self, seed_urls, save_html=1, use_splash=1, **kwargs):
         self.save_html = bool(int(save_html))
         self.use_splash = bool(int(use_splash))
         self.random = random.Random(self.random_seed)

@@ -38,7 +38,7 @@ DEPTH_LIMIT = 6  # make sure to adjust this when changing depth-related spider a
 AJAXCRAWL_ENABLED = True
 DOWNLOAD_TIMEOUT = 20  # default was 180s
 REDIRECT_MAX_TIMES = 10  # default was 20
-CLOSESPIDER_ITEMCOUNT = 1000  # ~100 websites max; don't crawl the whole Internet
+CLOSESPIDER_ITEMCOUNT = 10000  # ~100 websites max; don't crawl the whole Internet
 DOWNLOAD_DELAY = 1
 DUPEFILTER_DEBUG = True
 

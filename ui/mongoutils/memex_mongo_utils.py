@@ -71,25 +71,26 @@ class MemexMongoUtils(object):
         return list(docs)
 
     def list_hosts(self, page = 1, num_docs = 21):
-
+        docs = self.hostinfo_collection.find().sort("host_score", -1)
         try:
-            docs = self.hostinfo_collection.find().sort("host_score", -1).skip(num_docs * (page - 1)).limit(num_docs)
-        except:
-            docs = self.hostinfo_collection.find().sort("host_score", -1).limit(num_docs)
-            
+            docs = docs.skip(num_docs * (page - 1)).limit(num_docs)
+        except Exception:
+            docs = docs.limit(num_docs)
+
+        docs = docs.limit(num_docs)
         return list(docs)
 
     def list_all_hosts(self):
 
         docs = self.hostinfo_collection.find()
-            
+
         return list(docs)
 
     def list_all_urls(self, sort_by = "host"):
 
-        docs = self.urlinfo_collection.find().sort(sort_by, 1)
+        docs = self.urlinfo_collection.find({}, {'html':0, 'html_rendered': 0}) #.sort(sort_by, 1)
 
-        return list(docs)
+        return sorted(list(docs), key=lambda rec: rec[sort_by])
 
     def list_seeds(self, sort_by = "url"):
 
@@ -132,20 +133,22 @@ class MemexMongoUtils(object):
             host_dic["num_urls"] = len(group_list)
 
             #calculate score
-            host_score = 0
+            host_score = 0.0
             for url_dic in group_list:
                 if "score" in url_dic:
-                    if int(url_dic["score"]) > host_score:
-                        host_score = int(url_dic["score"])
+                    # host_score += float(url_dic["score"])
+                    if float(url_dic["score"]) > host_score:
+                        host_score = float(url_dic["score"])
 
-            host_dic["host_score"] = host_score
-
+            # host_dic["host_score"] = int(host_score / len(group_list) * 100)
+            host_dic["host_score"] = int(host_score * 100)
             host_dics.append(host_dic)
 
         for host_dic in host_dics:
             try:
                 self.hostinfo_collection.save(host_dic)
-            except:
+            except Exception as e:
+                print(e)
                 pass
 
         return host_dics
@@ -160,11 +163,11 @@ class MemexMongoUtils(object):
         try:
             seed_doc = {"url" : url, "state" : default_state, "job_id" : job_id}
             self.seed_collection.save(seed_doc)
-        except:
+        except Exception:
             self.seed_collection.update({"url" : url}, {'$set' : {"job_id" : job_id}})
 
     def mark_seed_state(self, url, state):
-        
+
         self.seed_collection.update({"url" : url}, {'$set': {'state': state}})
 
     def get_highest_scoring_url_with_screenshot(self, host):
@@ -191,7 +194,7 @@ class MemexMongoUtils(object):
         self.urlinfo_collection.update({"url" : url}, {'$set' : {"interest" : interest}})
 
     def set_score(self, url, score_set):
-        
+
         self.urlinfo_collection.update({"url" : url}, {'$set' : {"score" : score_set}})
 
 if __name__ == "__main__":
