@@ -38,7 +38,7 @@ public class WordCountJob {
 
 			conf.setMapperClass(WordCountOnlyMapper.class);
 			conf.setNumMapTasks(Integer.valueOf(args[3]));
-
+			conf.setNumReduceTasks(0);
 			// conf.setReducerClass(WordCountReducer.class);
 			// conf.setNumReduceTasks(1);
 

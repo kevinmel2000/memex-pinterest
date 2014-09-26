@@ -47,22 +47,17 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class WordCountOnlyMapper extends MapReduceBase implements Mapper<Object, Text, NullWritable, Text> {
+	
 	private static final Logger logger = LoggerFactory.getLogger(WordCountOnlyMapper.class);
-
 	private static final int LOWER_SCORE_THRESHOLD = 5;
 
-	private static final Pattern pattern = Pattern.compile("<title>(.+?)</title>", Pattern.CASE_INSENSITIVE);
 	private OutputParser outputParser = new OutputParser();
-	private WeightedKeyword weightedKeyword;
 	private Integer sampleSize;
+	private ContentMatcher contentMatcher;
 	
 	public void configure(JobConf job) {
 		String keywordsfileContent = job.get("keywordsFileContent");
-		weightedKeyword = new WeightedKeyword(keywordsfileContent);
-		
-		logger.info("weights:" + weightedKeyword.getDefinedWeightedWords());
-		logger.info("weights:" + weightedKeyword.getKeywordPattern());
-		
+		contentMatcher = new ContentMatcher(keywordsfileContent);
 		sampleSize = job.getInt("sampleSize",100);
 		logger.info("Running with sampleSize of:" + sampleSize);
 	}
@@ -129,8 +124,8 @@ public class WordCountOnlyMapper extends MapReduceBase implements Mapper<Object,
 				// it?
 				String content = new String(os.toString());
 
-				Map<String, Integer> matches = this.matchContent(content);
-				int score = score(matches);
+				Map<String, Integer> matches = contentMatcher.matchContent(content);
+				int score = contentMatcher.score(matches);
 
 				if (score > LOWER_SCORE_THRESHOLD) {
 
@@ -138,7 +133,7 @@ public class WordCountOnlyMapper extends MapReduceBase implements Mapper<Object,
 					logger.info("URL: " + url + " Score: " + score + " Detail: " + matches);
 					// outputCollector.collect(new IntWritable(score), new Text(url));
 					outputCollector.collect(NullWritable.get(),
-							new Text(outputParser.parse(this.getTitle(content), url, crawledDate, score, matches)));
+							new Text(outputParser.parse(contentMatcher.getTitle(content), url, crawledDate, score, matches)));
 				}
 				
 				logger.debug(new Integer(i).toString());
@@ -155,36 +150,5 @@ public class WordCountOnlyMapper extends MapReduceBase implements Mapper<Object,
 
 	}
 
-	public Map<String, Integer> matchContent(String content) throws IOException {
-		Map<String, Integer> matches = Maps.newHashMap();
-		if (!content.isEmpty() && content.length() > 50) {
-			for (Entry<String, Pattern> entry : weightedKeyword.getKeywordPattern().entrySet()) {
-				Matcher matcher = entry.getValue().matcher(content);
-				if (matcher.find())
-					matches.put(entry.getKey(), 1);
-			}
-		}
-		return matches;
-	}
-
-	// public for testing purposes
-	public int score(Map<String, Integer> matches) throws IOException {
-		int score = 1;
-		for (Entry<String, Integer> entry : matches.entrySet()) {
-			score *= weightedKeyword.getDefinedWeightedWords().get(entry.getKey()) * entry.getValue();
-		}
-		return score;
-	}
-
-	public String getTitle(String content) {
-		Matcher matcher = pattern.matcher(content);
-		String result;
-		if (matcher.find()) {
-			result = matcher.group(1);
-		} else {
-			result = "";
-		}
-		return result;
-	}
 
 }
