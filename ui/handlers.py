@@ -5,8 +5,10 @@ import json
 import itertools
 
 def get_screenshot_relative_path(real_path):
-
-    return real_path.split("static/")[1]
+    try:
+        return real_path.split("static/")[1]
+    except IndexError:
+        return None
 
 def request_wants_json():
 
@@ -58,12 +60,12 @@ def schedule_spider_handler(seed, spider_host = "localhost", spider_port = "6800
     return True
 
 def get_job_state_handler(url, spider_host = "localhost", spider_port = "6800"):
-    
+
     mmu = MemexMongoUtils()
     scrapyd_util = ScrapydJob(spider_host, spider_port)
     job_id = mmu.get_seed_doc(url)["job_id"]
 
-    return scrapyd_util.get_state(job_id)    
+    return scrapyd_util.get_state(job_id)
 
 def discovery_handler():
 
