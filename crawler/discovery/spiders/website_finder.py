@@ -26,7 +26,7 @@ from discovery.urlutils import (
 
 
 class WebpageItem(scrapy.Item):
-    mongo_collection = 'crawl-data'
+    mongo_collection = 'urlinfo'
 
     url = scrapy.Field()                 # url of a page
     host = scrapy.Field()                # website

@@ -9,9 +9,16 @@
 {% endif %}
 
 <article class="white-panel" id="{{ host_dic["host"] }}">
-<span class="glyphicon glyphicon-ok-circle" style="cursor: pointer;"></span>
-<span class="glyphicon glyphicon-remove-circle" style="cursor: pointer; cursor: hand;"></span>
-<img src="http://www.mediademon.com/wp-content/uploads/2013/07/Blog-Post-Imagery5.png" alt="ALT">
+<!--<span class="glyphicon glyphicon-ok-circle" style="cursor: pointer;"></span>
+<span class="glyphicon glyphicon-remove-circle" style="cursor: pointer; cursor: hand;"></span>-->
+
+{% if 'hsu_screenshot_path' in host_dic and host_dic['hsu_screenshot_path'] %}
+  {% set hsu_screenshot_path = host_dic['hsu_screenshot_path'] %}
+  <img src="{{ url_for('static', filename=hsu_screenshot_path) }}" alt="ALT">
+{% else %}
+  <img src="http://www1.macys.com/img/pdp/productNotAvailable.jpg" alt="ALT">
+{% endif %}
+
 <h1><a href="{{ url_path }}/{{ host_dic["host"] }}">Host: {{ host_dic["host"] }}<br /></a></h1>
 <p>Number of Urls Crawled: {{ host_dic["num_urls"] }}</p>
 <p>Score: {{ host_dic["host_score"] }}</p>

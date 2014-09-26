@@ -24,7 +24,7 @@ SPLASH_URL = 'http://127.0.0.1:8050'
 SPLASH_PROXY_URL = 'http://127.0.0.1:8051'
 
 # MONGO_URI = '...'
-MONGO_DB = 'MemexHack'
+MONGO_DATABASE = 'MemexHack'
 ITEM_PIPELINES = {
     'discovery.pipelines.MongoPipeline': 100,
 }

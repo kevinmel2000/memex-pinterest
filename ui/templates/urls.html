@@ -4,6 +4,7 @@
   <thead>
     <tr>
       <th>URL</th>
+      <th>Interesting</th>
       <th>Host</th>
       <th>Score</th>
       <th>Crawl At</th>
@@ -15,7 +16,31 @@
   <tbody>
   {% for url_dic in urls %}
       <tr>
-        <td><span class="glyphicon glyphicon-screenshot"></span>&nbsp;<a href="{{ url_dic["url"] }}">{{ url_dic["url"][:40] }}</a></td>
+        <td>
+	  <!--<span class="glyphicon glyphicon-screenshot"></span>-->
+	  &nbsp;<a href="{{ url_dic["url"] }}">{{ url_dic["url"][:40] }}</a>
+	</td>
+	  <!--<span class="glyphicon glyphicon-ok-circle" style="cursor: pointer;" onlick="markInterest('true', '{{ url_dic["url"] }}');"></span>&nbsp;
+	  <span class="glyphicon glyphicon-remove-circle" style="cursor: pointer; cursor: hand;" onlick="markInterest('false', '{{ url_dic["url"] }}');"></span>-->
+        <td>
+	    {% if "interest" in url_dic and url_dic["interest"] %}
+	      <button class="btn btn-success" onclick="markInterest('true', '{{ url_dic["url"] }}');" disabled>yes</button>
+	      <button class="btn btn-danger" onclick="markInterest('false', '{{ url_dic["url"] }}');">no</button>
+	    {% elif "interest" in url_dic and not url_dic["interest"] %}
+  	      <button class="btn btn-success" onclick="markInterest('true', '{{ url_dic["url"] }}');">yes</button>
+	      <button class="btn btn-danger" onclick="markInterest('false', '{{ url_dic["url"] }}');" disabled>no</button>
+	    {% else %}
+	      <button class="btn btn-success" onclick="markInterest('true', '{{ url_dic["url"] }}');">yes</button>
+	      <button class="btn btn-danger" onclick="markInterest('false', '{{ url_dic["url"] }}');">no</button>
+	    {% endif %}
+
+  	      <!--<p style="margin-top:4px;">Currently: {{ url_dic["interest"] }}</p>-->
+	  <!--<div onclick="markInterest('true', '{{ url_dic["url"] }}');">ddddddddddddd</div>-->
+	  <!--<span class="glyphicon glyphicon-screenshot"></span>-->
+	</td>
+
+	
+
 	{% if "host" in url_dic and url_dic["host"] %}
           <td>{{ url_dic["host"] }}</td>
         {% else %}
@@ -46,8 +71,9 @@
           <td></td>
 	{% endif %}
 
-	{% if "url" in url_dic["url"] %}
-          <td><img src="http://splash.scrapinghub.com/render.png?url={{ url_dic["url"] }}&width=640&height=480"> </img></td>
+	{% if "screenshot_path" in url_dic %}	  
+	  {% set screenshot_path = url_dic["screenshot_path"] %}
+          <td><img src="{{ url_for('static', filename=screenshot_path) }}"></img></td>
         {% else %}
           <td></td>
 	{% endif %}
@@ -56,4 +82,18 @@
   {% endfor %}
   </tbody>
 </table>
+
+<script>
+function markInterest(interest, url) {
+
+  console.log("Marking interest");
+  interest_url = "/mark-interest/" + interest + "?url=" + url;
+
+  $.get(interest_url, function( status ) {
+    console.log("Everything's good y'all, s'all good, s'all good interest");
+    location.reload();
+  });
+}
+</script>
+
 {% endblock %}
