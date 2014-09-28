@@ -10,6 +10,7 @@ import json
 import hashlib
 server_path = os.path.dirname(os.path.realpath(__file__))
 app = Flask(__name__)
+app.config.from_object('settings')
 
 #ui
 @app.route("/discovery")
@@ -117,5 +118,11 @@ def mark_interest(interest):
     return Response("OK")
 
 if __name__ == "__main__":
-    app.debug = True
+
+    if app.confg["INIT_DB_ON_START"]:
+        MemexMongoUtils(init_db = True)
+
+    if app.config['DEBUG']:
+        app.debug = True
+
     app.run('0.0.0.0', threaded = True)
