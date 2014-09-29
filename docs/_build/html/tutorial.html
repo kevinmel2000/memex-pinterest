@@ -24,7 +24,7 @@
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
     <link rel="top" title="sourcefinder 0.1.0 documentation" href="index.html" />
-    <link rel="prev" title="Welcome to sourcefinder’s documentation!" href="index.html" />
+    <link rel="prev" title="Introduction" href="intro.html" />
    
   
   <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9">
@@ -38,7 +38,7 @@
           <a href="genindex.html" title="General Index"
              accesskey="I">index</a></li>
         <li class="right" >
-          <a href="index.html" title="Welcome to sourcefinder’s documentation!"
+          <a href="intro.html" title="Introduction"
              accesskey="P">previous</a> |</li>
         <li><a href="index.html">sourcefinder 0.1.0 documentation</a> &raquo;</li> 
       </ul>
@@ -55,10 +55,288 @@
 <ul class="simple">
 </ul>
 </div>
-<p>Balls.:</p>
-<div class="highlight-python"><div class="highlight"><pre>code code code
-code code code
+<div class="section" id="install">
+<h2>Install<a class="headerlink" href="#install" title="Permalink to this headline">¶</a></h2>
+<p>SourcePin is easy to install, here are the steps.</p>
+<ul>
+<li><p class="first">Install dependencies</p>
+<div class="highlight-python"><div class="highlight"><pre>sudo apt-get install mongodb
+sudo apt-get install libxml2-dev libxslt1-dev python-dev
+sudo apt-get build-dep python-lxml
+pip install pymongo
+pip install scrapy
+pip install scrapyd
+pip install splash
+pip install python-scrapyd-api
+pip install lxml
+pip install service_identity
+pip install pytest
+pip install tldextract
+pip install reppy
+pip install scrapy-inline-requests
 </pre></div>
+</div>
+</li>
+</ul>
+<p>If any of the previous commands fail, please see the documentation
+for each respective project or email <a class="reference external" href="mailto:acaceres&#37;&#52;&#48;hyperiongray&#46;com">acaceres<span>&#64;</span>hyperiongray<span>&#46;</span>com</a> for help
+(Splash in particular can cause some trouble).</p>
+<p>Once dependencies have been installed please check out the SourcePin code by doing</p>
+<div class="highlight-python"><div class="highlight"><pre>git@github.com:acaceres2176/memex-hackathon-1.git
+</pre></div>
+</div>
+<p>If you don&#8217;t have access to this repo please email <a class="reference external" href="mailto:acaceres&#37;&#52;&#48;hyperiongray&#46;com">acaceres<span>&#64;</span>hyperiongray<span>&#46;</span>com</a>.</p>
+<p>Once dependencies are installed and the code is checked out head on over to the scrapy crawler
+&#8220;discovery&#8221; crawler directory, from the project root:</p>
+<div class="highlight-python"><div class="highlight"><pre>cd crawler
+scrapyd
+</pre></div>
+</div>
+<p>This will start scrapyd on your local machine on port 6800. Next, start the Splash server by doing</p>
+<div class="highlight-python"><div class="highlight"><pre>python -m splash.server
+</pre></div>
+</div>
+<p>This will start splash on your local machine. Now you&#8217;re ready to start the SourcePin application,
+from the project root</p>
+<div class="highlight-python"><div class="highlight"><pre>python server.py
+</pre></div>
+</div>
+<p>Now open up your web browser and go to <a class="reference external" href="http://localhost:5000">http://localhost:5000</a>. You should see a blank page with
+the Hyperion Gray SourcePin title at the top.</p>
+<p>Now it&#8217;s time to instantiate the database. You can do this by doing the following from the project root</p>
+<div class="highlight-python"><div class="highlight"><pre>cd ui/mongoutils
+python memex_mongo_utils.py
+</pre></div>
+</div>
+<p>You should see some messages that the db is being instantiated, and you&#8217;re good to go!</p>
+</div>
+<div class="section" id="using-the-ui">
+<h2>Using the UI<a class="headerlink" href="#using-the-ui" title="Permalink to this headline">¶</a></h2>
+<p>In the base install the UI provides 2 important interfaces. The first is the ability to provide
+a seed URL, which performs crawls and the other an interface to view these results to make a decision
+on their relevance to your particular interest set.</p>
+<p>To get started click over to the Crawl New Sites tab, it should look like this:</p>
+<a class="reference internal image-reference" href="_images/crawl-new.png"><img alt="Crawl a new website from here" class="align-center" src="_images/crawl-new.png" style="width: 800px; height: 400px;" /></a>
+<p>Enter a website that you want to seed from in the box and click Submit. You should see the website
+inerted into a table on the screen and go into a state of &#8220;Running&#8221;. At this point, the site has
+been sent to our Scrapy based crawler, is being crawled and screenshotted, and being inserted into
+the database. Feel free to test this out on <a class="reference external" href="http://www.hyperiongray.com/">http://www.hyperiongray.com/</a> at your leisure. It should
+look like this:</p>
+<a class="reference internal image-reference" href="_images/running-crawl.png"><img alt="A running crawl" class="align-center" src="_images/running-crawl.png" style="width: 800px; height: 400px;" /></a>
+<p>Once you&#8217;ve entered some seeds in there, the system is crawling using Scrapy/Scrapyd, sending web pages
+to be rendered in a WebKit browser using Splash, and storing information in the database. To browse the
+results, check out the View Crawl Data link. It should look like this:</p>
+<a class="reference internal image-reference" href="_images/success-crawl.png"><img alt="Viewing successful crawl data" class="align-center" src="_images/success-crawl.png" style="width: 800px; height: 400px;" /></a>
+<p>Once you are viewing the crawl data successfully, you can drill down on specific hosts. In doing so
+you&#8217;ll open a &#8220;URL-level view&#8221; of the data. You should see screenshots of individual pages associated
+with a host. You can then mark interest or disinterst in them. This information gets stored in the database
+and can be used as generic user feedback and training data when plugging in to the scoring API.</p>
+</div>
+<div class="section" id="using-the-api">
+<h2>Using the API<a class="headerlink" href="#using-the-api" title="Permalink to this headline">¶</a></h2>
+<p>SourcePin has a simple, but powerful API that allows you to submit sites for crawl, view all results,
+and plug in to the scoring mechanism. It&#8217;s pretty sweet. Please note that you have to explicitly request
+JSON by using the Accept HTTP header value application/json. Here&#8217;s how it works.</p>
+<div class="section" id="endpoint-hosts-page">
+<h3>Endpoint <strong>/hosts/&lt;page&gt;</strong><a class="headerlink" href="#endpoint-hosts-page" title="Permalink to this headline">¶</a></h3>
+<p>Purpose: Retrieve host-level data.</p>
+<p>Example call</p>
+<div class="highlight-python"><div class="highlight"><pre>curl -iH &quot;Accept: application/json&quot; http://localhost:5000/hosts/1
+</pre></div>
+</div>
+<p>Example response</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="p">[</span>
+     <span class="p">{</span>
+             <span class="s">&quot;host_score&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+             <span class="s">&quot;host&quot;</span><span class="p">:</span> <span class="s">&quot;hyperiongray.com&quot;</span><span class="p">,</span>
+             <span class="s">&quot;hsu_screenshot_path&quot;</span><span class="p">:</span> <span class="n">null</span><span class="p">,</span>
+             <span class="s">&quot;num_urls&quot;</span><span class="p">:</span> <span class="mi">2</span>
+     <span class="p">},</span>
+
+     <span class="p">{</span>
+             <span class="s">&quot;host_score&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+             <span class="s">&quot;host&quot;</span><span class="p">:</span> <span class="s">&quot;stackoverflow.com&quot;</span><span class="p">,</span>
+             <span class="s">&quot;hsu_screenshot_path&quot;</span><span class="p">:</span> <span class="n">null</span><span class="p">,</span>
+             <span class="s">&quot;num_urls&quot;</span><span class="p">:</span> <span class="mi">28</span>
+     <span class="p">},</span>
+
+     <span class="p">{</span>
+             <span class="s">&quot;host_score&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+             <span class="s">&quot;host&quot;</span><span class="p">:</span> <span class="s">&quot;hyperiongray.com&quot;</span><span class="p">,</span>
+             <span class="s">&quot;hsu_screenshot_path&quot;</span><span class="p">:</span> <span class="n">null</span><span class="p">,</span>
+             <span class="s">&quot;num_urls&quot;</span><span class="p">:</span> <span class="mi">2</span>
+     <span class="p">},</span>
+
+     <span class="p">{</span>
+             <span class="s">&quot;host_score&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+             <span class="s">&quot;host&quot;</span><span class="p">:</span> <span class="s">&quot;stackoverflow.com&quot;</span><span class="p">,</span>
+             <span class="s">&quot;hsu_screenshot_path&quot;</span><span class="p">:</span> <span class="n">null</span><span class="p">,</span>
+             <span class="s">&quot;num_urls&quot;</span><span class="p">:</span> <span class="mi">29</span>
+     <span class="p">}</span>
+<span class="p">]</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="endpoint-urls-page">
+<h3>Endpoint <strong>/urls/&lt;page&gt;</strong><a class="headerlink" href="#endpoint-urls-page" title="Permalink to this headline">¶</a></h3>
+<p>Purpose: Retrieve url-level data.</p>
+<p>Example call</p>
+<div class="highlight-python"><div class="highlight"><pre>curl -iH &quot;Accept: application/json&quot; http://localhost:5000/urls/1
+</pre></div>
+</div>
+<p>Example response</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="p">[</span>
+   <span class="p">{</span>
+      <span class="s">&quot;referrer_url&quot;</span><span class="p">:</span> <span class="s">&quot;http://stackoverflow.com/questions/6504810/how-to-install-lxml-on-ubuntu/&quot;</span><span class="p">,</span>
+      <span class="s">&quot;total_depth&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+      <span class="s">&quot;crawled_at&quot;</span><span class="p">:</span> <span class="s">&quot;2014-09-29T02:04:52.593000&quot;</span><span class="p">,</span>
+      <span class="s">&quot;title&quot;</span><span class="p">:</span> <span class="s">&quot;User AKX - Stack Overflow&quot;</span><span class="p">,</span>
+      <span class="s">&quot;url&quot;</span><span class="p">:</span> <span class="s">&quot;http://stackoverflow.com/users/51685/akx&quot;</span><span class="p">,</span>
+      <span class="s">&quot;link_url&quot;</span><span class="p">:</span> <span class="s">&quot;http://stackoverflow.com/users/51685/akx&quot;</span><span class="p">,</span>
+      <span class="s">&quot;referrer_depth&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+      <span class="s">&quot;depth&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+      <span class="s">&quot;is_seed&quot;</span><span class="p">:</span> <span class="n">true</span><span class="p">,</span>
+      <span class="s">&quot;host&quot;</span><span class="p">:</span> <span class="s">&quot;stackoverflow.com&quot;</span><span class="p">,</span>
+      <span class="s">&quot;html&quot;</span> <span class="p">:</span> <span class="s">&quot;&lt;big long html string&gt;&quot;</span><span class="p">,</span>
+      <span class="s">&quot;rendered_html&quot;</span> <span class="p">:</span> <span class="s">&quot;&lt;big long html string after browser rendering&gt;&quot;</span>
+   <span class="p">},</span>
+
+   <span class="p">{</span>
+      <span class="s">&quot;referrer_url&quot;</span><span class="p">:</span> <span class="s">&quot;http://stackoverflow.com/questions/6504810/how-to-install-lxml-on-ubuntu/&quot;</span><span class="p">,</span>
+      <span class="s">&quot;total_depth&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+      <span class="s">&quot;crawled_at&quot;</span><span class="p">:</span> <span class="s">&quot;2014-09-29T02:04:53.488000&quot;</span><span class="p">,</span>
+      <span class="s">&quot;title&quot;</span><span class="p">:</span> <span class="s">&quot;python - Error installing libxml2-dev on Ubuntu 9.10 - for lxml-etree - Stack Overflow&quot;</span><span class="p">,</span>
+      <span class="s">&quot;url&quot;</span><span class="p">:</span> <span class="s">&quot;http://stackoverflow.com/questions/14024229/error-installing-libxml2-dev-on-ubuntu-9-10-for-lxml-etree&quot;</span><span class="p">,</span>
+      <span class="s">&quot;link_url&quot;</span><span class="p">:</span> <span class="s">&quot;http://stackoverflow.com/questions/14024229/error-installing-libxml2-dev-on-ubuntu-9-10-for-lxml-etree&quot;</span><span class="p">,</span>
+      <span class="s">&quot;link_text&quot;</span><span class="p">:</span> <span class="s">&quot;Error installing libxml2-dev on Ubuntu 9.10 - for lxml-etree&quot;</span><span class="p">,</span>
+      <span class="s">&quot;referrer_depth&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+      <span class="s">&quot;depth&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+      <span class="s">&quot;is_seed&quot;</span><span class="p">:</span> <span class="n">true</span><span class="p">,</span>
+      <span class="s">&quot;host&quot;</span><span class="p">:</span> <span class="s">&quot;stackoverflow.com&quot;</span><span class="p">,</span>
+      <span class="s">&quot;html&quot;</span> <span class="p">:</span> <span class="s">&quot;&lt;big long html string&gt;&quot;</span><span class="p">,</span>
+      <span class="s">&quot;rendered_html&quot;</span> <span class="p">:</span> <span class="s">&quot;&lt;big long html string after browser rendering&gt;&quot;</span>
+   <span class="p">},</span>
+
+   <span class="p">{</span>
+      <span class="s">&quot;referrer_url&quot;</span><span class="p">:</span> <span class="s">&quot;http://stackoverflow.com/questions/6504810/how-to-install-lxml-on-ubuntu/&quot;</span><span class="p">,</span>
+      <span class="s">&quot;total_depth&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+      <span class="s">&quot;crawled_at&quot;</span><span class="p">:</span> <span class="s">&quot;2014-09-29T02:04:54.759000&quot;</span><span class="p">,</span>
+      <span class="s">&quot;title&quot;</span><span class="p">:</span> <span class="s">&quot;User JimmyYe - Stack Overflow&quot;</span><span class="p">,</span>
+      <span class="s">&quot;url&quot;</span><span class="p">:</span> <span class="s">&quot;http://stackoverflow.com/users/1266258/jimmyye&quot;</span><span class="p">,</span>
+      <span class="s">&quot;link_url&quot;</span><span class="p">:</span> <span class="s">&quot;http://stackoverflow.com/users/1266258/jimmyye&quot;</span><span class="p">,</span>
+      <span class="s">&quot;referrer_depth&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+      <span class="s">&quot;depth&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+      <span class="s">&quot;is_seed&quot;</span><span class="p">:</span> <span class="n">true</span><span class="p">,</span>
+      <span class="s">&quot;host&quot;</span><span class="p">:</span> <span class="s">&quot;stackoverflow.com&quot;</span><span class="p">,</span>
+      <span class="s">&quot;html&quot;</span> <span class="p">:</span> <span class="s">&quot;&lt;big long html string&gt;&quot;</span><span class="p">,</span>
+      <span class="s">&quot;rendered_html&quot;</span> <span class="p">:</span> <span class="s">&quot;&lt;big long html string after browser rendering&gt;&quot;</span>
+   <span class="p">}</span>
+<span class="p">]</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="endpoint-schedule-spider">
+<h3>Endpoint: <strong>/schedule-spider/</strong><a class="headerlink" href="#endpoint-schedule-spider" title="Permalink to this headline">¶</a></h3>
+<p>Purpose: Schedule the spider to run against a URL.</p>
+<p>Example call</p>
+<div class="highlight-python"><div class="highlight"><pre>curl -iH http://localhost:5000/schedule-spider/?url=&#39;https://docs.python.org/2/library/datetime.html&#39;
+</pre></div>
+</div>
+<p>Example response (headers included below)</p>
+<div class="highlight-python"><div class="highlight"><pre>HTTP/1.0 200 OK
+Content-Type: text/html; charset=utf-8
+Content-Length: 2
+Server: Werkzeug/0.9.6 Python/2.7.6
+Date: Mon, 29 Sep 2014 17:24:03 GMT
+
+OK
+</pre></div>
+</div>
+</div>
+<div class="section" id="endpoint-url-job-state-params-url">
+<h3>Endpoint: <strong>/url-job-state/</strong>, <strong>params: url</strong><a class="headerlink" href="#endpoint-url-job-state-params-url" title="Permalink to this headline">¶</a></h3>
+<p>Purpose: Check the job state of a spider instantiated against a URL.</p>
+<p>Example call</p>
+<div class="highlight-python"><div class="highlight"><pre>curl -iH http://localhost:5000/url-job-state/?url=&#39;https://docs.python.org/2/library/datetime.html&#39;
+</pre></div>
+</div>
+<p>Example response (headers included below)</p>
+<div class="highlight-python"><div class="highlight"><pre>HTTP/1.0 200 OK
+Content-Type: text/html; charset=utf-8
+Content-Length: 7
+Server: Werkzeug/0.9.6 Python/2.7.6
+Date: Mon, 29 Sep 2014 17:26:32 GMT
+
+Running
+</pre></div>
+</div>
+<p>Note: The above can be in a state of Inititalizing, Running or Done</p>
+</div>
+<div class="section" id="endpoint-mark-interest-true-false-params-url">
+<h3>Endpoint <strong>/mark-interest/&lt;true|false&gt;/</strong>, <strong>params: url</strong><a class="headerlink" href="#endpoint-mark-interest-true-false-params-url" title="Permalink to this headline">¶</a></h3>
+<p>Purpose: Mark interest in a URL, store this information</p>
+<p>Example call</p>
+<div class="highlight-python"><div class="highlight"><pre>curl http://localhost:5000/mark-interest/true/?url=&#39;https://docs.python.org/2/library/datetime.html&#39;
+</pre></div>
+</div>
+<p>Example response (headers included below)</p>
+<div class="highlight-python"><div class="highlight"><pre>HTTP/1.0 200 OK
+Content-Type: text/html; charset=utf-8
+Content-Length: 2
+Server: Werkzeug/0.9.6 Python/2.7.6
+Date: Mon, 29 Sep 2014 17:31:10 GMT
+
+OK
+</pre></div>
+</div>
+</div>
+<div class="section" id="endpoint-set-score-score-params-url">
+<h3>Endpoint <strong>/set-score/&lt;score&gt;</strong>, <strong>params: url</strong><a class="headerlink" href="#endpoint-set-score-score-params-url" title="Permalink to this headline">¶</a></h3>
+<p><strong>Note: &lt;score&gt; is an integer from 1-100</strong></p>
+<p>Purpose: After performing some analysis, set the score of a URL, the UI organizes by score and stores this
+value in subsequent requests for URLs. For requesting hosts, the score is set automatically as the highest
+scoring URL in the set, this may change later.</p>
+<p>Example call</p>
+<div class="highlight-python"><div class="highlight"><pre>curl http://localhost:5000/set-score/83/?url=&#39;https://docs.python.org/2/library/datetime.html&#39;
+</pre></div>
+</div>
+<p>Example response</p>
+<div class="highlight-python"><div class="highlight"><pre>HTTP/1.0 200 OK
+Content-Type: text/html; charset=utf-8
+Content-Length: 2
+Server: Werkzeug/0.9.6 Python/2.7.6
+Date: Mon, 29 Sep 2014 17:51:38 GMT
+
+OK
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="writing-an-analysis-plugin">
+<h2>Writing an analysis plugin<a class="headerlink" href="#writing-an-analysis-plugin" title="Permalink to this headline">¶</a></h2>
+<p>Analysis plugins should simply use the REST API to add scoring to URLs in the system. Assume that URLs
+have already been added to the system either via scheduled crawling using hte UI or API. Let&#8217;s take a concrete
+(if a little contrived) example. Say we want to score all URLs based on the wordcount of the rendered
+HTML. One could simply make a call to the <strong>/host/0</strong> endpoint to list the first page of hosts, iterating
+through these pages will give you a list of all hosts. These can then be passed to the <strong>/urls/&lt;host&gt;</strong> endpoint
+to get the URLs, their html, and their rendered HTML. Once you have these, you can run them through a simple wordcount
+function, normalizing the score to be between 0 and 100, and then index the score by using the <strong>/set-score/&lt;score&gt;</strong>
+endpoint. If this is unclear or you want to use this but something isn&#8217;t working properly, please email <a class="reference external" href="mailto:acaceres&#37;&#52;&#48;hyperiongray&#46;com">acaceres<span>&#64;</span>hyperiongray<span>&#46;</span>com</a>.</p>
+</div>
+<div class="section" id="troubleshooting">
+<h2>Troubleshooting<a class="headerlink" href="#troubleshooting" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li>If you enter a URL to crawl, click submit and nothing happens then something has gone terribly wrong in your setup or there is a bug in the application. Check the terminal where you are running server.py, it should contain a traceback.</li>
+<li>If you get a 500 internal server error, check the terminal where you are running server.py, it should contain a traceback</li>
+<li>If you get a 404 not found, that usually means you&#8217;ve messed up an API call, check these docs and make sure you have the proper fields and parameters set.</li>
+</ul>
+<p>In any case email <a class="reference external" href="mailto:acaceres&#37;&#52;&#48;hyperiongray&#46;com">acaceres<span>&#64;</span>hyperiongray<span>&#46;</span>com</a> for help, and copy and paste
+any relevant exception traceback information if possible. This can usually be found in the terminal in which you are running
+server.py.</p>
+</div>
+<div class="section" id="thanks">
+<h2>Thanks<a class="headerlink" href="#thanks" title="Permalink to this headline">¶</a></h2>
+<p>Thanks for trying out our stuff, feedback is always welcome!</p>
 </div>
 </div>
 
@@ -82,7 +360,14 @@ code code code
 
 <h3>Navigation</h3>
 <ul class="current">
-<li class="toctree-l1 current"><a class="current reference internal" href="">Tutorial</a><ul class="simple">
+<li class="toctree-l1"><a class="reference internal" href="intro.html">Introduction</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="">Tutorial</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#install">Install</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#using-the-ui">Using the UI</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#using-the-api">Using the API</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#writing-an-analysis-plugin">Writing an analysis plugin</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#troubleshooting">Troubleshooting</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#thanks">Thanks</a></li>
 </ul>
 </li>
 </ul>

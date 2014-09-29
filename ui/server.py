@@ -1,92 +1,92 @@
-import random
 import os
 from flask import Flask
-from operator import itemgetter
-from flask import render_template, jsonify, Response, request
+from flask import render_template, Response, request
 from handlers import request_wants_json
 from mongoutils.memex_mongo_utils import MemexMongoUtils
-from handlers import hosts_handler, urls_handler, schedule_spider_handler, get_job_state_handler, schedule_spider_handler, discovery_handler, mark_interest_handler, get_screenshot_relative_path
+from handlers import hosts_handler, urls_handler, \
+get_job_state_handler, schedule_spider_handler, \
+discovery_handler, mark_interest_handler, get_screenshot_relative_path
 import json
 import hashlib
+from handlers import set_score_handler
 server_path = os.path.dirname(os.path.realpath(__file__))
 app = Flask(__name__)
 app.config.from_object('settings')
 
-#ui
+# ui
 @app.route("/discovery")
 def discovery():
 
     seeds = discovery_handler()
     for seed in seeds:
         seed["url_hash"] = str(hashlib.md5(seed["url"]).hexdigest())
-    return render_template('discovery.html', seeds = seeds)
+    return render_template('discovery.html', seeds=seeds)
 
 @app.route("/data")
 @app.route("/")
-def data(page = 1):
+def data(page=1):
 
-    hosts = hosts_handler(page = int(page))
+    hosts = hosts_handler(page=int(page) + 1)
 
-    return render_template('data.html', hosts = hosts, which_collection = "crawl-data", use_cc_data = False)
+    return render_template('data.html', hosts=hosts, which_collection="crawl-data", use_cc_data=False)
 
 @app.route("/cc-data")
-def cc_data(page = 1):
+def cc_data(page=1):
 
-    hosts = hosts_handler(page = int(page), which_collection = "cc-crawl-data")
+    hosts = hosts_handler(page=int(page) + 1, which_collection="cc-crawl-data")
 
-    return render_template('data.html', hosts = hosts, use_cc_data = True)
+    return render_template('data.html', hosts=hosts, use_cc_data=True)
 
-#services
+# services
 @app.route("/hosts/<page>")
-def load_hosts(page = 1):
+def load_hosts(page=1):
 
-    hosts = hosts_handler(page = int(page))
+    hosts = hosts_handler(page=int(page))
 
     if request_wants_json():
-        return Response(json.dumps(hosts), mimetype = "application/json")
+        return Response(json.dumps(hosts), mimetype="application/json")
 
-    return render_template('hosts.html', hosts = hosts, use_cc_data = False)
+    return render_template('hosts.html', hosts=hosts, use_cc_data=False)
 
 @app.route("/cc-hosts/<page>")
-def cc_load_hosts(page = 1):
+def cc_load_hosts(page=1):
 
-    hosts = hosts_handler(page = int(page), which_collection = "cc-crawl-data")
+    hosts = hosts_handler(page=int(page), which_collection="cc-crawl-data")
 
     if request_wants_json():
-        return Response(json.dumps(hosts), mimetype = "application/json")
+        return Response(json.dumps(hosts), mimetype="application/json")
 
-    return render_template('hosts.html', hosts = hosts, which_collection = "cc-crawl-data", use_cc_data = True)
+    return render_template('hosts.html', hosts=hosts, which_collection="cc-crawl-data", use_cc_data=True)
 
 @app.route("/urls")
 @app.route("/urls/<host>")
-def urls(host = None):
+def urls(host=None):
 
     urls = urls_handler(host)
     if request_wants_json():
-        return Response(json.dumps(urls), mimetype = "application/json")
+        return Response(json.dumps(urls), mimetype="application/json")
 
-    #!super hacky
+    # !super hacky
     for url_dic in urls:
         screenshot_path = url_dic.get("screenshot_path")
         if screenshot_path:
             url_dic["screenshot_path"] = get_screenshot_relative_path(screenshot_path)
 
-    return render_template("urls.html", urls = urls)
+    return render_template("urls.html", urls=urls)
 
 @app.route("/cc-urls")
 @app.route("/cc-urls/<host>")
-def cc_urls(host = None):
+def cc_urls(host=None):
 
-    urls = list(urls_handler(host, which_collection = "cc-crawl-data"))
+    urls = list(urls_handler(host, which_collection="cc-crawl-data"))
     if request_wants_json():
-        return Response(json.dumps(urls), mimetype = "application/json")
+        return Response(json.dumps(urls), mimetype="application/json")
 
-    #change this
-    return render_template("urls.html", urls = urls, use_cc_data = True)
+    # change this
+    return render_template("urls.html", urls=urls, use_cc_data=True)
 
 @app.route("/schedule-spider/")
 def schedule_spider():
-
 
     url = request.args.get('url')
     schedule_spider_handler(url)
@@ -117,12 +117,20 @@ def mark_interest(interest):
     ret = mark_interest_handler(interest, url)
     return Response("OK")
 
+@app.route("/set-score/<score>/")
+def set_score(score):
+
+    url = request.args.get('url')
+    ret = set_score_handler(url, score)
+
+    return Response("OK")
+
 if __name__ == "__main__":
 
-    if app.confg["INIT_DB_ON_START"]:
-        MemexMongoUtils(init_db = True)
+    if app.config["INIT_DB_ON_START"]:
+        MemexMongoUtils(init_db=True)
 
     if app.config['DEBUG']:
         app.debug = True
 
-    app.run('0.0.0.0', threaded = True)
+    app.run('0.0.0.0', threaded=True)

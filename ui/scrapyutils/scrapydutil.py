@@ -1,20 +1,23 @@
 from scrapyd_api import ScrapydAPI
-import requests
-import time
 import traceback
 
 class ScrapydJob(object):
 
-    def __init__(self, scrapyd_host = "localhost", scrapyd_port = "6800", project = "default", spider = "website_finder"):
+    def __init__(self, scrapyd_host="localhost", scrapyd_port="6800", project="default", spider="website_finder", screenshot_dir=""):
 
-        scrapy_url = "http://" + scrapyd_host + ":" + scrapyd_port
+        scrapy_url = "http://" + scrapyd_host + ":" + str(scrapyd_port)
         self.scrapi = ScrapydAPI(scrapy_url)
         self.project = project
         self.spider = spider
+        self.screenshot_dir = screenshot_dir        
 
     def schedule(self, seed):
 
-        self.job_id = self.scrapi.schedule(self.project, self.spider, seed_urls = seed)
+        if not self.screenshot_dir:
+            raise Exception("Please set the screenshot path in the config before scheduling")
+
+        self.job_id = self.scrapi.schedule(self.project, self.spider, seed_urls=seed, screenshot_dir = self.screenshot_dir)
+
         return self.job_id
 
     def list_jobs(self):
@@ -35,13 +38,11 @@ class ScrapydJob(object):
 
         except:
             print "handled exception:"
+            traceback.print_exc()
             return None
 
         return "Done"
 
 if __name__ == "__main__":
 
-    scrapy_util = ScrapydJob()
-    jid = scrapy_util.schedule("http://www.hyperiongray.com/")
-    print scrapy_util.get_state(jid)
-#    print scrapy_util.list_jobs()
+    scrapyd_util = ScrapydJob("localhost", 80, screenshot_dir = "blahblah")

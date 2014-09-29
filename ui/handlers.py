@@ -1,8 +1,8 @@
 from flask import request
 from mongoutils.memex_mongo_utils import MemexMongoUtils
 from scrapyutils.scrapydutil import ScrapydJob
-import json
-import itertools
+from settings import SCREENSHOT_DIR
+from gnome._gnome import score_init
 
 def get_screenshot_relative_path(real_path):
     try:
@@ -47,13 +47,15 @@ def urls_handler(host = None, which_collection  = "crawl-data"):
 
     for url_dic in url_dics:
         url_dic.pop("_id")
+        date = url_dic["crawled_at"]
+        url_dic["crawled_at"] = date.isoformat()
 
     return url_dics
 
 def schedule_spider_handler(seed, spider_host = "localhost", spider_port = "6800"):
 
     mmu = MemexMongoUtils()
-    scrapyd_util = ScrapydJob(spider_host, spider_port)
+    scrapyd_util = ScrapydJob(spider_host, spider_port, screenshot_dir = SCREENSHOT_DIR)
     job_id = scrapyd_util.schedule(seed)
     mmu.add_job(seed, job_id)
 
@@ -86,11 +88,19 @@ def mark_interest_handler(interest, url):
         #!should we be doing this?
 #        mmu.set_score(url, 0)
 
+def set_score_handler(url, score):
+    
+    mmu = MemexMongoUtils()
+    mmu.set_score(url, score)    
+
 if __name__ == "__main__":
 
+    print SCREENSHOT_DIR
+
 #    print schedule_spider_handler("http://butts.com/")
-    for x in hosts_handler(page = 3):
-        print x
+#    for x in hosts_handler(page = 3):
+#        print x
+
 
 #    print "===================================+"
 #    for x in hosts_handler(page = 3, which_collection = "cc-crawl-data"):

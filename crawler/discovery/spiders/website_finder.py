@@ -28,19 +28,19 @@ from discovery.urlutils import (
 class WebpageItem(scrapy.Item):
     mongo_collection = 'urlinfo'
 
-    url = scrapy.Field()                 # url of a page
-    host = scrapy.Field()                # website
-    title = scrapy.Field()               # <title> contents
-    depth = scrapy.Field()               # depth at which the page is found, relative to its website
-    referrer_depth = scrapy.Field()      # depth of the referrer page
-    total_depth = scrapy.Field()         # number of hops from a seed page
-    crawled_at = scrapy.Field()          # datetime in UTC
-    html = scrapy.Field()                # full HTML
-    html_rendered = scrapy.Field()       # full HTML rendered via Splash, optional
-    link_text = scrapy.Field()           # text of the link that lead to this page
-    link_url = scrapy.Field()            # URL of a link that lead to this page
-    referrer_url = scrapy.Field()        # URL of a referrer page
-    is_seed = scrapy.Field()             # this is True for pages from seed websites
+    url = scrapy.Field()  # url of a page
+    host = scrapy.Field()  # website
+    title = scrapy.Field()  # <title> contents
+    depth = scrapy.Field()  # depth at which the page is found, relative to its website
+    referrer_depth = scrapy.Field()  # depth of the referrer page
+    total_depth = scrapy.Field()  # number of hops from a seed page
+    crawled_at = scrapy.Field()  # datetime in UTC
+    html = scrapy.Field()  # full HTML
+    html_rendered = scrapy.Field()  # full HTML rendered via Splash, optional
+    link_text = scrapy.Field()  # text of the link that lead to this page
+    link_url = scrapy.Field()  # URL of a link that lead to this page
+    referrer_url = scrapy.Field()  # URL of a referrer page
+    is_seed = scrapy.Field()  # this is True for pages from seed websites
     screenshot_path = scrapy.Field()
     # score = scrapy.Field()
 
@@ -101,17 +101,16 @@ class WebsiteFinderSpider(scrapy.Spider):
     max_external_links_per_domain = 10
 
     # screenshot_dir = 'data/screenshots'
-    screenshot_dir = '/Users/kmike/scrap/memex-hackathon-1/ui/static/images/screenshots'
+    # screenshot_dir = '/Users/kmike/scrap/memex-hackathon-1/ui/static/images/screenshots'
 
-
-    def __init__(self, seed_urls, save_html=1, use_splash=1, **kwargs):
+    def __init__(self, seed_urls, save_html=1, use_splash=1, screenshot_dir=None, **kwargs):
         self.save_html = bool(int(save_html))
         self.use_splash = bool(int(use_splash))
         self.random = random.Random(self.random_seed)
         self.start_urls = [add_scheme_if_missing(url) for url in seed_urls.split(',')]
         self.req_count = defaultdict(int)
         super(WebsiteFinderSpider, self).__init__(name=None, **kwargs)
-        makedir(self.screenshot_dir)
+        self.screenshot_dir = screenshot_dir
 
     def parse(self, response):
         if 'referrer_url' in response.meta:
