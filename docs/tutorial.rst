@@ -322,7 +322,7 @@ Troubleshooting
 
 * If you enter a URL to crawl, click submit and nothing happens then something has gone terribly wrong in your setup or there is a bug in the application. Check the terminal where you are running server.py, it should contain a traceback. 
 
-* If you get a 500 internal server error, check the terminal where you are running server.py, it should contain a traceback.
+* If you get a 500 internal server error, or submitting something seems to act funny (or do nothing) check the terminal where you are running server.py, it should contain a traceback.
 
 * If you get a 404 not found, that usually means you've messed up an API call, check these docs and make sure you have the proper fields and parameters set.
 
