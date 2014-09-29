@@ -96,7 +96,14 @@ scrapyd
 <div class="highlight-python"><div class="highlight"><pre>python -m splash.server
 </pre></div>
 </div>
-<p>This will start splash on your local machine. Now you&#8217;re ready to start the SourcePin application,
+<p>This will start splash on your local machine.</p>
+<p>Almost there... now it&#8217;s time to configure the server application, pop open <em>ui/settings.py</em>. The only
+config value that you really need to worry about is</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">SCREENSHOT_DIR</span> <span class="o">=</span> <span class="s">&#39;/home/memex-punk/memex-dev/workspace/memex-pinterest/ui/static/images/screenshots&#39;</span>
+</pre></div>
+</div>
+<p>Replace the above with the equivalent directory on your filesystem, for example yours may be <em>&#8216;/home/your-user/memex-hackathon-1/ui/static/images/screenshots&#8217;</em>.</p>
+<p>Now you&#8217;re ready to start the SourcePin application,
 from the project root</p>
 <div class="highlight-python"><div class="highlight"><pre>python server.py
 </pre></div>
@@ -327,7 +334,7 @@ endpoint. If this is unclear or you want to use this but something isn&#8217;t w
 <h2>Troubleshooting<a class="headerlink" href="#troubleshooting" title="Permalink to this headline">¶</a></h2>
 <ul class="simple">
 <li>If you enter a URL to crawl, click submit and nothing happens then something has gone terribly wrong in your setup or there is a bug in the application. Check the terminal where you are running server.py, it should contain a traceback.</li>
-<li>If you get a 500 internal server error, check the terminal where you are running server.py, it should contain a traceback</li>
+<li>If you get a 500 internal server error, check the terminal where you are running server.py, it should contain a traceback.</li>
 <li>If you get a 404 not found, that usually means you&#8217;ve messed up an API call, check these docs and make sure you have the proper fields and parameters set.</li>
 </ul>
 <p>In any case email <a class="reference external" href="mailto:acaceres&#37;&#52;&#48;hyperiongray&#46;com">acaceres<span>&#64;</span>hyperiongray<span>&#46;</span>com</a> for help, and copy and paste

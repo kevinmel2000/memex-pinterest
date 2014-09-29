@@ -48,10 +48,19 @@ This will start scrapyd on your local machine on port 6800. Next, start the Spla
 
     python -m splash.server
 
-This will start splash on your local machine. Now you're ready to start the SourcePin application,
+This will start splash on your local machine.
+
+Almost there... now it's time to configure the server application, pop open *ui/settings.py*. The only
+config value that you really need to worry about is ::
+
+   SCREENSHOT_DIR = '/home/memex-punk/memex-dev/workspace/memex-pinterest/ui/static/images/screenshots'
+
+Replace the above with the equivalent directory on your filesystem, for example yours may be *'/home/your-user/memex-hackathon-1/ui/static/images/screenshots'*.
+
+Now you're ready to start the SourcePin application,
 from the project root ::
 
-    python server.py
+   python server.py
     
 Now open up your web browser and go to http://localhost:5000. You should see a blank page with
 the Hyperion Gray SourcePin title at the top.
