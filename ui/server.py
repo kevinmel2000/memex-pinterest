@@ -26,22 +26,29 @@ def discovery():
 @app.route("/")
 def data(page=1):
 
-    hosts = hosts_handler(page=int(page) + 1)
+    hosts = hosts_handler(page=int(page))
 
     return render_template('data.html', hosts=hosts, which_collection="crawl-data", use_cc_data=False)
 
 @app.route("/cc-data")
 def cc_data(page=1):
 
-    hosts = hosts_handler(page=int(page) + 1, which_collection="cc-crawl-data")
+    hosts = hosts_handler(page=int(page), which_collection="cc-crawl-data")
 
     return render_template('data.html', hosts=hosts, use_cc_data=True)
+
+@app.route("/known-data")
+def known_data(page=1):
+
+    hosts = hosts_handler(page=int(page), which_collection="known-data")
+
+    return render_template('data.html', hosts=hosts, use_known_data=True)
 
 # services
 @app.route("/hosts/<page>")
 def load_hosts(page=1):
 
-    hosts = hosts_handler(page=int(page))
+    hosts = hosts_handler(page=int(page) + 1)
 
     if request_wants_json():
         return Response(json.dumps(hosts), mimetype="application/json")
@@ -51,12 +58,22 @@ def load_hosts(page=1):
 @app.route("/cc-hosts/<page>")
 def cc_load_hosts(page=1):
 
-    hosts = hosts_handler(page=int(page), which_collection="cc-crawl-data")
+    hosts = hosts_handler(page=int(page) + 1, which_collection="cc-crawl-data")
 
     if request_wants_json():
         return Response(json.dumps(hosts), mimetype="application/json")
 
     return render_template('hosts.html', hosts=hosts, which_collection="cc-crawl-data", use_cc_data=True)
+
+@app.route("/known-hosts/<page>")
+def known_load_hosts(page=1):
+
+    hosts = hosts_handler(page=int(page) + 1, which_collection="known-data")
+
+    if request_wants_json():
+        return Response(json.dumps(hosts), mimetype="application/json")
+
+    return render_template('hosts.html', hosts=hosts, which_collection="known-data", use_known_data=True)
 
 @app.route("/urls")
 @app.route("/urls/<host>")
@@ -84,6 +101,17 @@ def cc_urls(host=None):
 
     # change this
     return render_template("urls.html", urls=urls, use_cc_data=True)
+
+@app.route("/known-urls")
+@app.route("/known-urls/<host>")
+def known_urls(host=None):
+
+    urls = list(urls_handler(host, which_collection="known-data"))
+    if request_wants_json():
+        return Response(json.dumps(urls), mimetype="application/json")
+
+    # change this
+    return render_template("urls.html", urls=urls, use_known_data=True)
 
 @app.route("/schedule-spider/")
 def schedule_spider():

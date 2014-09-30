@@ -24,6 +24,10 @@ class MemexMongoUtils(object):
             url_collection_name = "cc-urlinfo"
             host_collection_name = "cc-hostinfo"
 
+        elif which_collection == "known-data":
+            url_collection_name = "known-urlsinfo"
+            host_collection_name = "known-hostsinfo"
+
         else:
             raise Exception("You have specified an invalid collection, please choose either crawl-data or cc-crawl-data for which_collection")
 
@@ -57,6 +61,9 @@ class MemexMongoUtils(object):
             self.hostinfo_collection.ensure_index("host", unique=True, drop_dups=True)
             self.seed_collection.ensure_index("url", unique=True, drop_dups=True)
 
+    def list_indexes(self):
+        
+        return self.hostinfo_collection.index_information()
 
     def list_urls(self, host=None, limit=20):
 
@@ -67,7 +74,7 @@ class MemexMongoUtils(object):
 
         return list(docs)
 
-    def list_hosts(self, page=1, num_docs=21):
+    def list_hosts(self, page=1, num_docs=30):
         docs = self.hostinfo_collection.find().sort("host_score", -1)
         try:
             docs = docs.skip(num_docs * (page - 1)).limit(num_docs)
@@ -118,14 +125,17 @@ class MemexMongoUtils(object):
         """Insert data into domain collection, requires docs to be indexed already
         e.g. through __insert_url_test_data"""
 
-        hosts = self.list_all_urls()
-        for host in hosts:
-            host.pop("_id")
+        urls = self.list_all_urls()
+        for url in urls:
+            url.pop("_id")
 
         host_dics = []
-        for key, group in itertools.groupby(hosts, lambda item: item["host"]):
+        for key, group in itertools.groupby(urls, lambda item: item["host"]):
             host_dic = {}
             group_list = list(group)
+            for url in group_list:
+                print url["url"]
+            print "============"
             host_dic["host"] = key
             host_dic["num_urls"] = len(group_list)
 
@@ -142,11 +152,15 @@ class MemexMongoUtils(object):
             host_dics.append(host_dic)
 
         for host_dic in host_dics:
+            print "************"
+            print host_dic
             try:
                 self.hostinfo_collection.save(host_dic)
-            except Exception as e:
-                print(e)
-                pass
+            except:
+                # pop id if the above try appended it (cases update to fail)
+                if "_id" in host_dic:
+                    host_dic.pop("_id")
+                self.hostinfo_collection.update({"host" : host_dic["host"]}, host_dic)
 
         return host_dics
 
@@ -196,4 +210,6 @@ class MemexMongoUtils(object):
 
 if __name__ == "__main__":
 
-    mmu = MemexMongoUtils(which_collection="crawl-data", init_db=True)
+    MemexMongoUtils(which_collection="crawl-data", init_db=True)
+    MemexMongoUtils(which_collection="known-data", init_db=True)
+    MemexMongoUtils(which_collection="cc-crawl-data", init_db=True)

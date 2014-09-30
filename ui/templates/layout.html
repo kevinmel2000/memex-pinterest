@@ -1,8 +1,8 @@
 <!doctype html>
 <meta charset=utf-8>
 
-<title>Team Hyperion Gray Sourcefinder</title>
-
+<title>SourcePin</title>
+<link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
 <script src="{{ url_for('static', filename='js/jquery-1.9.1.min.js') }}"></script>
 <script src="{{ url_for('static', filename='js/jquery-ui.min.js') }}"></script>
 <script src="{{ url_for('static', filename='js/d3.v3.min.js') }}" charset=utf-8></script>
@@ -13,7 +13,7 @@
 <link href=https://netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap-glyphicons.css rel=stylesheet>
 <script src=https://netdna.bootstrapcdn.com/bootstrap/3.0.3/js/bootstrap.min.js></script>
 
-<body style="background-color: lightgoldenrodyellow">
+<body style="background-color: #E9E9E9">
 
   <div id=info-panel class="modal fade">
   <div class=modal-dialog>
@@ -43,12 +43,12 @@
 
 <div class="navbar navbar-default navbar-fixed-top">
     <div class=navbar-header>
-      <div class=navbar-brand>Team Hyperion Gray Sourcefinder</div>
+      <div class=navbar-brand>SourcePin by Team Hyperion Gray</div>
     </div>
 
     <ul class="nav navbar-nav">
       <li><a href="/"><span class="glyphicon glyphicon-screenshot"></span> View Crawl Data</a>
-      <li><a href="/cc-data"><span class="glyphicon glyphicon-globe"></span> View Common Crawl Data</a>
+      <li><a href="/known-data"><span class="glyphicon glyphicon-globe"></span> Known Sites</a>
       <li><a href="/discovery"><span class="glyphicon glyphicon-globe"></span> Crawl New Sites</a>
       <li><a data-toggle=modal data-target=#info-panel><span class="glyphicon glyphicon-info-sign"></span> Info</a>
     </ul>

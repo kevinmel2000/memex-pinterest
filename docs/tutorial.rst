@@ -304,7 +304,6 @@ Example response ::
    
    OK
 
-
 Writing an analysis plugin
 ==========================
 

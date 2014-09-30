@@ -4,13 +4,16 @@
   <thead>
     <tr>
       <th>URL</th>
-      <th>Interesting</th>
+      {% if not use_cc_data and not use_known_data %}
+        <th>Interesting</th>
+      {% endif %}
       <th>Host</th>
       <th>Score</th>
-      <th>Crawl At</th>
+      <th>Crawled At</th>
       <th>Seed</th>
       <th>Title</th>
       <th>Screenshot</th>
+      <th>Crawl</th>
     </tr>
   </thead>
   <tbody>
@@ -20,8 +23,8 @@
 	  <!--<span class="glyphicon glyphicon-screenshot"></span>-->
 	  &nbsp;<a href="{{ url_dic["url"] }}">{{ url_dic["url"][:40] }}</a>
 	</td>
-	  <!--<span class="glyphicon glyphicon-ok-circle" style="cursor: pointer;" onlick="markInterest('true', '{{ url_dic["url"] }}');"></span>&nbsp;
-	  <span class="glyphicon glyphicon-remove-circle" style="cursor: pointer; cursor: hand;" onlick="markInterest('false', '{{ url_dic["url"] }}');"></span>-->
+      {% if not use_cc_data and not use_known_data  %}
+	
         <td>
 	    {% if "interest" in url_dic and url_dic["interest"] %}
 	      <button class="btn btn-success" onclick="markInterest('true', '{{ url_dic["url"] }}');" disabled>yes</button>
@@ -37,9 +40,8 @@
   	      <!--<p style="margin-top:4px;">Currently: {{ url_dic["interest"] }}</p>-->
 	  <!--<div onclick="markInterest('true', '{{ url_dic["url"] }}');">ddddddddddddd</div>-->
 	  <!--<span class="glyphicon glyphicon-screenshot"></span>-->
-	</td>
-
-	
+    	</td>
+      {% endif %}	
 
 	{% if "host" in url_dic and url_dic["host"] %}
           <td>{{ url_dic["host"] }}</td>
@@ -50,7 +52,7 @@
 	{% if "score" in url_dic and url_dic["score"] %}
           <td>{{ url_dic["score"] }}</td>
         {% else %}
-          <td></td>
+          <td>N/A</td>
 	{% endif %}
 
 	{% if "crawled_at" in url_dic and url_dic["crawled_at"] %}
@@ -62,7 +64,7 @@
 	{% if "is_seed" in url_dic and url_dic["is_seed"] %}
           <td>{{ url_dic["is_seed"] }}</td>
         {% else %}
-          <td></td>
+          <td>No</td>
 	{% endif %}
 
 	{% if "title" in url_dic and url_dic["title"] %}
@@ -77,6 +79,7 @@
         {% else %}
           <td></td>
 	{% endif %}
+		<td><button class="btn btn-primary" onclick="submitUrlForCrawl('{{ url_dic["url"] }}')">Crawl from here</button></td>
 
       </tr>
   {% endfor %}
@@ -92,6 +95,18 @@ function markInterest(interest, url) {
   $.get(interest_url, function( status ) {
     console.log("Everything's good y'all, s'all good, s'all good interest");
     location.reload();
+  });
+}
+
+function submitUrlForCrawl(url) {
+
+  scrapyd_url = "/schedule-spider/?url=" + url;
+  //alert(scrapyd_url);
+  console.log("Scheduled job");
+  $.get(scrapyd_url, function( whatever ) {
+    console.log("The job was successfully scheduled")
+    location.reload()
+    //alert('success');
   });
 }
 </script>

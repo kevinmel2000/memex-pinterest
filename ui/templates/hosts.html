@@ -3,6 +3,9 @@
 {% if use_cc_data %}
     {% set host_path = '/cc-hosts' %}
     {% set url_path = '/cc-urls' %}
+{% elif use_known_data %}
+    {% set host_path = '/known-hosts' %}
+    {% set url_path = '/known-urls' %}    
 {% else %}
     {% set host_path = '/hosts' %}
     {% set url_path = '/urls' %}
@@ -16,12 +19,16 @@
   {% set hsu_screenshot_path = host_dic['hsu_screenshot_path'] %}
   <img src="{{ url_for('static', filename=hsu_screenshot_path) }}" alt="ALT">
 {% else %}
-  <img src="http://www1.macys.com/img/pdp/productNotAvailable.jpg" alt="ALT">
+  <img src="" alt="No Image Available">
 {% endif %}
 
 <h1><a href="{{ url_path }}/{{ host_dic["host"] }}">Host: {{ host_dic["host"] }}<br /></a></h1>
-<p>Number of Urls Crawled: {{ host_dic["num_urls"] }}</p>
-<p>Score: {{ host_dic["host_score"] }}</p>
+<p>Number of URLs found: {{ host_dic["num_urls"] }}</p>
+
+{% if host_dic["host_score"] != 0 %}
+  <p>Score: {{ host_dic["host_score"] }}</p>
+{% endif %}
+
 </article>
 
 {% endif %}

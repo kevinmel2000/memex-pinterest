@@ -48,7 +48,10 @@ def urls_handler(host = None, which_collection  = "crawl-data"):
     for url_dic in url_dics:
         url_dic.pop("_id")
         date = url_dic["crawled_at"]
-        url_dic["crawled_at"] = date.isoformat()
+        try:
+            url_dic["crawled_at"] = date.isoformat()
+        except:
+            url_dic["crawled_at"] = str(date)
 
     return url_dics
 
@@ -95,13 +98,4 @@ def set_score_handler(url, score):
 
 if __name__ == "__main__":
 
-    print SCREENSHOT_DIR
-
-#    print schedule_spider_handler("http://butts.com/")
-#    for x in hosts_handler(page = 3):
-#        print x
-
-
-#    print "===================================+"
-#    for x in hosts_handler(page = 3, which_collection = "cc-crawl-data"):
-#        print x["host"]
+    pass
