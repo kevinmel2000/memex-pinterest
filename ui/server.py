@@ -9,12 +9,14 @@ discovery_handler, mark_interest_handler, get_screenshot_relative_path
 import json
 import hashlib
 from handlers import set_score_handler
+from auth import requires_auth
 server_path = os.path.dirname(os.path.realpath(__file__))
 app = Flask(__name__)
 app.config.from_object('settings')
 
 # ui
 @app.route("/discovery")
+@requires_auth
 def discovery():
 
     seeds = discovery_handler()
@@ -24,6 +26,7 @@ def discovery():
 
 @app.route("/data")
 @app.route("/")
+@requires_auth
 def data(page=1):
 
     hosts = hosts_handler(page=int(page))
@@ -31,6 +34,7 @@ def data(page=1):
     return render_template('data.html', hosts=hosts, which_collection="crawl-data", use_cc_data=False)
 
 @app.route("/cc-data")
+@requires_auth
 def cc_data(page=1):
 
     hosts = hosts_handler(page=int(page), which_collection="cc-crawl-data")
@@ -38,6 +42,7 @@ def cc_data(page=1):
     return render_template('data.html', hosts=hosts, use_cc_data=True)
 
 @app.route("/known-data")
+@requires_auth
 def known_data(page=1):
 
     hosts = hosts_handler(page=int(page), which_collection="known-data")
@@ -46,6 +51,7 @@ def known_data(page=1):
 
 # services
 @app.route("/hosts/<page>")
+@requires_auth
 def load_hosts(page=1):
 
     hosts = hosts_handler(page=int(page) + 1)
@@ -56,6 +62,7 @@ def load_hosts(page=1):
     return render_template('hosts.html', hosts=hosts, use_cc_data=False)
 
 @app.route("/cc-hosts/<page>")
+@requires_auth
 def cc_load_hosts(page=1):
 
     hosts = hosts_handler(page=int(page) + 1, which_collection="cc-crawl-data")
@@ -66,6 +73,7 @@ def cc_load_hosts(page=1):
     return render_template('hosts.html', hosts=hosts, which_collection="cc-crawl-data", use_cc_data=True)
 
 @app.route("/known-hosts/<page>")
+@requires_auth
 def known_load_hosts(page=1):
 
     hosts = hosts_handler(page=int(page) + 1, which_collection="known-data")
@@ -77,6 +85,7 @@ def known_load_hosts(page=1):
 
 @app.route("/urls")
 @app.route("/urls/<host>")
+@requires_auth
 def urls(host=None):
 
     urls = urls_handler(host)
@@ -93,6 +102,7 @@ def urls(host=None):
 
 @app.route("/cc-urls")
 @app.route("/cc-urls/<host>")
+@requires_auth
 def cc_urls(host=None):
 
     urls = list(urls_handler(host, which_collection="cc-crawl-data"))
@@ -104,6 +114,7 @@ def cc_urls(host=None):
 
 @app.route("/known-urls")
 @app.route("/known-urls/<host>")
+@requires_auth
 def known_urls(host=None):
 
     urls = list(urls_handler(host, which_collection="known-data"))
@@ -114,6 +125,7 @@ def known_urls(host=None):
     return render_template("urls.html", urls=urls, use_known_data=True)
 
 @app.route("/schedule-spider/")
+@requires_auth
 def schedule_spider():
 
     url = request.args.get('url')
@@ -121,6 +133,7 @@ def schedule_spider():
     return Response("OK")
 
 @app.route("/url-job-state/")
+@requires_auth
 def get_spider_update():
 
     url = request.args.get('url')
@@ -129,6 +142,7 @@ def get_spider_update():
     return str(state)
 
 @app.route("/mark-interest/<interest>/")
+@requires_auth
 def mark_interest(interest):
 
     url = request.args.get('url')
@@ -146,6 +160,7 @@ def mark_interest(interest):
     return Response("OK")
 
 @app.route("/set-score/<score>/")
+@requires_auth
 def set_score(score):
 
     url = request.args.get('url')

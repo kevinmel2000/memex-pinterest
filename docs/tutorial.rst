@@ -34,7 +34,7 @@ for each respective project or email acaceres@hyperiongray.com for help
 
 Once dependencies have been installed please check out the SourcePin code by doing ::
 
-    git@github.com:acaceres2176/memex-hackathon-1.git
+    git@github.com:acaceres2176/memex-pinterest.git
     
 If you don't have access to this repo please email acaceres@hyperiongray.com.
 
