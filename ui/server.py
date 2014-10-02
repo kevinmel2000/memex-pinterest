@@ -29,9 +29,13 @@ def discovery():
 @requires_auth
 def data(page=1):
 
+    filter_field = request.args.get('filter-field')
+    filter_regex = request.args.get('filter-regex')
+
     hosts = hosts_handler(page=int(page))
 
-    return render_template('data.html', hosts=hosts, which_collection="crawl-data", use_cc_data=False)
+    return render_template('data.html', hosts=hosts, which_collection="crawl-data", 
+                           filter_field = filter_field, filter_regex = filter_regex, use_cc_data=False)
 
 @app.route("/cc-data")
 @requires_auth
@@ -54,7 +58,10 @@ def known_data(page=1):
 @requires_auth
 def load_hosts(page=1):
 
-    hosts = hosts_handler(page=int(page) + 1)
+    filter_field = request.args.get('filter-field')
+    filter_regex = request.args.get('filter-regex')
+
+    hosts = hosts_handler(page=int(page) + 1, filter_field = filter_field, filter_regex = filter_regex)
 
     if request_wants_json():
         return Response(json.dumps(hosts), mimetype="application/json")

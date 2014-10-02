@@ -2,7 +2,6 @@ from flask import request
 from mongoutils.memex_mongo_utils import MemexMongoUtils
 from scrapyutils.scrapydutil import ScrapydJob
 from settings import SCREENSHOT_DIR
-from gnome._gnome import score_init
 
 def get_screenshot_relative_path(real_path):
     try:
@@ -18,7 +17,7 @@ def request_wants_json():
         request.accept_mimetypes[best] > \
         request.accept_mimetypes['text/html']
 
-def hosts_handler(page = 1, which_collection = "crawl-data"):
+def hosts_handler(page = 1, which_collection = "crawl-data", filter_field = None, filter_regex = None):
     """Put together host documents for use with hosts endpoint """
 
     mmu = MemexMongoUtils(which_collection = which_collection)
@@ -26,7 +25,9 @@ def hosts_handler(page = 1, which_collection = "crawl-data"):
     #!process host records
     #!THIS WON'T SCALE
     mmu.process_host_data()
-    host_dics = mmu.list_hosts(page = page)
+    print filter_field
+    print filter_regex
+    host_dics = mmu.list_hosts(page = page, filter_field = filter_field, filter_regex = filter_regex)
 
     for host_dic in host_dics:
         host_dic.pop("_id")
@@ -97,5 +98,5 @@ def set_score_handler(url, score):
     mmu.set_score(url, score)    
 
 if __name__ == "__main__":
-
-    print hosts_handler()
+    print "HERE"
+    print hosts_handler(filter_field = "host", filter_regex = "\.onion$")

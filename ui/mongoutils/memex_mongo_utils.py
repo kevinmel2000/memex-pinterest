@@ -74,15 +74,21 @@ class MemexMongoUtils(object):
 
         return list(docs)
 
-    def list_hosts(self, page=1, num_docs=30):
-        docs = self.hostinfo_collection.find().sort("host_score", -1)
+    def list_hosts(self, page=1, num_docs=30, filter_regex = None, filter_field = None):
+
+        if filter_regex and filter_field:
+            docs = self.hostinfo_collection.find({filter_field:{'$regex':filter_regex}})
+        else:
+            docs = self.hostinfo_collection.find().sort("host_score", -1)
+        
         try:
             docs = docs.skip(num_docs * (page - 1)).limit(num_docs)
         except Exception:
             docs = docs.limit(num_docs)
 
-        docs = docs.limit(num_docs)
-        return list(docs)
+        docs_list = list(docs.limit(num_docs))
+            
+        return docs_list
 
     def list_all_hosts(self):
 
@@ -133,9 +139,9 @@ class MemexMongoUtils(object):
         for key, group in itertools.groupby(urls, lambda item: item["host"]):
             host_dic = {}
             group_list = list(group)
-            for url in group_list:
-                print url["url"]
-            print "============"
+#            for url in group_list:
+#                print url["url"]
+#            print "============"
             host_dic["host"] = key
             host_dic["num_urls"] = len(group_list)
 
@@ -152,8 +158,8 @@ class MemexMongoUtils(object):
             host_dics.append(host_dic)
 
         for host_dic in host_dics:
-            print "************"
-            print host_dic
+#            print "************"
+#            print host_dic
             try:
                 self.hostinfo_collection.save(host_dic)
             except:
@@ -207,11 +213,59 @@ class MemexMongoUtils(object):
     def set_score(self, url, score_set):
 
         self.urlinfo_collection.update({"url" : url}, {'$set' : {"score" : score_set}})
+        
+    def set_screenshot_path(self, url, screenshot_path):
 
+        self.urlinfo_collection.update({"url" : url}, {'$set' : {"screenshot_path" : screenshot_path}})        
+
+    def delete_urls_by_match(self, match, negative_match = False):
+        """Remove hosts and urls by matching URLs"""
+
+        url_dics = self.list_all_urls()
+        for url_dic in url_dics:
+            if negative_match:
+                if not match in url_dic["url"]:                    
+                    self.hostinfo_collection.remove({"host" : url_dic["host"]})
+                    self.urlinfo_collection.remove({"url" : url_dic["url"]})
+            else:
+                if match in url_dic["url"]:
+                    self.hostinfo_collection.remove({"host" : url_dic["host"]})
+                    self.urlinfo_collection.remove({"url" : url_dic["url"]})
+
+    def delete_hosts_by_match(self, match, negative_match = False):
+        """Remove hosts and urls by matching hosts"""
+
+        host_dics = self.list_all_hosts()
+        for host_dic in host_dics:
+            if negative_match:
+                if not match in host_dic["host"]:                    
+                    self.hostinfo_collection.remove({"host" : host_dic["host"]})
+                    self.urlinfo_collection.remove({"host" : host_dic["host"]})
+            else:
+                if match in host_dic["host"]:
+                    self.hostinfo_collection.remove({"host" : host_dic["host"]})
+                    self.urlinfo_collection.remove({"host" : host_dic["host"]})
+
+    def delete_all_by_match(self, match, negative_match = False):
+        """Remove hosts and urls by matching both urls and hosts"""
+
+        self.delete_urls_by_match(match, negative_match = negative_match)
+        self.delete_hosts_by_match(match, negative_match = negative_match)
+                    
 if __name__ == "__main__":
 
-#    mmu = MemexMongoUtils()
+    mmu = MemexMongoUtils()
 #    print mmu.list_all_urls()
-    MemexMongoUtils(which_collection="crawl-data", init_db=True)
-    MemexMongoUtils(which_collection="known-data", init_db=True)
-    MemexMongoUtils(which_collection="cc-crawl-data", init_db=True)
+#    MemexMongoUtils(which_collection="crawl-data", init_db=True)
+#    MemexMongoUtils(which_collection="known-data", init_db=True)
+#    MemexMongoUtils(which_collection="cc-crawl-data", init_db=True)
+#    mmu.delete_all_by_match(".onion", negative_match = True)
+#    mmu.process_host_data()
+#    for url in mmu.list_all_urls():
+#        print url
+    print "thx"
+
+#    for host in mmu.list_hosts():
+    for host in mmu.list_hosts(filter_field="host", filter_regex="\.onion$"):
+        print host
+
