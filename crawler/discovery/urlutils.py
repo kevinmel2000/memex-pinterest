@@ -2,16 +2,20 @@
 from __future__ import absolute_import
 import re
 import urlparse
-import tldextract
-
 
 has_scheme = re.compile(r"[a-z]+://.+", re.IGNORECASE).match
 
 
 def get_domain(url):
-    p = tldextract.extract(url)
-    return ".".join([p.domain, p.suffix])
+#! fails on .onion
+#!    p = tldextract.extract(url)
+#!    return ".".join([p.domain, p.suffix])
 
+    host = urlparse.urlparse(url).netloc
+    if ":" in host:
+        host.split(":", 1)[0]
+        
+    return host
 
 def get_hostname(url):
     """
@@ -89,6 +93,10 @@ def is_external_url(source_url, target_url):
     >>> is_external_url("http://example.com", "http://static.example.co.uk")
     False
     """
-    p1 = tldextract.extract(source_url)
-    p2 = tldextract.extract(target_url)
-    return p1.domain != p2.domain
+    p1 = get_hostname(source_url)
+    p2 = get_hostname(target_url)
+    return p1 != p2
+
+if __name__ == "__main__":
+    
+    print get_domain("http://3223423wfawefawf.onion")

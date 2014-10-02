@@ -32,7 +32,7 @@ class SplashMiddleware(object):
 
     """
     DEFAULT_SPLASH_URL = 'http://127.0.0.1:8050'
-    SPLASH_EXTRA_TIMEOUT = 5
+    SPLASH_EXTRA_TIMEOUT = 10
     RESPECT_SLOTS = True
 
     def __init__(self, crawler, splash_url):
@@ -76,7 +76,7 @@ class SplashMiddleware(object):
 
         self.crawler.stats.inc_value('splash/request_count')
 
-        return request.replace(
+        req_rep = request.replace(
             url=self.splash_url(splash_options, request.url),
             meta=meta,
 
@@ -84,6 +84,8 @@ class SplashMiddleware(object):
             # To respect them changes to Splash are needed.
             headers={},
         )
+
+        return req_rep
 
     def process_response(self, request, response, spider):
         if '_splash' in request.meta:

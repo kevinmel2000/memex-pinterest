@@ -98,4 +98,4 @@ def set_score_handler(url, score):
 
 if __name__ == "__main__":
 
-    pass
+    print hosts_handler()

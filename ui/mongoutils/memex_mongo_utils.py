@@ -210,6 +210,8 @@ class MemexMongoUtils(object):
 
 if __name__ == "__main__":
 
+#    mmu = MemexMongoUtils()
+#    print mmu.list_all_urls()
     MemexMongoUtils(which_collection="crawl-data", init_db=True)
     MemexMongoUtils(which_collection="known-data", init_db=True)
     MemexMongoUtils(which_collection="cc-crawl-data", init_db=True)

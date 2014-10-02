@@ -29,8 +29,9 @@ SourcePin is easy to install, here are the steps.
     pip install scrapy-inline-requests
 
 If any of the previous commands fail, please see the documentation 
-for each respective project or email acaceres@hyperiongray.com for help 
-(Splash in particular can cause some trouble).
+for each respective project or email acaceres@hyperiongray.com for help. 
+Splash in particular can cause some trouble - it has a bunch of requirements to run properly,
+see here: http://splash.readthedocs.org/en/latest/install.html.
 
 Once dependencies have been installed please check out the SourcePin code by doing ::
 

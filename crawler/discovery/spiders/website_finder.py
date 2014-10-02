@@ -161,6 +161,7 @@ class WebsiteFinderSpider(scrapy.Spider):
             splash_resp = yield self._splash_request(response.url)
             response.meta['depth'] += 1
 
+                        
             self._process_splash_response(response, splash_resp, ld)
 
         yield ld.load_item()
@@ -185,17 +186,18 @@ class WebsiteFinderSpider(scrapy.Spider):
                 )
 
     def _splash_request(self, url):
-        return scrapy.Request(url, meta={
+        screq = scrapy.Request(url, meta={
             'splash': {
                 'html': '1' if self.save_html else '0',
                 'png': '1',
                 'wait': '2.0',
                 'width': '640',
                 'height': '480',
-                'timeout': '30',
+                'timeout': '60',
             },
-            'download_timeout': 40,
+            'download_timeout': 60,
         })
+        return screq
 
     def _process_splash_response(self, response, splash_response, ld):
         data = json.loads(splash_response.body, encoding='utf8')
