@@ -29,6 +29,16 @@
   <p>Score: {{ host_dic["host_score"] }}</p>
 {% endif %}
 
+{% if "is_known_host" in host_dic %}
+  {% if host_dic["is_known_host"] %}
+    <button style="float:right;" class="btn btn-danger" disabled>Known</button>  
+  {% else %}
+    <button style="float:right;"class="btn btn-success" disabled>New Host</button>  
+  <!--<p>Known host: {{ host_dic["is_known_host"] }}</p>-->
+  {% endif %}
+{% endif %}
+
+
 </article>
 
 {% endif %}

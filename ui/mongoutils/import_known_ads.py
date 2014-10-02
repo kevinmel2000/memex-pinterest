@@ -5,7 +5,7 @@ import csv
 
 def import_known_ads(csv_filename, limit = 2000):
 
-    mmu = MemexMongoUtils(which_collection = "known-data", init_db = True)
+    mmu = MemexMongoUtils(which_collection = "known-data")
     with open(csv_filename) as testfile:
         reader = csv.DictReader(testfile)
 
@@ -37,8 +37,4 @@ def import_known_ads(csv_filename, limit = 2000):
     
 if __name__ == "__main__":
 
-    mmu = MemexMongoUtils(which_collection = "known-data", init_db = True)    
-    import_known_ads("/home/memex-punk/Desktop/known_sites.csv")
-    mmu.process_host_data()
-    for host in mmu.list_all_hosts():
-        print host
+    import_known_ads("/home/memex-punk/Desktop/known_sites.csv", limit = 5000)

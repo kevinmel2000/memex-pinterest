@@ -2,6 +2,7 @@ from flask import request
 from mongoutils.memex_mongo_utils import MemexMongoUtils
 from scrapyutils.scrapydutil import ScrapydJob
 from settings import SCREENSHOT_DIR
+from mongoutils.known_hosts import KnownHostsCompare
 
 def get_screenshot_relative_path(real_path):
     try:
@@ -25,13 +26,17 @@ def hosts_handler(page = 1, which_collection = "crawl-data", filter_field = None
     #!process host records
     #!THIS WON'T SCALE
     mmu.process_host_data()
-    print filter_field
-    print filter_regex
+    #!neither will this...
+    khc = KnownHostsCompare()
+    
     host_dics = mmu.list_hosts(page = page, filter_field = filter_field, filter_regex = filter_regex)
 
     for host_dic in host_dics:
         host_dic.pop("_id")
+        is_known_host = khc.is_known_host(host_dic["host"])
+        host_dic["is_known_host"] = is_known_host
         hsu = mmu.get_highest_scoring_url_with_screenshot(host_dic["host"])
+
         if hsu:
             screenshot_path = get_screenshot_relative_path(hsu['screenshot_path'])
             host_dic["hsu_screenshot_path"] = screenshot_path
