@@ -251,21 +251,10 @@ class MemexMongoUtils(object):
 
         self.delete_urls_by_match(match, negative_match = negative_match)
         self.delete_hosts_by_match(match, negative_match = negative_match)
-                    
+
 if __name__ == "__main__":
 
     mmu = MemexMongoUtils()
-#    print mmu.list_all_urls()
-#    MemexMongoUtils(which_collection="crawl-data", init_db=True)
-#    MemexMongoUtils(which_collection="known-data", init_db=True)
-#    MemexMongoUtils(which_collection="cc-crawl-data", init_db=True)
-#    mmu.delete_all_by_match(".onion", negative_match = True)
-#    mmu.process_host_data()
-#    for url in mmu.list_all_urls():
-#        print url
-    print "thx"
-
-#    for host in mmu.list_hosts():
-    for host in mmu.list_hosts(filter_field="host", filter_regex="\.onion$"):
-        print host
-
+    MemexMongoUtils(which_collection="crawl-data", init_db=True)
+    MemexMongoUtils(which_collection="known-data", init_db=True)
+    MemexMongoUtils(which_collection="cc-crawl-data", init_db=True)
