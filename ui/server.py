@@ -66,7 +66,7 @@ def load_hosts(page=1):
     if request_wants_json():
         return Response(json.dumps(hosts), mimetype="application/json")
 
-    return render_template('hosts.html', hosts=hosts, use_cc_data=False)
+    return render_template('hosts.html', hosts=hosts, use_cc_data=False, page = page)
 
 @app.route("/cc-hosts/<page>")
 @requires_auth
@@ -183,4 +183,5 @@ if __name__ == "__main__":
     if app.config['DEBUG']:
         app.debug = True
 
-    app.run('0.0.0.0', threaded=True)
+#    app.run('0.0.0.0', threaded=True)
+    app.run('0.0.0.0')

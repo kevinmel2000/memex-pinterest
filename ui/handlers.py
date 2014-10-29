@@ -22,13 +22,8 @@ def hosts_handler(page = 1, which_collection = "crawl-data", filter_field = None
     """Put together host documents for use with hosts endpoint """
 
     mmu = MemexMongoUtils(which_collection = which_collection)
-
-    #!process host records
-    #!THIS WON'T SCALE
-    mmu.process_host_data()
-    #!neither will this...
     khc = KnownHostsCompare()
-    
+
     host_dics = mmu.list_hosts(page = page, filter_field = filter_field, filter_regex = filter_regex)
 
     for host_dic in host_dics:
@@ -36,7 +31,9 @@ def hosts_handler(page = 1, which_collection = "crawl-data", filter_field = None
         is_known_host = khc.is_known_host(host_dic["host"])
         host_dic["is_known_host"] = is_known_host
         hsu = mmu.get_highest_scoring_url_with_screenshot(host_dic["host"])
-
+        host_score = mmu.get_host_score(host_dic["host"])
+        host_dic["host_score"] = host_score
+        
         if hsu:
             screenshot_path = get_screenshot_relative_path(hsu['screenshot_path'])
             host_dic["hsu_screenshot_path"] = screenshot_path
@@ -104,4 +101,4 @@ def set_score_handler(url, score):
 
 if __name__ == "__main__":
     print "HERE"
-    print hosts_handler(filter_field = "host", filter_regex = "\.onion$")
+    print hosts_handler()

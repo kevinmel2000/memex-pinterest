@@ -4,6 +4,8 @@ from pymongo import MongoClient
 import traceback
 from random import randrange
 from operator import itemgetter
+from urlparse import urlparse
+from pymongo.errors import DuplicateKeyError
 
 class MemexMongoUtils(object):
 
@@ -74,7 +76,7 @@ class MemexMongoUtils(object):
 
         return list(docs)
 
-    def list_hosts(self, page=1, num_docs=30, filter_regex = None, filter_field = None):
+    def list_hosts(self, page=1, num_docs=28, filter_regex = None, filter_field = None):
 
         if filter_regex and filter_field:
             docs = self.hostinfo_collection.find({filter_field:{'$regex':filter_regex}})
@@ -127,53 +129,44 @@ class MemexMongoUtils(object):
                     # doc with same url exists, skip
                     pass
 
-    def process_host_data(self):
-        """Insert data into domain collection, requires docs to be indexed already
-        e.g. through __insert_url_test_data"""
+    def insert_url(self, **kwargs):
+        '''
+        Inserts a URL and properly increments the needed host document
+        
+        is_seed,crawled_at,title,url,link_url,link_text,html_rendered,referrer_depth,depth,total_depth,host,referrer_url,html        
+        '''
 
-        urls = self.list_all_urls()
-        for url in urls:
-            url.pop("_id")
+        url = kwargs["url"]
+        host = urlparse(url).netloc
+        if ":" in host:
+            host = host.split(":")[0]
+            
+        url_doc = kwargs
+        if not "host" in url_doc:
+            url_doc["host"] = host
+        
+        #throws exception if URL already exists, user of method
+        #should take this into account
+        self.urlinfo_collection.save(kwargs)
+        host_doc = {"host" : host, "num_urls" : 1, "host_score" : None}
 
-        host_dics = []
-        for key, group in itertools.groupby(urls, lambda item: item["host"]):
-            host_dic = {}
-            group_list = list(group)
-#            for url in group_list:
-#                print url["url"]
-#            print "============"
-            host_dic["host"] = key
-            host_dic["num_urls"] = len(group_list)
+        #try to insert a new host doc, if fail increment url count
+        try:
+            self.hostinfo_collection.save(host_doc)
+        except DuplicateKeyError:
+            self.hostinfo_collection.update({"host" : host}, {"$inc" : {"num_urls" : 1}})
 
-            # calculate score
-            host_score = 0.0
-            for url_dic in group_list:
-                if "score" in url_dic:
-                    # host_score += float(url_dic["score"])
-                    if float(url_dic["score"]) > host_score:
-                        host_score = float(url_dic["score"])
+    def get_host_score(self, host):
 
-            # host_dic["host_score"] = int(host_score / len(group_list) * 100)
-            host_dic["host_score"] = int(host_score * 100)
-            host_dics.append(host_dic)
-
-        for host_dic in host_dics:
-#            print "************"
-#            print host_dic
-            try:
-                self.hostinfo_collection.save(host_dic)
-            except:
-                # pop id if the above try appended it (cases update to fail)
-                if "_id" in host_dic:
-                    host_dic.pop("_id")
-                self.hostinfo_collection.update({"host" : host_dic["host"]}, host_dic)
-
-        return host_dics
+        high_score_doc = self.urlinfo_collection.find_one({"host" : host}, sort = [("score", -1)])
+        if "score" in high_score_doc:
+            return high_score_doc["score"]
+        else:
+            return 0
 
     def insert_test_data(self, test_fn="test_sites.csv"):
 
         self.__insert_url_test_data(test_fn=test_fn)
-        self.process_host_data()
 
     def add_job(self, url, job_id, default_state="Initializing"):
 
