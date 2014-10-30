@@ -183,5 +183,4 @@ if __name__ == "__main__":
     if app.config['DEBUG']:
         app.debug = True
 
-#    app.run('0.0.0.0', threaded=True)
-    app.run('0.0.0.0')
+    app.run('0.0.0.0', threaded=True)
