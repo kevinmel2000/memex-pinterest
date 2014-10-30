@@ -27,6 +27,8 @@ def hosts_handler(page = 1, which_collection = "crawl-data", filter_field = None
     host_dics = mmu.list_hosts(page = page, filter_field = filter_field, filter_regex = filter_regex)
 
     for host_dic in host_dics:
+
+        #host scoring is added here as is known hostedness
         host_dic.pop("_id")
         is_known_host = khc.is_known_host(host_dic["host"])
         host_dic["is_known_host"] = is_known_host

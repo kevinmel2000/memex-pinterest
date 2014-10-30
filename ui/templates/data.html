@@ -71,10 +71,14 @@ transition: all 0.3s ease-in-out;
 ================================================== -->
 
 <body>
+<div id="top-of-page"></div>
 <div class="jquery-script-ads"><script type="text/javascript">
-
 </script>
 </div>
+<!--25,300-->
+<button id="page-up" style="width:100%; height:40px; position:absolute; display:none ;" class="btn btn-warning" onclick="loadPrevious();">PAGE UP</button>
+
+
 <div class="jquery-script-clear"></div>
 </div>
 </div>
@@ -99,38 +103,160 @@ transition: all 0.3s ease-in-out;
                 margin_bottom: 50,
                 single_column_breakpoint: 700
             });
-	    loadMore();
+	    //loadMore();
         });
 </script>
+<div id="bottom-of-page"><button id="page-down" style="width:100%; height:40px; position:relative; margin-top:150px; display:none;" class="btn btn-success" onclick="loadMore();">PAGE DOWN</button></div>
 </body>
 <script>
-var current_page = 0;
+var loaded_pages = []
 
-function loadMore(page)
+function sleep(milliseconds) {
+  var start = new Date().getTime();
+  for (var i = 0; i < 1e7; i++) {
+    if ((new Date().getTime() - start) > milliseconds){
+      break;
+    }
+  }
+}
+
+function checkCollapse(from_bottom) {
+
+  if (loaded_pages.length > 3) {
+    if (from_bottom) {
+      var page_to_remove = loaded_pages[loaded_pages.length - 1];
+  	  console.log("Collapsing page " + String(page_to_remove));
+      $( ".page-" + String(page_to_remove) ).remove();
+      loaded_pages.pop();
+    }
+    
+    else {
+      var page_to_remove = loaded_pages[0];
+  	  console.log("Collapsing page " + String(page_to_remove));
+      $( ".page-" + String(page_to_remove) ).remove();
+      loaded_pages.shift();
+    }
+  console.log("Loaded pages: " + String(loaded_pages));      
+    
+  }
+}
+
+var is_first_load = 0;
+function checkDisabled() {
+
+  if (loaded_pages[0] != 0) {
+    $("#page-up").css("display","");
+  }
+  else {
+    $("#page-up").css("display", "none");  
+  }
+  if (is_first_load == 0) {
+    $("#page-down").css("display", "");
+  }
+}
+
+function loadPrevious()
 {
-   console.log("More loaded");
-   host_url = "{{ host_path }}/" + current_page
+   var page_to_load = loaded_pages[0] - 1;
+   if (page_to_load < 0) {
+     console.log("Got order to load page less than 0, returning.")
+     return null;
+   }
+   
+   console.log("Loading previous page " + String(page_to_load));
+   host_url = "{{ host_path }}/" + String(page_to_load)
    {% if filter_regex and filter_field %}
-       host_url = host_url + "?filter-regex={{ filter_regex }}&filter-field={{ filter_field }}"     
+       host_url = host_url + "?filter-regex={{ filter_regex }}&filter-field={{ filter_field }}"
+   {% endif %}
+
+
+	$.ajaxSetup({
+	async: false
+	});   
+   $.get(host_url, function( host_html ) {
+     $("section#blog-landing").prepend(host_html);
+//     $(window).bind('scroll', bindScroll);
+     if (host_html) {
+       loaded_pages.unshift(page_to_load);
+       console.log("Loaded pages: " + String(loaded_pages));
+       checkCollapse(true);
+     }
+   });
+	$.ajaxSetup({
+	async: true
+	});
+    checkDisabled();
+}
+
+function loadMore()
+{   
+   console.log("Loading more");
+   if (loaded_pages.length !== 0) {
+     var page_to_load = loaded_pages[loaded_pages.length - 1] + 1;
+   }
+   else{
+     var page_to_load = 0;
+   }
+   
+  if (page_to_load < 0) {
+     console.log("Got order to load page less than 0, returning.")
+     return null;
+   }
+      
+   host_url = "{{ host_path }}/" + page_to_load;
+   {% if filter_regex and filter_field %}
+       host_url = host_url + "?filter-regex={{ filter_regex }}&filter-field={{ filter_field }}"
    {% endif %}
    
+	$.ajaxSetup({
+	async: false
+	});
    $.get(host_url, function( host_html ) {
      $("section#blog-landing").append(host_html);
-     $(window).bind('scroll', bindScroll);
+//     $(window).bind('scroll', bindScroll);
+     if (host_html) {
+       loaded_pages.push(page_to_load);
+       checkCollapse(false);
+       console.log("Loaded pages: " + String(loaded_pages));
+     }
+     else {
+       console.log("No more pages to load!");
+     }
    });
-
+	$.ajaxSetup({
+	async: true
+	});
+	checkDisabled();
 }
+//return $.waypoints('viewportHeight') - $(this).height() + 100;
 
-function bindScroll(){
-   if($(window).scrollTop() + $(window).height() > $(document).height() - 100) {
-       $(window).unbind('scroll');
-       current_page = current_page + 1;
-       loadMore();
-       //alert(current_page);
-   }
-}
- 
-$(window).scroll(bindScroll);
+$(document).ready(function() {
+
+  //user scrolls down and hits bottom of page
+  $('#bottom-of-page').waypoint(
+  function(direction) {
+    console.log("Got downward action at bottom of page...");
+    if (direction == "down") {
+      loadMore();
+    }
+  },
+  {
+    offset: 'bottom-in-view'
+  });  
+});
+
+$(document).ready(function() {
+  //user scrolls up and hits top of page  
+  $('#top-of-page').waypoint(
+  function(direction) {
+    console.log("Got upward action at top of page...");
+    if (direction == "up") {
+      loadPrevious();
+    }
+  });
+});
+
 </script>
+
 </html>
 {% endblock %}
