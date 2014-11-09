@@ -61,6 +61,7 @@ Replace the above with the equivalent directory on your filesystem, for example 
 Now you're ready to start the SourcePin application,
 from the project root ::
 
+   cd ui
    python server.py
     
 Now open up your web browser and go to http://localhost:5000. You should see a blank page with

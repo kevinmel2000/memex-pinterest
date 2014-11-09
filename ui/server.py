@@ -9,10 +9,29 @@ discovery_handler, mark_interest_handler, get_screenshot_relative_path
 import json
 import hashlib
 from handlers import set_score_handler
+from handlers import list_workspace, add_workspace, set_workspace_selected, delete_workspace
 from auth import requires_auth
 server_path = os.path.dirname(os.path.realpath(__file__))
 app = Flask(__name__)
 app.config.from_object('settings')
+from bson.objectid import ObjectId
+
+class JSONEncoder(json.JSONEncoder):
+    def default(self, o):
+        if isinstance(o, ObjectId):
+            return str(o)
+        return json.JSONEncoder.default(self, o)
+
+
+#mongo decoder for ObjectId
+def decoder(dct):
+    for k, v in dct.items():
+        if '_id' in dct:
+            try:
+                dct['_id'] = ObjectId(dct['_id'])
+            except:
+                pass
+        return dct
 
 # ui
 @app.route("/discovery")
@@ -174,6 +193,54 @@ def set_score(score):
     ret = set_score_handler(url, score)
 
     return Response("OK")
+
+
+############# Workspaces #############
+
+@app.route("/workspace/" , methods=['GET'])
+@requires_auth
+def get_workspace_view():
+    return render_template("workspace.html")
+
+
+@app.route("/api/workspace/", methods=['GET'])
+@requires_auth
+def get_workspace_api():
+    in_doc = list_workspace()
+    out_doc = JSONEncoder().encode(in_doc)
+    return Response(json.dumps(out_doc), mimetype="application/json")
+
+
+@app.route("/api/workspace/", methods=['POST'])
+@requires_auth
+def add_workspace_api():
+    name = request.form.get('name')
+    add_workspace(name)
+
+    in_doc = list_workspace()
+    out_doc = JSONEncoder().encode(in_doc)
+    return Response(json.dumps(out_doc), mimetype="application/json")
+
+@app.route("/api/workspace/selected/", methods=['POST'])
+@requires_auth
+def selected_workspace_api():
+    id = request.form.get('id')
+    set_workspace_selected(id)
+
+    in_doc = list_workspace()
+    out_doc = JSONEncoder().encode(in_doc)
+    return Response(json.dumps(out_doc), mimetype="application/json")
+
+@app.route("/api/workspace/", methods=['DELETE'])
+@requires_auth
+def delete_workspace_api():
+    id = request.form.get('id')
+    delete_workspace(id)
+
+    in_doc = list_workspace()
+    out_doc = JSONEncoder().encode(in_doc)
+    return Response(json.dumps(out_doc), mimetype="application/json")
+
 
 if __name__ == "__main__":
 

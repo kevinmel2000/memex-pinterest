@@ -1,0 +1,176 @@
+{% extends "layout.html" %}
+{% block content %}
+<head>
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<!--<link rel="stylesheet" href="http://netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css">-->
+	<style>
+		body {
+			background: #E9E9E9;
+		}
+		#blog-landing {
+			margin-top: 81px;
+			position: relative;
+			max-width: 100%;
+			width: 100%;
+		}
+		img {
+			width: 100%;
+			max-width: 100%;
+			height: auto;
+		}
+		.white-panel {
+			position: absolute;
+			background: white;
+			box-shadow: 0px 1px 2px rgba(0,0,0,0.3);
+			padding: 10px;
+		}
+		.white-panel h1 {
+			font-size: 1em;
+		}
+		.white-panel h1 a {
+			color: #A92733;
+		}
+		.white-panel:hover {
+			box-shadow: 1px 1px 10px rgba(0,0,0,0.5);
+			margin-top: -5px;
+			-webkit-transition: all 0.3s ease-in-out;
+			-moz-transition: all 0.3s ease-in-out;
+			-o-transition: all 0.3s ease-in-out;
+			transition: all 0.3s ease-in-out;
+		}
+	</style>
+
+	<!--<link href="http://www.jqueryscript.net/css/jquerysctipttop.css" rel="stylesheet" type="text/css">-->
+</head>
+<!-- NAVBAR
+================================================== -->
+
+<body>
+	<div id="top-of-page"></div>
+	<div class="jquery-script-ads">
+		<script type="text/javascript"></script>
+	</div>
+	<!--25,300-->
+	<!-- <button id="page-up" style="width:100%; height:40px; position:absolute; display:none ;" class="btn btn-warning" onclick="loadPrevious();">PAGE UP</button> -->
+	<div class="jquery-script-clear"></div>
+	<div id="container">
+
+		<div class="container marketing">
+			<div class="row" >
+				<div class="col-lg-8">
+					<h1 style="margin-top:50px;margin-left: 20px"> Switch Workspace</h1>
+					<div id="wsList" class="list-group">
+						<!-- 
+						<a href="#" class="list-group-item">Human Trafficking <span class="badge">1540</span></a>
+						<a href="#" class="list-group-item list-group-item-info">Ebola Outbreak <span class="badge">214</span></a>
+						<a href="#" class="list-group-item">Pharma online <span class="badge">14</span></a>
+						<a href="#" class="list-group-item">Miscellaneous <span class="badge">5</span></a>
+						<a href="#" class="list-group-item">Empty <span class="badge"></span></a>
+						-->
+					</div>
+					<div class="input-group">
+						<input id="addText" type="text" class="form-control">
+						<span class="input-group-btn">
+							<button id="addButton" class="btn btn-default" type="button">
+								Add
+							</button> </span>
+					</div><!-- /input-group -->
+				</div><!-- /.col-lg-6 -->
+			</div><!-- /.row -->
+		</div>
+	</div>
+
+	<!-- Bootstrap core JavaScript
+	================================================== -->
+	<!-- Placed at the end of the document so the pages load faster -->
+	<!--<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>-->
+	<script src="{{ url_for('static', filename='js/pinterest_grid.js') }}"></script>
+
+	<script>
+
+		$(document).ready(function() {
+			
+			var url = '/api/workspace/';
+			var store;
+			
+			var renderWsFn = function(data){
+				store = data;
+				var obj = $.parseJSON(data);
+				$('#addText').val('');
+				$('#wsList').empty();
+		  		var wsList = $('#wsList');
+				$.each(obj, function(index,elem){
+					var clickme = "onclick=deleteme('"+elem._id+"','"+elem.name+"')";
+					var span ='<span name="'+elem.name+'" '+clickme+' class="badge" style="z-index:100" ><span class="glyphicon glyphicon-trash"></span></span>';
+					var clazz = (elem.selected?'list-group-item-info':'');
+					var li = '<a href="#" id="'+elem._id+'" class="list-group-item '+ clazz +'">';
+						li = li + '<span  class="selectionable">'+elem.name +'</span>'+ span +'</a>';
+					wsList.append(li);
+				});
+				
+				$('.list-group-item').click(function(){
+					var id = this.id;
+					var posting = $.post( url +'selected/', 'id=' + id, function(data){
+						renderWsFn(data);
+						$('#'+id).focus();
+					});
+	
+				});
+				
+			};
+			
+			deleteme = function(id, name){
+				var confirmed = confirm('Are you sure you want to remove ' + name);
+				if (confirmed){
+					var posting = $.ajax({
+										type: "DELETE",
+										url: url,
+										data:  'id=' + id,
+										success: function(data) {
+													renderWsFn(data);
+										}
+									});
+				}
+				else{
+					renderWsFn(store);
+				}
+		  		return false;
+			};
+			
+	
+			var posting = $.get( url, function(data){
+				renderWsFn(data);
+			});
+
+			var addWorkspaceFn = function() {
+				var name = $('#addText').val();
+				if(name != null && name.trim() != "")
+					name = name.trim();
+				else{
+					alert('Enter a valid name for the workspace');
+					return false;
+				}
+				var posting = $.post( url, 'name=' + name, function(data){
+					renderWsFn(data);
+				});
+			};
+			
+			
+			$('#addButton').click(addWorkspaceFn);
+			
+			$('#addText').keypress(function(e) {
+				  if(e.which == 13) {
+				    // enter pressed
+				    addWorkspaceFn.apply();
+				  }
+				});
+  
+		});
+		
+	</script>
+</body>
+
+</html>
+{% endblock %}

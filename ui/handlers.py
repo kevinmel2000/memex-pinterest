@@ -4,6 +4,7 @@ from scrapyutils.scrapydutil import ScrapydJob
 from settings import SCREENSHOT_DIR
 from mongoutils.known_hosts import KnownHostsCompare
 
+    
 def get_screenshot_relative_path(real_path):
     try:
         return real_path.split("static/")[1]
@@ -97,9 +98,29 @@ def mark_interest_handler(interest, url):
 #        mmu.set_score(url, 0)
 
 def set_score_handler(url, score):
-    
     mmu = MemexMongoUtils()
-    mmu.set_score(url, score)    
+    mmu.set_score(url, score)   
+    
+
+
+    
+def list_workspace():
+    mmu = MemexMongoUtils()
+    return mmu.list_workspace()
+    
+def add_workspace(name):
+    mmu = MemexMongoUtils()
+    mmu.add_workspace(name)
+
+def set_workspace_selected(id):
+    mmu = MemexMongoUtils()
+    mmu.set_workspace_selected(id)
+
+def delete_workspace(id):
+    mmu = MemexMongoUtils()
+    mmu.delete_workspace(id)
+
+
 
 if __name__ == "__main__":
     print "HERE"

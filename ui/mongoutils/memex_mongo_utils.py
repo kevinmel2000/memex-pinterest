@@ -6,6 +6,7 @@ from random import randrange
 from operator import itemgetter
 from urlparse import urlparse
 from pymongo.errors import DuplicateKeyError
+from bson.objectid import ObjectId
 
 class MemexMongoUtils(object):
 
@@ -30,6 +31,21 @@ class MemexMongoUtils(object):
             url_collection_name = "known-urlsinfo"
             host_collection_name = "known-hostsinfo"
 
+
+        #TODO 
+        # 1) check if the exists in the workspaces collection 
+        # 2) create CRUD (endpoint, dao) for worspace
+        # 2.1 when deleting ws, delete also the collection
+        # 3) change js calls to include ws
+        # 4) change BE to receive ws
+        # 5) Add the new collections to the DDL (create & delete)
+        
+        
+        # nomenclature = 
+        # ws +"_" + urlinfo
+        # ws +"_" + hostinfo
+        
+        
         else:
             raise Exception("You have specified an invalid collection, please choose either crawl-data or cc-crawl-data for which_collection")
 
@@ -56,13 +72,14 @@ class MemexMongoUtils(object):
         self.urlinfo_collection = db[url_collection_name]
         self.hostinfo_collection = db[host_collection_name]
         self.seed_collection = db["seeds"]
+        self.workspace_collection = db["workspace"]
 
         # create index and drop any dupes
         if init_db:
             self.urlinfo_collection.ensure_index("url", unique=True, drop_dups=True)
             self.hostinfo_collection.ensure_index("host", unique=True, drop_dups=True)
             self.seed_collection.ensure_index("url", unique=True, drop_dups=True)
-
+    
     def list_indexes(self):
         
         return self.hostinfo_collection.index_information()
@@ -245,9 +262,26 @@ class MemexMongoUtils(object):
         self.delete_urls_by_match(match, negative_match = negative_match)
         self.delete_hosts_by_match(match, negative_match = negative_match)
 
+#####################   workspace  #####################
+    def list_workspace(self):
+        docs = self.workspace_collection.find()
+        return list(docs)
+
+    def add_workspace(self, name):
+        self.workspace_collection.save({'name':name, 'selected': False})
+
+    def set_workspace_selected(self, id):
+        self.workspace_collection.update({}, {'$set' : {"selected" : False}}, multi=True)
+        self.workspace_collection.update({"_id" : ObjectId( id )}, {'$set' : {"selected" : True}})
+
+    def delete_workspace(self, id):
+        self.workspace_collection.remove({"_id" : ObjectId( id )})
+
+
 if __name__ == "__main__":
 
     mmu = MemexMongoUtils()
     MemexMongoUtils(which_collection="crawl-data", init_db=True)
     MemexMongoUtils(which_collection="known-data", init_db=True)
     MemexMongoUtils(which_collection="cc-crawl-data", init_db=True)
+    MemexMongoUtils(which_collection="workspace", init_db=True)
