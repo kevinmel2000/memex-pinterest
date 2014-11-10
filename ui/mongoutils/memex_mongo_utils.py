@@ -10,6 +10,18 @@ from bson.objectid import ObjectId
 
 class MemexMongoUtils(object):
 
+        #TODO 
+        # 1) check if the exists in the workspaces collection 
+        # 2) create CRUD (endpoint, dao) for worspace
+        # 2.1 when deleting ws, delete also the collection
+        # 3) change js calls to include ws
+        # 4) change BE to receive ws
+        # 5) Add the new collections to the DDL (create & delete)
+        
+        # nomenclature = 
+        # ws +"_" + urlinfo
+        # ws +"_" + hostinfo
+
     def __init__(self, init_db=False, address="localhost", port=27017, which_collection="crawl-data"):
         """This class  initializes a Memex Mongo object and rebuilds the db collections if you want.
 
@@ -19,66 +31,72 @@ class MemexMongoUtils(object):
         to connect to common crawl specify this as cc-crawldata
         """
 
-        if which_collection == "crawl-data":
-            url_collection_name = "urlinfo"
-            host_collection_name = "hostinfo"
+        self.client = MongoClient(address, port)
+        db = self.client["MemexHack"]
 
-        elif which_collection == "cc-crawl-data":
+        self.workspace_collection = db["workspace"]
+
+        seed_collection_name = "seedinfo"
+
+        if which_collection == "cc-crawl-data":
             url_collection_name = "cc-urlinfo"
             host_collection_name = "cc-hostinfo"
-
         elif which_collection == "known-data":
             url_collection_name = "known-urlsinfo"
             host_collection_name = "known-hostsinfo"
-
-
-        #TODO 
-        # 1) check if the exists in the workspaces collection 
-        # 2) create CRUD (endpoint, dao) for worspace
-        # 2.1 when deleting ws, delete also the collection
-        # 3) change js calls to include ws
-        # 4) change BE to receive ws
-        # 5) Add the new collections to the DDL (create & delete)
-        
-        
-        # nomenclature = 
-        # ws +"_" + urlinfo
-        # ws +"_" + hostinfo
-        
+        elif which_collection == "crawl-data":
+            # Search for the current selected workspace
+            # if empty leave the default
+            ws_doc = self.workspace_collection.find_one({"selected" : True})
+            if None == ws_doc:
+                url_collection_name = "urlinfo"
+                host_collection_name = "hostinfo"
+            else:
+                url_collection_name = "urlinfo" + "-" + ws_doc['name']
+                host_collection_name = "hostinfo" + "-" + ws_doc['name']
+                seed_collection_name = "seedinfo" + "-" + ws_doc['name']
         
         else:
             raise Exception("You have specified an invalid collection, please choose either crawl-data or cc-crawl-data for which_collection")
+   
+        """
+        if which_collection == "crawl-data":
+            url_collection_name = "urlinfo"
+            host_collection_name = "hostinfo"
+        elif which_collection == "cc-crawl-data":
+            url_collection_name = "cc-urlinfo"
+            host_collection_name = "cc-hostinfo"
+        elif which_collection == "known-data":
+            url_collection_name = "known-urlsinfo"
+            host_collection_name = "known-hostsinfo"
+        else:
+            raise Exception("You have specified an invalid collection, please choose either crawl-data or cc-crawl-data for which_collection")
+        """        
 
-        self.client = MongoClient(address, port)
+        self.urlinfo_collection = db[url_collection_name]
+        self.hostinfo_collection = db[host_collection_name]
+        self.seed_collection = db[seed_collection_name]
 
-        db = self.client["MemexHack"]
-
+        
         if init_db:
             print "Got call to initialize db with %s %s" % (url_collection_name, host_collection_name)
             try:
                 print "Dropping %s and %s" % (url_collection_name, host_collection_name)
                 db.drop_collection(url_collection_name)
                 db.drop_collection(host_collection_name)
-                db.drop_collection("seeds")
-
+                db.drop_collection(seed_collection_name)
             except:
                 print "handled:"
                 traceback.print_exc()
 
             db.create_collection(url_collection_name)
             db.create_collection(host_collection_name)
-            db.create_collection("seeds")
-
-        self.urlinfo_collection = db[url_collection_name]
-        self.hostinfo_collection = db[host_collection_name]
-        self.seed_collection = db["seeds"]
-        self.workspace_collection = db["workspace"]
-
-        # create index and drop any dupes
-        if init_db:
+            db.create_collection(seed_collection_name)
+            # create index and drop any dupes
             self.urlinfo_collection.ensure_index("url", unique=True, drop_dups=True)
             self.hostinfo_collection.ensure_index("host", unique=True, drop_dups=True)
             self.seed_collection.ensure_index("url", unique=True, drop_dups=True)
+
     
     def list_indexes(self):
         
@@ -274,8 +292,16 @@ class MemexMongoUtils(object):
         self.workspace_collection.update({}, {'$set' : {"selected" : False}}, multi=True)
         self.workspace_collection.update({"_id" : ObjectId( id )}, {'$set' : {"selected" : True}})
 
+    def get_workspace_selected(self):
+        return self.workspace_collection.find_one({"selected" : True})
+
     def delete_workspace(self, id):
+        ws_doc = self.workspace_collection.find_one({"_id" : ObjectId( id )})
         self.workspace_collection.remove({"_id" : ObjectId( id )})
+        db = self.client["MemexHack"]
+        db["urlinfo" + "-" + ws_doc['name']].drop()
+        db["hostinfo" + "-" + ws_doc['name']].drop()
+        db["seedinfo" + "-" + ws_doc['name']].drop()
 
 
 if __name__ == "__main__":

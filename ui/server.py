@@ -23,16 +23,6 @@ class JSONEncoder(json.JSONEncoder):
         return json.JSONEncoder.default(self, o)
 
 
-#mongo decoder for ObjectId
-def decoder(dct):
-    for k, v in dct.items():
-        if '_id' in dct:
-            try:
-                dct['_id'] = ObjectId(dct['_id'])
-            except:
-                pass
-        return dct
-
 # ui
 @app.route("/discovery")
 @requires_auth
