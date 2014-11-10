@@ -10,18 +10,6 @@ from bson.objectid import ObjectId
 
 class MemexMongoUtils(object):
 
-        #TODO 
-        # 1) check if the exists in the workspaces collection 
-        # 2) create CRUD (endpoint, dao) for worspace
-        # 2.1 when deleting ws, delete also the collection
-        # 3) change js calls to include ws
-        # 4) change BE to receive ws
-        # 5) Add the new collections to the DDL (create & delete)
-        
-        # nomenclature = 
-        # ws +"_" + urlinfo
-        # ws +"_" + hostinfo
-
     def __init__(self, init_db=False, address="localhost", port=27017, which_collection="crawl-data"):
         """This class  initializes a Memex Mongo object and rebuilds the db collections if you want.
 
