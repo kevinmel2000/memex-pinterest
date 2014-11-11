@@ -102,8 +102,8 @@
 				$('#wsList').empty();
 		  		var wsList = $('#wsList');
 				$.each(obj, function(index,elem){
-					var clickme = "onclick=deleteme('"+elem._id+"','"+elem.name+"')";
-					var span ='<span name="'+elem.name+'" '+clickme+' class="badge" style="z-index:100" ><span class="glyphicon glyphicon-trash"></span></span>';
+					//var clickme = ;
+					var span ='<span name="'+elem.name+'" onclick=deleteme("'+elem._id +'") class="badge" style="z-index:100" ><span class="glyphicon glyphicon-trash"></span></span>';
 					var clazz = (elem.selected?'list-group-item-info':'');
 					var li = '<a href="#" id="'+elem._id+'" class="list-group-item '+ clazz +'">';
 						li = li + '<span  class="selectionable">'+elem.name +'</span>'+ span +'</a>';
@@ -112,24 +112,27 @@
 				
 				$('.list-group-item').click(function(){
 					var id = this.id;
-					var posting = $.post( url +'selected/', 'id=' + id, function(data){
-						renderWsFn(data);
-						$('#'+id).focus();
-					});
+					var posting = $.ajax({
+										type: "PUT",
+										url:  url + 'selected/' + id +'/',
+										success: function(data) {
+											renderWsFn(data);
+											$('#'+id).focus();
+										}
+									});
 	
 				});
-				
 			};
 			
-			deleteme = function(id, name){
-				var confirmed = confirm('Are you sure you want to remove ' + name);
+			deleteme = function(id){
+				$('.list-group-item').unbind();
+				var confirmed = confirm('Are you sure you want to remove the workspace?');
 				if (confirmed){
 					var posting = $.ajax({
 										type: "DELETE",
-										url: url,
-										data:  'id=' + id,
+										url: url + id + '/',
 										success: function(data) {
-													renderWsFn(data);
+											renderWsFn(data);
 										}
 									});
 				}
@@ -152,11 +155,14 @@
 					alert('Enter a valid name for the workspace');
 					return false;
 				}
-				var posting = $.post( url, 'name=' + name, function(data){
-					renderWsFn(data);
-				});
+				var posting = $.ajax({
+									type: "PUT",
+									url: url + name + '/',
+									success: function(data) {
+										renderWsFn(data);
+									}
+								});
 			};
-			
 			
 			$('#addButton').click(addWorkspaceFn);
 			

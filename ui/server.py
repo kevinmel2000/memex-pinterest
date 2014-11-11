@@ -201,30 +201,27 @@ def get_workspace_api():
     return Response(json.dumps(out_doc), mimetype="application/json")
 
 
-@app.route("/api/workspace/", methods=['POST'])
+@app.route("/api/workspace/<name>/", methods=['PUT'])
 @requires_auth
-def add_workspace_api():
-    name = request.form.get('name')
+def add_workspace_api(name):
     add_workspace(name)
 
     in_doc = list_workspace()
     out_doc = JSONEncoder().encode(in_doc)
     return Response(json.dumps(out_doc), mimetype="application/json")
 
-@app.route("/api/workspace/selected/", methods=['POST'])
+@app.route("/api/workspace/selected/<id>/", methods=['PUT'])
 @requires_auth
-def selected_workspace_api():
-    id = request.form.get('id')
+def selected_workspace_api(id):
     set_workspace_selected(id)
 
     in_doc = list_workspace()
     out_doc = JSONEncoder().encode(in_doc)
     return Response(json.dumps(out_doc), mimetype="application/json")
 
-@app.route("/api/workspace/", methods=['DELETE'])
+@app.route("/api/workspace/<id>/", methods=['DELETE'])
 @requires_auth
-def delete_workspace_api():
-    id = request.form.get('id')
+def delete_workspace_api(id):
     delete_workspace(id)
 
     in_doc = list_workspace()
