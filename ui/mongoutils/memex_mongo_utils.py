@@ -22,8 +22,9 @@ class MemexMongoUtils(object):
         self.client = MongoClient(address, port)
         db = self.client["MemexHack"]
 
-        self.workspace_collection = db["workspace"]
-
+        workspace_collection_name = "workspace"
+        self.workspace_collection = db[workspace_collection_name]
+        
         seed_collection_name = "seedinfo"
 
         if which_collection == "cc-crawl-data":
@@ -43,29 +44,14 @@ class MemexMongoUtils(object):
                 url_collection_name = "urlinfo" + "-" + ws_doc['name']
                 host_collection_name = "hostinfo" + "-" + ws_doc['name']
                 seed_collection_name = "seedinfo" + "-" + ws_doc['name']
-        
+
         else:
             raise Exception("You have specified an invalid collection, please choose either crawl-data or cc-crawl-data for which_collection")
-   
-        """
-        if which_collection == "crawl-data":
-            url_collection_name = "urlinfo"
-            host_collection_name = "hostinfo"
-        elif which_collection == "cc-crawl-data":
-            url_collection_name = "cc-urlinfo"
-            host_collection_name = "cc-hostinfo"
-        elif which_collection == "known-data":
-            url_collection_name = "known-urlsinfo"
-            host_collection_name = "known-hostsinfo"
-        else:
-            raise Exception("You have specified an invalid collection, please choose either crawl-data or cc-crawl-data for which_collection")
-        """        
 
         self.urlinfo_collection = db[url_collection_name]
         self.hostinfo_collection = db[host_collection_name]
         self.seed_collection = db[seed_collection_name]
 
-        
         if init_db:
             print "Got call to initialize db with %s %s" % (url_collection_name, host_collection_name)
             try:
@@ -73,6 +59,7 @@ class MemexMongoUtils(object):
                 db.drop_collection(url_collection_name)
                 db.drop_collection(host_collection_name)
                 db.drop_collection(seed_collection_name)
+                
             except:
                 print "handled:"
                 traceback.print_exc()
@@ -80,12 +67,22 @@ class MemexMongoUtils(object):
             db.create_collection(url_collection_name)
             db.create_collection(host_collection_name)
             db.create_collection(seed_collection_name)
+            
             # create index and drop any dupes
             self.urlinfo_collection.ensure_index("url", unique=True, drop_dups=True)
             self.hostinfo_collection.ensure_index("host", unique=True, drop_dups=True)
             self.seed_collection.ensure_index("url", unique=True, drop_dups=True)
 
-    
+            
+    def init_workspace(self, address="localhost", port=27017):
+        self.client = MongoClient(address, port)
+        db = self.client["MemexHack"]
+        workspace_collection_name = "workspace"
+        self.workspace_collection = db[workspace_collection_name]
+        print "Dropping %s" % (workspace_collection_name)
+        db.drop_collection(workspace_collection_name)
+        db.create_collection(workspace_collection_name)
+        
     def list_indexes(self):
         
         return self.hostinfo_collection.index_information()
@@ -298,4 +295,4 @@ if __name__ == "__main__":
     MemexMongoUtils(which_collection="crawl-data", init_db=True)
     MemexMongoUtils(which_collection="known-data", init_db=True)
     MemexMongoUtils(which_collection="cc-crawl-data", init_db=True)
-    MemexMongoUtils(which_collection="workspace", init_db=True)
+    mmu.init_workspace()
