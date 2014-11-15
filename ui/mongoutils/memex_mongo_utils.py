@@ -75,10 +75,14 @@ class MemexMongoUtils(object):
 
             
     def init_workspace(self, address="localhost", port=27017):
-        self.client = MongoClient(address, port)
         db = self.client["MemexHack"]
         workspace_collection_name = "workspace"
         self.workspace_collection = db[workspace_collection_name]
+        res = self.workspace_collection.find();
+        docs = list(res)
+        for doc in docs:
+            self.delete_workspace_related(doc['name'])
+        
         print "Dropping %s" % (workspace_collection_name)
         db.drop_collection(workspace_collection_name)
         db.create_collection(workspace_collection_name)
@@ -273,6 +277,23 @@ class MemexMongoUtils(object):
     def add_workspace(self, name):
         self.workspace_collection.save({'name':name, 'selected': False})
 
+
+        url_collection_name = "urlinfo" + "-" + name
+        host_collection_name = "hostinfo" + "-" + name
+        seed_collection_name = "seedinfo" + "-" + name
+
+        db = self.client["MemexHack"]
+        db.create_collection(url_collection_name)
+        db.create_collection(host_collection_name)
+        db.create_collection(seed_collection_name)
+
+        # create index and drop any dupes
+        db[url_collection_name].ensure_index("url", unique=True, drop_dups=True)
+        db[host_collection_name].ensure_index("host", unique=True, drop_dups=True)
+        db[seed_collection_name].ensure_index("url", unique=True, drop_dups=True)
+
+
+
     def set_workspace_selected(self, id):
         self.workspace_collection.update({}, {'$set' : {"selected" : False}}, multi=True)
         self.workspace_collection.update({"_id" : ObjectId( id )}, {'$set' : {"selected" : True}})
@@ -280,13 +301,21 @@ class MemexMongoUtils(object):
     def get_workspace_selected(self):
         return self.workspace_collection.find_one({"selected" : True})
 
+
     def delete_workspace(self, id):
         ws_doc = self.workspace_collection.find_one({"_id" : ObjectId( id )})
+        self.delete_workspace_related(ws_doc['name'])
         self.workspace_collection.remove({"_id" : ObjectId( id )})
+
+    def delete_workspace_related(self,name):
         db = self.client["MemexHack"]
-        db["urlinfo" + "-" + ws_doc['name']].drop()
-        db["hostinfo" + "-" + ws_doc['name']].drop()
-        db["seedinfo" + "-" + ws_doc['name']].drop()
+        print "Dropping %s" % ("urlinfo" + "-" + name)
+        db["urlinfo" + "-" + name].drop()
+        print "Dropping %s" % ("hostinfo" + "-" + name)
+        db["hostinfo" + "-" + name].drop()
+        print "Dropping %s" % ("seedinfo" + "-" + name)
+        db["seedinfo" + "-" + name].drop()
+
 
 
 if __name__ == "__main__":
