@@ -32,9 +32,6 @@
 	  $( document ).ready(function() {
           getUrlCrawlStatus('{{ seed["url"] }}', '{{ seed["url_hash"] }}');
 	  });
-          setInterval(function() {
-          getUrlCrawlStatus('{{ seed["url"] }}', '{{ seed["url_hash"] }}');
-          }, 5000);
 	</script>
 
 	{% endfor %}
@@ -46,12 +43,10 @@ function submitUrlForCrawl() {
 
   url = document.getElementById('url-input').value
   scrapyd_url = "/schedule-spider/?url=" + url;
-  //alert(scrapyd_url);
   console.log("Scheduled job");
   $.get(scrapyd_url, function( whatever ) {
     console.log("The job was successfully scheduled")
     location.reload()
-    //alert('success');
   });
 }
 
@@ -64,7 +59,14 @@ function getUrlCrawlStatus(url, url_hash) {
   $.get(status_url, function( status ) {
     console.log("Everything's good y'all, s'all good, s'all good");
     $("td#" + url_hash).html(status);
+  	
+  	if(status != "Done"){
+		setTimeout(function() {
+			getUrlCrawlStatus(url, url_hash);
+		}, 5000);
+  	}
   });
+  
 }
 
 </script>
