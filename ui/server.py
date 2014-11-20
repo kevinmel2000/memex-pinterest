@@ -229,6 +229,15 @@ def delete_workspace_api(id):
     return Response(json.dumps(out_doc), mimetype="application/json")
 
 
+############# Keywords #############
+
+@app.route("/keyword/" , methods=['GET'])
+@requires_auth
+def get_keyword_view():
+    return render_template("keyword.html")
+
+
+
 if __name__ == "__main__":
 
     if app.config["INIT_DB_ON_START"]:
