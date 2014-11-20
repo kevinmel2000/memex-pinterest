@@ -12,3 +12,4 @@ crawler/twistd.pid
 .classpath
 .project
 *.iml
+target/

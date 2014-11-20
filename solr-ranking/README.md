@@ -1,2 +1,0 @@
-Solr-ranking here
-=================
