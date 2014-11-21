@@ -20,10 +20,12 @@ import java.util.Set;
 import static java.util.concurrent.TimeUnit.SECONDS;
 
 public class MongoDbOp {
+    private   DB db;
     public static void main(String [] args) throws Exception {
         // test the connnection
         MongoDbOp instance = new MongoDbOp();
         instance.testConnection();
+        instance.readMongoDB();
     }
     private void testConnection() throws java.net.UnknownHostException {
 
@@ -39,7 +41,14 @@ public class MongoDbOp {
 //                new ServerAddress("localhost", 27018),
 //                new ServerAddress("localhost", 27019)));
 
-        DB db = mongoClient.getDB( "mydb" );
+        db = mongoClient.getDB( "mydb" );
         System.out.println("Connection to MongoDB established");
+    }
+    private void readMongoDB() {
+        // get a list of the collections in this database and print them out
+        Set<String> collectionNames = db.getCollectionNames();
+        for (final String s : collectionNames) {
+            System.out.println(s);
+        }
     }
 }
