@@ -3,21 +3,9 @@ package com.hyperiongray.ranker2.db;
 /**
  * Created by mark on 11/20/14.
  */
-import com.mongodb.BasicDBObject;
-import com.mongodb.BulkWriteOperation;
-import com.mongodb.BulkWriteResult;
-import com.mongodb.Cursor;
-import com.mongodb.DB;
-import com.mongodb.DBCollection;
-import com.mongodb.DBCursor;
-import com.mongodb.DBObject;
-import com.mongodb.MongoClient;
-import com.mongodb.ParallelScanOptions;
+import com.mongodb.*;
 
-import java.util.List;
 import java.util.Set;
-
-import static java.util.concurrent.TimeUnit.SECONDS;
 
 public class MongoDbOp {
     private   DB db;
@@ -25,7 +13,8 @@ public class MongoDbOp {
         // test the connnection
         MongoDbOp instance = new MongoDbOp();
         instance.testConnection();
-        instance.readMongoDB();
+        instance.listCollections();
+        instance.iterateThroughCollection();
     }
     private void testConnection() throws java.net.UnknownHostException {
 
@@ -41,14 +30,32 @@ public class MongoDbOp {
 //                new ServerAddress("localhost", 27018),
 //                new ServerAddress("localhost", 27019)));
 
-        db = mongoClient.getDB( "mydb" );
+        db = mongoClient.getDB( "MemexHack" );
         System.out.println("Connection to MongoDB established");
     }
-    private void readMongoDB() {
+    private void listCollections() {
+        System.out.println("List collections:");
         // get a list of the collections in this database and print them out
         Set<String> collectionNames = db.getCollectionNames();
         for (final String s : collectionNames) {
             System.out.println(s);
         }
     }
+    private void iterateThroughCollection() {
+        DBCollection collection = db.getCollection("urlinfo");
+        DBObject myDoc = collection.findOne();
+        System.out.println(myDoc);
+
+        DBCursor cursor = collection.find();
+        int count = 0;
+        try {
+            while (cursor.hasNext()) {
+                cursor.next();
+                System.out.println(++count);
+            }
+        } finally {
+            cursor.close();
+        }
+    }
+
 }
