@@ -3,19 +3,27 @@ package com.hyperiongray.ranker2.db;
 /**
  * Created by mark on 11/20/14.
  */
-import com.mongodb.*;
 
+import com.hyperiongray.ranker2.index.Indexer;
+import com.mongodb.*;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.Set;
 
 public class MongoDbOp {
-    private   DB db;
-    public static void main(String [] args) throws Exception {
+    private DB db;
+
+    public static void main(String[] args) throws Exception {
         // test the connnection
         MongoDbOp instance = new MongoDbOp();
         instance.testConnection();
         instance.listCollections();
         instance.iterateThroughCollection();
     }
+
     private void testConnection() throws java.net.UnknownHostException {
 
 // To directly connect to a single MongoDB server (note that this will not auto-discover the primary even
@@ -30,9 +38,10 @@ public class MongoDbOp {
 //                new ServerAddress("localhost", 27018),
 //                new ServerAddress("localhost", 27019)));
 
-        db = mongoClient.getDB( "MemexHack" );
+        db = mongoClient.getDB("MemexHack");
         System.out.println("Connection to MongoDB established");
     }
+
     private void listCollections() {
         System.out.println("List collections:");
         // get a list of the collections in this database and print them out
@@ -41,7 +50,10 @@ public class MongoDbOp {
             System.out.println(s);
         }
     }
+
     private void iterateThroughCollection() {
+        Indexer indexer = new Indexer();
+        indexer.setIndexLocation("output/index");
         DBCollection collection = db.getCollection("urlinfo");
         DBObject myDoc = collection.findOne();
         System.out.println(myDoc);
@@ -49,13 +61,25 @@ public class MongoDbOp {
         DBCursor cursor = collection.find();
         int count = 0;
         try {
+            indexer.openIndexForWrite();
             while (cursor.hasNext()) {
-                cursor.next();
-                System.out.println(++count);
+                DBObject object = cursor.next();
+                Set<String> keys = object.keySet();
+                String html = (String) object.get("html");
+                if (html != null) {
+                    Document doc = Jsoup.parse(html);
+                    String text = doc.text();
+                    indexer.addTextToIndex(text);
+                    System.out.println(++count);
+                }
             }
+            indexer.closeIndex();
+        } catch (Exception e) {
+            e.printStackTrace();
+
         } finally {
             cursor.close();
         }
+        System.out.println(count);
     }
-
 }

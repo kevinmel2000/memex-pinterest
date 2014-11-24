@@ -13,3 +13,4 @@ crawler/twistd.pid
 .project
 *.iml
 target/
+output/
