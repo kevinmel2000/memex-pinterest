@@ -4,6 +4,7 @@ package com.hyperiongray.ranker2;
  * Created by mark on 11/19/14.
  */
 import com.hyperiongray.ranker2.db.MongoDbOp;
+import com.hyperiongray.ranker2.index.Indexer;
 import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Options;
 import org.slf4j.Logger;
@@ -24,6 +25,7 @@ public class Ranker {
         Ranker main = new Ranker();
         try {
             main.createIndex(args);
+            main.readAndApplyIndex();
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -36,5 +38,10 @@ public class Ranker {
 
     private void createIndex(String args[]) throws Exception {
         MongoDbOp.main(args);
+    }
+    private void readAndApplyIndex() throws Exception {
+        Indexer indexer = new Indexer();
+        indexer.setIndexLocation("output/index");
+        indexer.readIndex();
     }
 }

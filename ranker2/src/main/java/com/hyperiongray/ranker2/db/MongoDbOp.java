@@ -63,6 +63,7 @@ public class MongoDbOp {
         try {
             indexer.openIndexForWrite();
             while (cursor.hasNext()) {
+                ++count;
                 DBObject object = cursor.next();
                 Set<String> keys = object.keySet();
                 String html = (String) object.get("html");
@@ -70,7 +71,6 @@ public class MongoDbOp {
                     Document doc = Jsoup.parse(html);
                     String text = doc.text();
                     indexer.addTextToIndex(text);
-                    System.out.println(++count);
                 }
             }
             indexer.closeIndex();
@@ -80,6 +80,6 @@ public class MongoDbOp {
         } finally {
             cursor.close();
         }
-        System.out.println(count);
+        System.out.println(count + " entries in MongoDB indexed");
     }
 }
