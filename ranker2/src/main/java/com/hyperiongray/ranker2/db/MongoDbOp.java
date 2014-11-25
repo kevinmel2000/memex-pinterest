@@ -14,7 +14,7 @@ import java.util.Set;
 
 public class MongoDbOp {
     private DB db;
-
+    private DBCollection collection;
     public static void main(String[] args) throws Exception {
         // test the connnection
         MongoDbOp instance = new MongoDbOp();
@@ -39,6 +39,7 @@ public class MongoDbOp {
 
         db = mongoClient.getDB("MemexHack");
         System.out.println("Connection to MongoDB established");
+        collection = db.getCollection("urlinfo");
     }
 
     private void listCollections() {
@@ -53,7 +54,6 @@ public class MongoDbOp {
     private void iterateThroughCollection() {
         Indexer indexer = new Indexer();
         indexer.setIndexLocation("output/index");
-        DBCollection collection = db.getCollection("urlinfo");
         DBObject myDoc = collection.findOne();
         System.out.println(myDoc);
 
@@ -86,5 +86,10 @@ public class MongoDbOp {
     public void addScore(String mongoId, String keyPhrase, float score) {
         System.out.println("Updating MongoDB for mongoId=" + mongoId + ", keyPhrase=" + keyPhrase + ", score=" + score);
         // TODO add code to actually write
+        // something like below
+//        BasicDBObject newDocument = new BasicDBObject();
+//        newDocument.append("$set", new BasicDBObject().append("clients", 110));
+//        BasicDBObject searchQuery = new BasicDBObject().append("hosting", "hostB");
+//        collection.update(searchQuery, newDocument);
     }
 }
