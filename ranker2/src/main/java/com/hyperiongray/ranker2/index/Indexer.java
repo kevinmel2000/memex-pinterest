@@ -1,5 +1,6 @@
 package com.hyperiongray.ranker2.index;
 
+import com.hyperiongray.ranker2.db.MongoDbOp;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.document.Field;
 import org.apache.lucene.document.TextField;
@@ -31,16 +32,25 @@ public class Indexer {
     private static StandardAnalyzer analyzer = new StandardAnalyzer(Version.LUCENE_40);
 
     private IndexWriter writer;
+    private MongoDbOp mongoDbOp = new MongoDbOp();
+
 
     public void openIndexForWrite() throws IOException {
+        // clean up the index dir
+        File [] indexFiles = new File(indexLocation).listFiles();
+        // recursive deletes are a bother, and we know that there will be only one level, so just do it
+        for (File indexFile: indexFiles) {
+            indexFile.delete();
+        }
         FSDirectory dir = FSDirectory.open(new File(indexLocation));
         IndexWriterConfig config = new IndexWriterConfig(Version.LUCENE_40, analyzer);
         writer = new IndexWriter(dir, config);
     }
 
-    public void addTextToIndex(String text) throws IOException {
+    public void addTextToIndex(String text, String mongoId) throws IOException {
         Document doc = new Document();
         doc.add(new TextField("contents", text, Field.Store.YES));
+        doc.add(new TextField("mongoId", mongoId, Field.Store.YES));
         writer.addDocument(doc);
     }
 
@@ -57,7 +67,8 @@ public class Indexer {
         this.indexLocation = indexLocation;
     }
 
-    public void readIndex() throws Exception {
+    public void updateDbFromIndex() throws Exception {
+        mongoDbOp.openConnection();
         for (String query : keyPhrases) {
             IndexReader reader = DirectoryReader.open(FSDirectory.open(new File(indexLocation)));
             IndexSearcher searcher = new IndexSearcher(reader);
@@ -68,11 +79,16 @@ public class Indexer {
             searcher.search(q, collector);
             TopDocs topDocs = searcher.search(q, Math.max(1, collector.getTotalHits()));
             ScoreDoc[] hits = collector.topDocs().scoreDocs;
-        }
-    }
+            for (ScoreDoc hit: hits) {
+                System.out.println(" hit: " + hit.toString() + " score: " + hit.score);
+                Document document = searcher.doc(hit.doc);
+                String mongoId = document.get("mongoId");
+                // now update MongoDB with this id and add the score to the columns with the query
+                System.out.println(mongoId);
+                mongoDbOp.addScore(mongoId, query, hit.score);
+            }
 
-    public List<String> getKeyPhrases() {
-        return keyPhrases;
+        }
     }
 
     public void setKeyPhrases(List<String> keyPhrases) {

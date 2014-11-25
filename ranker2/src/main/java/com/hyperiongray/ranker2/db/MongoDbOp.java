@@ -6,11 +6,10 @@ package com.hyperiongray.ranker2.db;
 
 import com.hyperiongray.ranker2.index.Indexer;
 import com.mongodb.*;
+import org.bson.types.ObjectId;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 
-import java.io.IOException;
-import java.io.InputStream;
 import java.util.Set;
 
 public class MongoDbOp {
@@ -19,12 +18,12 @@ public class MongoDbOp {
     public static void main(String[] args) throws Exception {
         // test the connnection
         MongoDbOp instance = new MongoDbOp();
-        instance.testConnection();
+        instance.openConnection();
         instance.listCollections();
         instance.iterateThroughCollection();
     }
 
-    private void testConnection() throws java.net.UnknownHostException {
+    public void openConnection() throws java.net.UnknownHostException {
 
 // To directly connect to a single MongoDB server (note that this will not auto-discover the primary even
 // if it's a member of a replica set:
@@ -66,11 +65,13 @@ public class MongoDbOp {
                 ++count;
                 DBObject object = cursor.next();
                 Set<String> keys = object.keySet();
+                ObjectId oid = (ObjectId) object.get("_id");
+                String id = oid.toString();
                 String html = (String) object.get("html");
                 if (html != null) {
                     Document doc = Jsoup.parse(html);
                     String text = doc.text();
-                    indexer.addTextToIndex(text);
+                    indexer.addTextToIndex(text, id);
                 }
             }
             indexer.closeIndex();
@@ -81,5 +82,9 @@ public class MongoDbOp {
             cursor.close();
         }
         System.out.println(count + " entries in MongoDB indexed");
+    }
+    public void addScore(String mongoId, String keyPhrase, float score) {
+        System.out.println("Updating MongoDB for mongoId=" + mongoId + ", keyPhrase=" + keyPhrase + ", score=" + score);
+        // TODO add code to actually write
     }
 }
