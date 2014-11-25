@@ -7,6 +7,7 @@ from operator import itemgetter
 from urlparse import urlparse
 from pymongo.errors import DuplicateKeyError
 from bson.objectid import ObjectId
+from errors import DeletingSelectedWorkspaceError
 
 class MemexMongoUtils(object):
 
@@ -86,6 +87,8 @@ class MemexMongoUtils(object):
         print "Dropping %s" % (workspace_collection_name)
         db.drop_collection(workspace_collection_name)
         db.create_collection(workspace_collection_name)
+        self.add_workspace("default")
+        self.set_workspace_selected_by_name("default")
         
     def list_indexes(self):
         
@@ -293,6 +296,13 @@ class MemexMongoUtils(object):
         db[seed_collection_name].ensure_index("url", unique=True, drop_dups=True)
 
 
+    def get_workspace_by_id(self,id):
+        return self.workspace_collection.find_one({"_id" : ObjectId( id )})
+        
+
+    def set_workspace_selected_by_name(self, name):
+        self.workspace_collection.update({}, {'$set' : {"selected" : False}}, multi=True)
+        self.workspace_collection.update({"name" : name}, {'$set' : {"selected" : True}})
 
     def set_workspace_selected(self, id):
         self.workspace_collection.update({}, {'$set' : {"selected" : False}}, multi=True)
@@ -301,11 +311,13 @@ class MemexMongoUtils(object):
     def get_workspace_selected(self):
         return self.workspace_collection.find_one({"selected" : True})
 
-
     def delete_workspace(self, id):
         ws_doc = self.workspace_collection.find_one({"_id" : ObjectId( id )})
-        self.delete_workspace_related(ws_doc['name'])
-        self.workspace_collection.remove({"_id" : ObjectId( id )})
+        if ws_doc["selected"] == True:
+            raise DeletingSelectedWorkspaceError('Deleting the selected workspace is not allowed')
+        else:   
+            self.delete_workspace_related(ws_doc['name'])
+            self.workspace_collection.remove({"_id" : ObjectId( id )})
 
     def delete_workspace_related(self,name):
         db = self.client["MemexHack"]
@@ -315,7 +327,24 @@ class MemexMongoUtils(object):
         db["hostinfo" + "-" + name].drop()
         print "Dropping %s" % ("seedinfo" + "-" + name)
         db["seedinfo" + "-" + name].drop()
+        
+        
 
+#####################   keyword  #####################
+    def list_keyword(self):
+        ws = self.get_workspace_selected()
+
+        if ws == None or "keyword" not in ws or ws["keyword"] == None:
+            return []
+        else:
+            return list(ws["keyword"])
+
+    def save_keyword(self, keywords):
+        ws = self.get_workspace_selected()
+        if ws == None:
+            self.workspace_collection.upsert({"_id" : "_default"}, {'$set' : {"keyword" : keywords}})
+        else:
+            self.workspace_collection.update({"_id" : ObjectId(ws["_id"] )}, {'$set' : {"keyword" : keywords}})
 
 
 if __name__ == "__main__":

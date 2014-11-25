@@ -68,32 +68,24 @@
 							<div>
 							Enter comma separated values
 							</div>
+							<div class="input-group">
+								<input id="addText" type="text" class="form-control">
 								<span class="input-group-btn">
-									<input id="addText" type="text" class="form-control col-sm-4">
 									<button id="addButton" class="btn btn-default" type="button">
 										Add
-									</button> 
-								</span>
+									</button> </span>
+							</div><!-- /input-group -->
+							<div id="tags">
+							</div>
 						</div>
 						<div class="panel-footer">
-							<button type="button" class="btn btn-default-inverse btn-sm ">
-								<span class="glyphicon glyphicon-star" aria-hidden="true"></span> Star
-							</button>
+							<span class="input-group-btn">
+								<button id="saveButton" class="btn btn-default " type="button">
+									Save
+								</button> 
+							</span>
 						</div>
 					</div>
-<!--
-	
-					<h1 style="margin-top:50px;margin-left: 20px"> Target Keywords</h1>
-					<div id="wsList" class="list-group"></div>
-					<div class="input-group">
-						<input id="addText" type="text" class="form-control">
-						<span class="input-group-btn">
-							<button id="addButton" class="btn btn-default" type="button">
-								Add
-							</button> </span>
-						<span> </span>
-					</div>--><!-- /input-group -->
-					
 				</div><!-- /.col-lg-6 -->
 			</div><!-- /.row -->
 		</div>
@@ -106,85 +98,73 @@
 	<script src="{{ url_for('static', filename='js/pinterest_grid.js') }}"></script>
 
 	<script>
-		$(document).ready(function() {
 
-			var url = '/api/workspace/';
-			var store;
+		var url = '/api/keyword/';
 
-			var renderWsFn = function(data) {
-				store = data;
-				var obj = $.parseJSON(data);
-				$('#addText').val('');
-				$('#wsList').empty();
-				var wsList = $('#wsList');
-				$.each(obj, function(index, elem) {
-					//var clickme = ;
-					var span = '<span name="' + elem.name + '" onclick=deleteme("' + elem._id + '") class="badge" style="z-index:100" ><span class="glyphicon glyphicon-trash"></span></span>';
-					var clazz = (elem.selected ? 'list-group-item-info' : '');
-					var li = '<a href="#" id="' + elem._id + '" class="list-group-item ' + clazz + '">';
-					li = li + '<span  class="selectionable">' + elem.name + '</span>' + span + '</a>';
-					wsList.append(li);
-				});
-
-				$('.list-group-item').click(function() {
-					var id = this.id;
-					var posting = $.ajax({
-						type : "PUT",
-						url : url + 'selected/' + id + '/',
-						success : function(data) {
-							renderWsFn(data);
-							$('#' + id).focus();
-						}
-					});
-
-				});
-			};
-
-			deleteme = function(id) {
-				$('.list-group-item').unbind();
-				var confirmed = confirm('Are you sure you want to remove the workspace?');
-				if (confirmed) {
-					var posting = $.ajax({
-						type : "DELETE",
-						url : url + id + '/',
-						success : function(data) {
-							renderWsFn(data);
-						}
-					});
-				} else {
-					renderWsFn(store);
-				}
+		var newKey = function(){
+			var key = $('#addText').val();
+			if(key == '')
 				return false;
-			};
+			renderTags(key);
+			$('#addText').val('');
+		};
+		
+		var renderTags = function(key){
+			var template =
+			'<button type="button" onclick="remove(this);" class="keyword btn btn-default-inverse btn-sm" style="margin-top:10px">' + 
+				'<span class="glyphicon glyphicon-remove" aria-hidden="true"></span> ####' +
+			'</button>&nbsp;';
+			template = template.replace('####',key);
+			$('#tags').append(template);
 
-			var posting = $.get(url, function(data) {
-				renderWsFn(data);
-			});
+		};
+		
+		var saveKeywords = function() {
 
-			var addWorkspaceFn = function() {
-				var name = $('#addText').val();
-				if (name != null && name.trim() != "")
-					name = name.trim();
-				else {
-					alert('Enter a valid name for the workspace');
-					return false;
-				}
+				var keywords = [];
+				$.each($(".keyword"), function(index, elem) {
+					//alert(elem.innerText.trim());
+					keywords.push(elem.innerText.trim());
+				});
+
+
 				var posting = $.ajax({
 					type : "PUT",
-					url : url + name + '/',
+					url : url,
+					contentType: 'application/json',
+  					dataType: 'json',
+  					data: JSON.stringify(keywords),
 					success : function(data) {
-						renderWsFn(data);
+						//alert(data);
 					}
 				});
 			};
 
-			$('#addButton').click(addWorkspaceFn);
+		var renderKeywords = function(data) {
+			var obj = $.parseJSON(data);
 
+			$.each(obj, function(index, elem){
+				renderTags(elem);
+			});
+		};
+		
+		$(document).ready(function() {
 			$('#addText').keypress(function(e) {
-				if (e.which == 13) {
-					// enter pressed
-					addWorkspaceFn.apply();
-				}
+					if (e.which == 13) {// enter pressed
+						newKey.apply();
+					}
+					else if (e.which == 44) {// ',' pressed
+						newKey.apply();
+						return false;
+					}
+
+			});
+			
+			$('#addButton').click(newKey);
+			$('#saveButton').click(saveKeywords);
+			
+			var keywords = $.get(url, function(data){
+				renderKeywords(data);
 			});
 
 		});

@@ -132,7 +132,17 @@
 										type: "DELETE",
 										url: url + id + '/',
 										success: function(data) {
-											renderWsFn(data);
+											var obj = $.parseJSON(data);
+											if(obj.error)
+											{
+												alert(obj.error);
+											}
+											else{
+												renderWsFn(data);
+											}
+										},
+										error: function(data){
+											alert(data);
 										}
 									});
 				}

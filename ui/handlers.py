@@ -103,7 +103,7 @@ def set_score_handler(url, score):
     
 
 
-    
+## workspace    
 def list_workspace():
     mmu = MemexMongoUtils()
     return mmu.list_workspace()
@@ -120,6 +120,15 @@ def delete_workspace(id):
     mmu = MemexMongoUtils()
     mmu.delete_workspace(id)
 
+
+##keyword
+def list_keyword():
+    mmu = MemexMongoUtils()
+    return mmu.list_keyword()
+    
+def save_keyword(list):
+    mmu = MemexMongoUtils()
+    mmu.save_keyword(list)
 
 
 if __name__ == "__main__":

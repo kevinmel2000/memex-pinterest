@@ -10,7 +10,10 @@ import json
 import hashlib
 from handlers import set_score_handler
 from handlers import list_workspace, add_workspace, set_workspace_selected, delete_workspace
+from handlers import list_keyword, save_keyword
 from auth import requires_auth
+from mongoutils.errors import DeletingSelectedWorkspaceError
+
 server_path = os.path.dirname(os.path.realpath(__file__))
 app = Flask(__name__)
 app.config.from_object('settings')
@@ -222,12 +225,15 @@ def selected_workspace_api(id):
 @app.route("/api/workspace/<id>/", methods=['DELETE'])
 @requires_auth
 def delete_workspace_api(id):
-    delete_workspace(id)
+    try:
+        delete_workspace(id)
+    except DeletingSelectedWorkspaceError:
+        ui_response = '{"error":"Is not allowed to delete the workspace while it is selected."}'
+        return Response(json.dumps(ui_response), mimetype="application/json")
 
     in_doc = list_workspace()
     out_doc = JSONEncoder().encode(in_doc)
     return Response(json.dumps(out_doc), mimetype="application/json")
-
 
 ############# Keywords #############
 
@@ -236,7 +242,34 @@ def delete_workspace_api(id):
 def get_keyword_view():
     return render_template("keyword.html")
 
+@app.route("/api/keyword/", methods=['GET'])
+@requires_auth
+def get_keyword_api():
+    in_doc = list_keyword()
+    out_doc = JSONEncoder().encode(in_doc)
+    return Response(json.dumps(out_doc), mimetype="application/json")
 
+
+@app.route("/api/keyword/", methods=['PUT'])
+@requires_auth
+def save_keyword_api():
+   # print(request)
+   # keywords = request.data
+   # print("keywords:" + keywords) 
+    keywords = request.json
+   # print(_json) 
+
+    save_keyword(keywords)
+
+    in_doc = list_keyword()
+    if in_doc == None:
+        out_doc = JSONEncoder().encode(in_doc)
+        return Response("{}", mimetype="application/json")
+    else:
+        out_doc = JSONEncoder().encode(in_doc)
+        
+        return Response(json.dumps(out_doc), mimetype="application/json")
+        
 
 if __name__ == "__main__":
 
