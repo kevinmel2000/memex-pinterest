@@ -15,6 +15,7 @@ import java.util.Set;
 public class MongoDbOp {
     private DB db;
     private DBCollection collection;
+
     public static void main(String[] args) throws Exception {
         // test the connnection
         MongoDbOp instance = new MongoDbOp();
@@ -55,6 +56,7 @@ public class MongoDbOp {
         Indexer indexer = new Indexer();
         indexer.setIndexLocation("output/index");
         DBObject myDoc = collection.findOne();
+        System.out.println("First document, print just as a sample");
         System.out.println(myDoc);
 
         DBCursor cursor = collection.find();
@@ -81,15 +83,29 @@ public class MongoDbOp {
         } finally {
             cursor.close();
         }
-        System.out.println(count + " entries in MongoDB indexed");
+        System.out.println(count + " entries in MongoDB indexed to Lucene");
     }
+
     public void addScore(String mongoId, String keyPhrase, float score) {
-        System.out.println("Updating MongoDB for mongoId=" + mongoId + ", keyPhrase=" + keyPhrase + ", score=" + score);
-        // TODO add code to actually write
-        // something like below
-//        BasicDBObject newDocument = new BasicDBObject();
-//        newDocument.append("$set", new BasicDBObject().append("clients", 110));
-//        BasicDBObject searchQuery = new BasicDBObject().append("hosting", "hostB");
-//        collection.update(searchQuery, newDocument);
+//        System.out.println("Updating MongoDB for mongoId=" + mongoId + ", keyPhrase=" + keyPhrase + ", score=" + score);
+        BasicDBObject newDocument = new BasicDBObject();
+        newDocument.append(keyPhrase, score);
+        BasicDBObject searchQuery = new BasicDBObject();
+        try {
+            searchQuery.put("_id", new ObjectId(mongoId));
+            DBObject dbObj = collection.findOne(searchQuery);
+//            System.out.println("before update");
+//            System.out.println(dbObj.toString());
+            dbObj.put("keyPhrase " + keyPhrase, score);
+            collection.update(searchQuery, dbObj);
+            // debugging - verify
+            dbObj = collection.findOne(searchQuery);
+//            System.out.println("after update");
+//            System.out.println(dbObj.toString());
+        } catch (Exception e) {
+            // TODO better error handling
+            // but this error should not normally happen
+            e.printStackTrace();
+        }
     }
 }

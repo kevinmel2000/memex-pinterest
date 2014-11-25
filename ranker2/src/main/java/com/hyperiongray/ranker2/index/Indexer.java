@@ -79,12 +79,12 @@ public class Indexer {
             searcher.search(q, collector);
             TopDocs topDocs = searcher.search(q, Math.max(1, collector.getTotalHits()));
             ScoreDoc[] hits = collector.topDocs().scoreDocs;
+            System.out.println("Key phrase: " + query + " got " + hits.length + " search hits, updating scores in MongoDB");
             for (ScoreDoc hit: hits) {
-                System.out.println(" hit: " + hit.toString() + " score: " + hit.score);
+//                System.out.println(" hit: " + hit.toString() + " score: " + hit.score);
                 Document document = searcher.doc(hit.doc);
                 String mongoId = document.get("mongoId");
                 // now update MongoDB with this id and add the score to the columns with the query
-                System.out.println(mongoId);
                 mongoDbOp.addScore(mongoId, query, hit.score);
             }
 
