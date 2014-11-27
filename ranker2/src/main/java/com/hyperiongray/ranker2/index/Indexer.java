@@ -36,6 +36,7 @@ public class Indexer {
 
 
     public void openIndexForWrite() throws IOException {
+        new File(indexLocation).mkdirs();
         // clean up the index dir
         File [] indexFiles = new File(indexLocation).listFiles();
         // recursive deletes are a bother, and we know that there will be only one level, so just do it
@@ -57,10 +58,6 @@ public class Indexer {
     public void closeIndex() throws IOException {
         writer.commit();
         writer.close();
-    }
-
-    public String getIndexLocation() {
-        return indexLocation;
     }
 
     public void setIndexLocation(String indexLocation) {
