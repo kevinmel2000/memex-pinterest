@@ -15,3 +15,4 @@ crawler/build
 *.iml
 .settings/org.eclipse.ltk.core.refactoring.prefs
 .pydevproject
+.settings/

@@ -5,9 +5,10 @@ import json
 import datetime
 
 import scrapy
-from scrapy_memex.utils.url import get_domain
+
 from scrapy.contrib.linkextractors import LinkExtractor
-from pharma.items import PharmaItemLoader
+from crawler.pharma.items import PharmaItemLoader
+from crawler.pharma.utils.url import get_domain
 
 
 def default_data_url(filename):
@@ -29,7 +30,8 @@ class BaseSearchEngineSpider(scrapy.Spider):
 
     phrases_url = default_data_url('phrases.json')
     regexes_url = default_data_url('regexes.json')
-    max_search_results = 1000
+    max_search_results = 100
+    search_results_per_page = 20
     use_splash = True
     save_html = True
     save_screenshots = True
@@ -46,6 +48,11 @@ class BaseSearchEngineSpider(scrapy.Spider):
         self.max_search_results = int(
             kwargs.get('max_search_results', self.max_search_results)
         )
+        self.search_results_per_page = int(
+            kwargs.get('search_results_per_page', self.search_results_per_page)
+        )
+
+
         if self.use_splash:
             self.splash_meta = {
                 'splash': {
@@ -66,6 +73,13 @@ class BaseSearchEngineSpider(scrapy.Spider):
             for offset in xrange(0, self.max_search_results,
                                  self.search_results_per_page):
                 yield self.create_search_request(phrase, offset)
+
+    def start_requests_with_phrases(self, phrases):
+
+        for phrase in phrases:
+            for offset in xrange(0, self.max_search_results, self.search_results_per_page):
+                  yield self.create_search_request(phrase, offset)
+                  #self.create_search_request(phrase, offset)
 
     def create_search_request(self, phrase, offset=0):
         request = self.get_search_request(phrase, offset)
@@ -93,10 +107,12 @@ class BaseSearchEngineSpider(scrapy.Spider):
                                  meta=self.splash_meta)
 
     def get_search_request(self, phrase, offset):
-        raise NotImplemented
+         raise NotImplemented
+        #scrapy.Spider.get_search_request(phrase,offset)
 
     def get_search_results_requests(self, response):
-        raise NotImplemented
+         raise NotImplemented
+        # scrapy.Spider.get_search_results_requests(response)
 
     def _extract_links(self, response):
         links = LinkExtractor().extract_links(response)

@@ -83,6 +83,9 @@
 								<button id="saveButton" class="btn btn-default " type="button">
 									Save
 								</button> 
+								<button id="fetchButton" class="btn btn-default " type="button">
+									Fetch
+								</button>
 							</span>
 						</div>
 					</div>
@@ -147,7 +150,28 @@
 				renderTags(elem);
 			});
 		};
-		
+
+		var fetchKeywords = function(){
+				var keywords = [];
+				$.each($(".keyword"), function(index, elem) {
+					//alert(elem.innerText.trim());
+					keywords.push(elem.innerText.trim());
+				});
+
+				var posting = $.ajax({
+					type : "POST",
+					url : '/api/fetch-keyword/',
+					contentType: 'application/json',
+  					dataType: 'json',
+  					data: JSON.stringify(keywords),
+					success : function(data) {
+						alert(data);
+					}
+				});
+		}
+
+
+
 		$(document).ready(function() {
 			$('#addText').keypress(function(e) {
 					if (e.which == 13) {// enter pressed
@@ -162,7 +186,13 @@
 			
 			$('#addButton').click(newKey);
 			$('#saveButton').click(saveKeywords);
-			
+
+			$('#fetchButton').click(fetchKeywords);
+
+
+
+
+
 			var keywords = $.get(url, function(data){
 				renderKeywords(data);
 			});

@@ -12,7 +12,7 @@ class GoogleComSpider(BaseSearchEngineSpider):
     name = "google.com"
 
     download_delay = 2
-    search_results_per_page = 100
+    search_results_per_page = 20
 
     def get_search_request(self, phrase, offset=0):
         encoded_phrase = urllib.quote(phrase.encode('utf-8'), '')

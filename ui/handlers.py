@@ -130,6 +130,18 @@ def save_keyword(list):
     mmu = MemexMongoUtils()
     mmu.save_keyword(list)
 
+def schedule_spider_searchengine_handler(keywords, spider_host = "localhost", spider_port = "6800"):
+
+    mmu = MemexMongoUtils()
+    #scrapyd_util = ScrapydJob(spider_host, spider_port, screenshot_dir = SCREENSHOT_DIR)
+    #scrapyd_util = ScrapydJob(spider_host, spider_port, project="search-engine", screenshot_dir = SCREENSHOT_DIR)
+    scrapyd_util = ScrapydJob(spider_host, spider_port, project="default", screenshot_dir = SCREENSHOT_DIR)
+    job_id = scrapyd_util.schedule_keywords(keywords)
+    mmu.add_job(keywords, job_id)
+
+    return True
+
+
 
 if __name__ == "__main__":
     print "HERE"
