@@ -10,14 +10,12 @@ import json
 import hashlib
 from handlers import set_score_handler
 from handlers import list_workspace, add_workspace, set_workspace_selected, delete_workspace
-from handlers import list_keyword, save_keyword, schedule_spider_searchengine_handler
+from handlers import list_keyword, save_keyword, schedule_spider_searchengine_handler, list_search_term, save_search_term
 from auth import requires_auth
 from mongoutils.errors import DeletingSelectedWorkspaceError
 
-
-
-from crawler.pharma.spiders.basesearchengine import BaseSearchEngineSpider
-from crawler.pharma.spiders.google_com import GoogleComSpider
+from searchengine.pharma.spiders.basesearchengine import BaseSearchEngineSpider
+from searchengine.pharma.spiders.google_com import GoogleComSpider
 
 server_path = os.path.dirname(os.path.realpath(__file__))
 app = Flask(__name__)
@@ -284,7 +282,41 @@ def fetch_keyword_api():
     schedule_spider_searchengine_handler(keywords)
     return Response("OK")
 
+########## Search Terms ################
+@app.route("/searchterm/" , methods=['GET'])
+@requires_auth
+def get_search_term_view():
+    return render_template("searchterm.html")
 
+@app.route("/api/searchterm/", methods=['GET'])
+@requires_auth
+def get_search_term_api():
+    in_doc = list_search_term()
+    out_doc = JSONEncoder().encode(in_doc)
+    return Response(json.dumps(out_doc), mimetype="application/json")
+
+@app.route("/api/searchterm/", methods=['PUT'])
+@requires_auth
+def save_search_term_api():
+    search_terms = request.json
+    save_search_term(search_terms)
+
+    in_doc = list_search_term()
+    if in_doc == None:
+        out_doc = JSONEncoder().encode(in_doc)
+        return Response("{}", mimetype="application/json")
+    else:
+        out_doc = JSONEncoder().encode(in_doc)
+        
+        return Response(json.dumps(out_doc), mimetype="application/json")
+
+@app.route("/api/fetch-searchterm/", methods=['POST'])
+@requires_auth
+def fetch_search_terms_api():
+    #search_terms = request.json
+    #schedule_spider_handler(url)
+    schedule_spider_searchengine_handler(search_terms, use_splash = False)
+    return Response("OK")
 
 if __name__ == "__main__":
 

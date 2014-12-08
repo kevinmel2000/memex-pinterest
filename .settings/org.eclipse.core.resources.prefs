@@ -12,4 +12,6 @@ encoding//crawler/discovery/urlutils.py=utf-8
 encoding//docs/conf.py=utf-8
 encoding//ranker/html.py=utf-8
 encoding//ranker/ranker.py=utf-8
+encoding//searchengine/pharma/items.py=utf-8
+encoding//searchengine/pharma/spiders/google_com.py=utf-8
 encoding/fabfile.py=utf-8

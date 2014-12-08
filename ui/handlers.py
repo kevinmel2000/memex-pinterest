@@ -120,7 +120,6 @@ def delete_workspace(id):
     mmu = MemexMongoUtils()
     mmu.delete_workspace(id)
 
-
 ##keyword
 def list_keyword():
     mmu = MemexMongoUtils()
@@ -130,18 +129,24 @@ def save_keyword(list):
     mmu = MemexMongoUtils()
     mmu.save_keyword(list)
 
-def schedule_spider_searchengine_handler(keywords, spider_host = "localhost", spider_port = "6800"):
+def list_search_term():
+    mmu = MemexMongoUtils()
+    return mmu.list_search_term()
+
+def save_search_term(list):
+    mmu = MemexMongoUtils()
+    mmu.save_search_term(list)
+
+def schedule_spider_searchengine_handler(search_terms, spider_host = "localhost", spider_port = "6800", use_splash = False):
 
     mmu = MemexMongoUtils()
     #scrapyd_util = ScrapydJob(spider_host, spider_port, screenshot_dir = SCREENSHOT_DIR)
     #scrapyd_util = ScrapydJob(spider_host, spider_port, project="search-engine", screenshot_dir = SCREENSHOT_DIR)
-    scrapyd_util = ScrapydJob(spider_host, spider_port, project="default", screenshot_dir = SCREENSHOT_DIR)
-    job_id = scrapyd_util.schedule_keywords(keywords)
-    mmu.add_job(keywords, job_id)
+    scrapyd_util = ScrapydJob("localhost", 6800, project='searchengine-project', spider="google.com", screenshot_dir="blahblah")    
+    job_id = scrapyd_util.schedule_keywords(search_terms, use_splash = use_splash)
+    mmu.add_job(search_terms, job_id)
 
     return True
-
-
 
 if __name__ == "__main__":
     print "HERE"

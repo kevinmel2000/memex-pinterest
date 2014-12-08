@@ -7,8 +7,8 @@ import datetime
 import scrapy
 
 from scrapy.contrib.linkextractors import LinkExtractor
-from crawler.pharma.items import PharmaItemLoader
-from crawler.pharma.utils.url import get_domain
+from searchengine.pharma.items import PharmaItemLoader
+from searchengine.pharma.utils.url import get_domain
 
 
 def default_data_url(filename):
@@ -20,17 +20,17 @@ def default_data_url(filename):
         )
     )
 
-
 def setdefaults(dict1, dict2):
     for key, value in dict2.iteritems():
         dict1.setdefault(key, value)
 
-
 class BaseSearchEngineSpider(scrapy.Spider):
 
-    phrases_url = default_data_url('phrases.json')
-    regexes_url = default_data_url('regexes.json')
-    max_search_results = 100
+#    phrases_url = default_data_url('phrases.json')
+#    regexes_url = default_data_url('regexes.json')
+    phrases = ''
+    regexes = ''
+    max_search_results = 5
     search_results_per_page = 20
     use_splash = True
     save_html = True
@@ -38,8 +38,12 @@ class BaseSearchEngineSpider(scrapy.Spider):
 
     def __init__(self, *args, **kwargs):
         super(BaseSearchEngineSpider, self).__init__(*args, **kwargs)
-        self.phrases_url = kwargs.get('phrases_url', self.phrases_url)
-        self.regexes_url = kwargs.get('regexes_url', self.regexes_url)
+#        self.phrases_url = kwargs.get('phrases_url', self.phrases_url)
+#        self.regexes_url = kwargs.get('regexes_url', self.regexes_url)
+        self.phrases = kwargs.get('phrases', self.phrases).split(',')
+        self.regexes = kwargs.get('regexes', self.regexes)
+        if self.regexes:
+            self.regexes = self.regexes.split(',')        
         self.use_splash = int(kwargs.get('use_splash', self.use_splash))
         self.save_html = int(kwargs.get('save_html', self.save_html))
         self.save_screenshots = self.use_splash and int(
@@ -64,10 +68,10 @@ class BaseSearchEngineSpider(scrapy.Spider):
             self.splash_meta = {}
 
     def start_requests(self):
-        phrases_response = urllib.urlopen(self.phrases_url).read()
-        self.phrases = json.loads(phrases_response)
-        regexes_response = urllib.urlopen(self.regexes_url).read()
-        self.regexes = json.loads(regexes_response)
+#        phrases_response = urllib.urlopen(self.phrases_url).read()
+#        self.phrases = json.loads(phrases_response)
+#        regexes_response = urllib.urlopen(self.regexes_url).read()
+#        self.regexes = json.loads(regexes_response)
 
         for phrase in self.phrases:
             for offset in xrange(0, self.max_search_results,

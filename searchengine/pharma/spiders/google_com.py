@@ -4,9 +4,10 @@ from urlparse import urljoin
 
 import scrapy
 from w3lib.url import url_query_parameter
-
-from pharma.spiders.basesearchengine import BaseSearchEngineSpider
-
+try:
+    from searchengine.pharma.spiders.basesearchengine import BaseSearchEngineSpider
+except:
+    from pharma.spiders.basesearchengine import BaseSearchEngineSpider
 
 class GoogleComSpider(BaseSearchEngineSpider):
     name = "google.com"

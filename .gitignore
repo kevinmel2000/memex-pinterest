@@ -16,3 +16,6 @@ crawler/build
 .settings/org.eclipse.ltk.core.refactoring.prefs
 .pydevproject
 .settings/
+eggs/
+logs/
+*.pid

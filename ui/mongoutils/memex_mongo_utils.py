@@ -347,10 +347,30 @@ class MemexMongoUtils(object):
             self.workspace_collection.update({"_id" : ObjectId(ws["_id"] )}, {'$set' : {"keyword" : keywords}})
 
 
+####################   search term  #####################
+    def list_search_term(self):
+        ws = self.get_workspace_selected()
+
+        if ws == None or "searchterm" not in ws or ws["searchterm"] == None:
+            return []
+        else:
+            return list(ws["searchterm"])
+
+    def save_search_term(self, search_terms):
+
+        ws = self.get_workspace_selected()
+        if ws == None:
+            self.workspace_collection.upsert({"_id" : "_default"}, {'$set' : {"searchterm" : search_terms}})
+        else:
+            self.workspace_collection.update({"_id" : ObjectId(ws["_id"] )}, {'$set' : {"searchterm" : search_terms}})
+
 if __name__ == "__main__":
 
     mmu = MemexMongoUtils()
-    MemexMongoUtils(which_collection="crawl-data", init_db=True)
-    MemexMongoUtils(which_collection="known-data", init_db=True)
-    MemexMongoUtils(which_collection="cc-crawl-data", init_db=True)
-    mmu.init_workspace()
+    #mmu.save_search_term(['blahg'])
+    print mmu.list_search_term()
+    
+    #MemexMongoUtils(which_collection="crawl-data", init_db=True)
+    #MemexMongoUtils(which_collection="known-data", init_db=True)
+    #MemexMongoUtils(which_collection="cc-crawl-data", init_db=True)
+    #mmu.init_workspace()

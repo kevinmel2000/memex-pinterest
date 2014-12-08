@@ -45,11 +45,11 @@ HTTPCACHE_ENABLED = True
 MEMUSAGE_ENABLED = True
 DEPTH_STATS_VERBOSE = True
 DEPTH_PRIORITY = True
-DEPTH_LIMIT = 6  # make sure to adjust this when changing depth-related spider attributes
+DEPTH_LIMIT = 3  # make sure to adjust this when changing depth-related spider attributes
 AJAXCRAWL_ENABLED = True
 DOWNLOAD_TIMEOUT = 60  # default was 180s
-REDIRECT_MAX_TIMES = 10  # default was 20
-CLOSESPIDER_ITEMCOUNT = 10000  # ~100 websites max; don't crawl the whole Internet
+REDIRECT_MAX_TIMES = 5  # default was 20
+CLOSESPIDER_ITEMCOUNT = 300  # ~100 websites max; don't crawl the whole Internet
 DOWNLOAD_DELAY = 1
 DUPEFILTER_DEBUG = True
 

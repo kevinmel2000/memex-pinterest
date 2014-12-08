@@ -1,9 +1,8 @@
 from scrapyd_api import ScrapydAPI
 import traceback
 
-from crawler.pharma.spiders.basesearchengine import BaseSearchEngineSpider
-from crawler.pharma.spiders.google_com import GoogleComSpider
-
+from searchengine.pharma.spiders.basesearchengine import BaseSearchEngineSpider
+from searchengine.pharma.spiders.google_com import GoogleComSpider
 
 class ScrapydJob(object):
 
@@ -16,27 +15,27 @@ class ScrapydJob(object):
         self.screenshot_dir = screenshot_dir
         self.searchEngineSpider = GoogleComSpider(BaseSearchEngineSpider)
 
-
     def schedule(self, seed):
 
         if not self.screenshot_dir:
             raise Exception("Please set the screenshot path in the config before scheduling")
 
-        self.job_id = self.scrapi.schedule(self.project, self.spider, seed_urls=seed, screenshot_dir = self.screenshot_dir)
+        self.job_id = self.scrapi.schedule(self.project, self.spider, seed_urls=seed, screenshot_dir=self.screenshot_dir)
 
         return self.job_id
 
-    def schedule_keywords(self, phrases):
-
+    def schedule_keywords(self, phrases, use_splash = True):
 
         if not self.screenshot_dir:
             raise Exception("Please set the screenshot path in the config before scheduling")
-        #self.job_id = self.scrapi.schedule(self.project, self.spider, seed_urls=seed, screenshot_dir = self.screenshot_dir)
-        #return self.job_id
+        # self.job_id = self.scrapi.schedule(self.project, self.spider, seed_urls=seed, screenshot_dir = self.screenshot_dir)
+        # return self.job_id
 
-        #self.phrases = json.loads(phrases)
+        # self.phrases = json.loads(phrases)
         # phrases = ["ebola", "outbreak"]
-        response = self.searchEngineSpider.start_requests_with_phrases(phrases)
+        # response = self.searchEngineSpider.start_requests_with_phrases(phrases)
+
+        self.job_id = self.scrapi.schedule(self.project, self.spider, phrases=phrases, screenshot_dir=self.screenshot_dir, use_splash = int(use_splash))
 
         return "1234"
 
@@ -65,4 +64,6 @@ class ScrapydJob(object):
 
 if __name__ == "__main__":
 
-    scrapyd_util = ScrapydJob("localhost", 80, screenshot_dir = "blahblah")
+    scrapyd_util = ScrapydJob("localhost", 6800, project='searchengine-project', spider="google.com", screenshot_dir="blahblah")
+    scrapyd_util.schedule_keywords("hyperiongray,blah", use_splash = False)
+
