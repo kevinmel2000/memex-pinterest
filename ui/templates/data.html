@@ -297,6 +297,9 @@
 		};
 
 		var renderTags = function(key){
+			if(key === "")
+				return;
+
 			var template =
 			'<button type="button" onclick="remove(this);" class="keyword btn btn-default-inverse btn-sm" style="margin-top:10px;margin-right:5px">' +
 				'<span class="glyphicon glyphicon-remove" aria-hidden="true"></span> ####' +
