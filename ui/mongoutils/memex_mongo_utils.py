@@ -7,6 +7,7 @@ from operator import itemgetter
 from urlparse import urlparse
 from pymongo.errors import DuplicateKeyError
 from bson.objectid import ObjectId
+from errors import DeletingSelectedWorkspaceError
 
 class MemexMongoUtils(object):
 
@@ -24,7 +25,7 @@ class MemexMongoUtils(object):
 
         workspace_collection_name = "workspace"
         self.workspace_collection = db[workspace_collection_name]
-        
+
         seed_collection_name = "seedinfo"
 
         if which_collection == "cc-crawl-data":
@@ -59,7 +60,7 @@ class MemexMongoUtils(object):
                 db.drop_collection(url_collection_name)
                 db.drop_collection(host_collection_name)
                 db.drop_collection(seed_collection_name)
-                
+
             except:
                 print "handled:"
                 traceback.print_exc()
@@ -67,13 +68,12 @@ class MemexMongoUtils(object):
             db.create_collection(url_collection_name)
             db.create_collection(host_collection_name)
             db.create_collection(seed_collection_name)
-            
+
             # create index and drop any dupes
             self.urlinfo_collection.ensure_index("url", unique=True, drop_dups=True)
             self.hostinfo_collection.ensure_index("host", unique=True, drop_dups=True)
             self.seed_collection.ensure_index("url", unique=True, drop_dups=True)
 
-            
     def init_workspace(self, address="localhost", port=27017):
         db = self.client["MemexHack"]
         workspace_collection_name = "workspace"
@@ -86,6 +86,8 @@ class MemexMongoUtils(object):
         print "Dropping %s" % (workspace_collection_name)
         db.drop_collection(workspace_collection_name)
         db.create_collection(workspace_collection_name)
+        self.add_workspace("default")
+        self.set_workspace_selected_by_name("default")
         
     def list_indexes(self):
         
@@ -192,13 +194,16 @@ class MemexMongoUtils(object):
 
         self.__insert_url_test_data(test_fn=test_fn)
 
-    def add_job(self, url, job_id, default_state="Initializing"):
+    def add_job(self, url, job_id, project, spider, default_state="Initializing"):
 
         try:
-            seed_doc = {"url" : url, "state" : default_state, "job_id" : job_id}
+            seed_doc = {"url" : url, "state" : default_state, "job_id" : job_id, "project" : project, "spider" : spider}
             self.seed_collection.save(seed_doc)
         except Exception:
             self.seed_collection.update({"url" : url}, {'$set' : {"job_id" : job_id}})
+
+    def list_seed_docs(self):
+        return list(self.seed_collection.find())        
 
     def mark_seed_state(self, url, state):
 
@@ -293,6 +298,13 @@ class MemexMongoUtils(object):
         db[seed_collection_name].ensure_index("url", unique=True, drop_dups=True)
 
 
+    def get_workspace_by_id(self,id):
+        return self.workspace_collection.find_one({"_id" : ObjectId( id )})
+        
+
+    def set_workspace_selected_by_name(self, name):
+        self.workspace_collection.update({}, {'$set' : {"selected" : False}}, multi=True)
+        self.workspace_collection.update({"name" : name}, {'$set' : {"selected" : True}})
 
     def set_workspace_selected(self, id):
         self.workspace_collection.update({}, {'$set' : {"selected" : False}}, multi=True)
@@ -301,11 +313,13 @@ class MemexMongoUtils(object):
     def get_workspace_selected(self):
         return self.workspace_collection.find_one({"selected" : True})
 
-
     def delete_workspace(self, id):
         ws_doc = self.workspace_collection.find_one({"_id" : ObjectId( id )})
-        self.delete_workspace_related(ws_doc['name'])
-        self.workspace_collection.remove({"_id" : ObjectId( id )})
+        if ws_doc["selected"] == True:
+            raise DeletingSelectedWorkspaceError('Deleting the selected workspace is not allowed')
+        else:   
+            self.delete_workspace_related(ws_doc['name'])
+            self.workspace_collection.remove({"_id" : ObjectId( id )})
 
     def delete_workspace_related(self,name):
         db = self.client["MemexHack"]
@@ -315,13 +329,51 @@ class MemexMongoUtils(object):
         db["hostinfo" + "-" + name].drop()
         print "Dropping %s" % ("seedinfo" + "-" + name)
         db["seedinfo" + "-" + name].drop()
+        
+        
 
+#####################   keyword  #####################
+    def list_keyword(self):
+        ws = self.get_workspace_selected()
 
+        if ws == None or "keyword" not in ws or ws["keyword"] == None:
+            return []
+        else:
+            return list(ws["keyword"])
+
+    def save_keyword(self, keywords):
+        ws = self.get_workspace_selected()
+        if ws == None:
+            self.workspace_collection.upsert({"_id" : "_default"}, {'$set' : {"keyword" : keywords}})
+        else:
+            self.workspace_collection.update({"_id" : ObjectId(ws["_id"] )}, {'$set' : {"keyword" : keywords}})
+
+####################   search term  #####################
+    def list_search_term(self):
+        ws = self.get_workspace_selected()
+
+        if ws == None or "searchterm" not in ws or ws["searchterm"] == None:
+            return []
+        else:
+            return list(ws["searchterm"])
+
+    def save_search_term(self, search_terms):
+
+        ws = self.get_workspace_selected()
+        if ws == None:
+            self.workspace_collection.upsert({"_id" : "_default"}, {'$set' : {"searchterm" : search_terms}})
+        else:
+            self.workspace_collection.update({"_id" : ObjectId(ws["_id"] )}, {'$set' : {"searchterm" : search_terms}})
 
 if __name__ == "__main__":
 
     mmu = MemexMongoUtils()
-    MemexMongoUtils(which_collection="crawl-data", init_db=True)
-    MemexMongoUtils(which_collection="known-data", init_db=True)
-    MemexMongoUtils(which_collection="cc-crawl-data", init_db=True)
-    mmu.init_workspace()
+    #mmu.save_search_term(['blahg'])
+#    print mmu.list_search_term()
+    print mmu.seed_collection
+    print mmu.list_seed_docs()
+    
+    #MemexMongoUtils(which_collection="crawl-data", init_db=True)
+    #MemexMongoUtils(which_collection="known-data", init_db=True)
+    #MemexMongoUtils(which_collection="cc-crawl-data", init_db=True)
+    #mmu.init_workspace()

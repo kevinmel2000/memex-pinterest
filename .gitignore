@@ -9,6 +9,14 @@ crawler/dbs
 crawler/logs
 crawler/items
 crawler/twistd.pid
+crawler/build
 .classpath
 .project
 *.iml
+.settings/org.eclipse.ltk.core.refactoring.prefs
+.pydevproject
+.settings/
+eggs/
+logs/
+*.pid
+dbs/

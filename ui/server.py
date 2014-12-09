@@ -10,7 +10,13 @@ import json
 import hashlib
 from handlers import set_score_handler
 from handlers import list_workspace, add_workspace, set_workspace_selected, delete_workspace
+from handlers import list_keyword, save_keyword, schedule_spider_searchengine_handler, list_search_term, save_search_term
 from auth import requires_auth
+from mongoutils.errors import DeletingSelectedWorkspaceError
+
+from searchengine.pharma.spiders.basesearchengine import BaseSearchEngineSpider
+from searchengine.pharma.spiders.google_com import GoogleComSpider
+
 server_path = os.path.dirname(os.path.realpath(__file__))
 app = Flask(__name__)
 app.config.from_object('settings')
@@ -34,7 +40,7 @@ def discovery():
     return render_template('discovery.html', seeds=seeds)
 
 @app.route("/data")
-@app.route("/")
+#@app.route("/")
 @requires_auth
 def data(page=1):
 
@@ -186,7 +192,7 @@ def set_score(score):
 
 
 ############# Workspaces #############
-
+@app.route("/")
 @app.route("/workspace/" , methods=['GET'])
 @requires_auth
 def get_workspace_view():
@@ -222,12 +228,96 @@ def selected_workspace_api(id):
 @app.route("/api/workspace/<id>/", methods=['DELETE'])
 @requires_auth
 def delete_workspace_api(id):
-    delete_workspace(id)
+    try:
+        delete_workspace(id)
+    except DeletingSelectedWorkspaceError:
+        ui_response = '{"error":"Is not allowed to delete the workspace while it is selected."}'
+        return Response(json.dumps(ui_response), mimetype="application/json")
 
     in_doc = list_workspace()
     out_doc = JSONEncoder().encode(in_doc)
     return Response(json.dumps(out_doc), mimetype="application/json")
 
+############# Keywords #############
+
+@app.route("/keyword/" , methods=['GET'])
+@requires_auth
+def get_keyword_view():
+    return render_template("keyword.html")
+
+@app.route("/api/keyword/", methods=['GET'])
+@requires_auth
+def get_keyword_api():
+    in_doc = list_keyword()
+    out_doc = JSONEncoder().encode(in_doc)
+    return Response(json.dumps(out_doc), mimetype="application/json")
+
+
+@app.route("/api/keyword/", methods=['PUT'])
+@requires_auth
+def save_keyword_api():
+   # print(request)
+   # keywords = request.data
+   # print("keywords:" + keywords) 
+    keywords = request.json
+   # print(_json) 
+
+    save_keyword(keywords)
+
+    in_doc = list_keyword()
+    if in_doc == None:
+        out_doc = JSONEncoder().encode(in_doc)
+        return Response("{}", mimetype="application/json")
+    else:
+        out_doc = JSONEncoder().encode(in_doc)
+        
+        return Response(json.dumps(out_doc), mimetype="application/json")
+
+@app.route("/api/fetch-keyword/", methods=['POST'])
+@requires_auth
+def fetch_keyword_api():
+    #url = request.args.get('keywords')
+    keywords = request.json
+    #schedule_spider_handler(url)
+    schedule_spider_searchengine_handler(keywords)
+    return Response("OK")
+
+########## Search Terms ################
+@app.route("/searchterm/" , methods=['GET'])
+@requires_auth
+def get_search_term_view():
+    return render_template("searchterm.html")
+
+@app.route("/api/searchterm/", methods=['GET'])
+@requires_auth
+def get_search_term_api():
+    in_doc = list_search_term()
+    out_doc = JSONEncoder().encode(in_doc)
+    return Response(json.dumps(out_doc), mimetype="application/json")
+
+@app.route("/api/searchterm/", methods=['PUT'])
+@requires_auth
+def save_search_term_api():
+    search_terms = request.json
+    save_search_term(search_terms)
+
+    in_doc = list_search_term()
+    if in_doc == None:
+        out_doc = JSONEncoder().encode(in_doc)
+        return Response("{}", mimetype="application/json")
+    else:
+        out_doc = JSONEncoder().encode(in_doc)
+        
+        return Response(json.dumps(out_doc), mimetype="application/json")
+
+@app.route("/api/fetch-searchterm/", methods=['POST'])
+@requires_auth
+def fetch_search_terms_api():
+    search_terms = request.json
+    #schedule_spider_handler(url)
+    search_terms = ",".join(search_terms)
+    schedule_spider_searchengine_handler(search_terms, use_splash = False)
+    return Response("OK")
 
 if __name__ == "__main__":
 
