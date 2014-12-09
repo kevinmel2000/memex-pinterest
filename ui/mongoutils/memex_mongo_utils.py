@@ -2,6 +2,7 @@ import itertools
 import csv
 from pymongo import MongoClient
 import traceback
+import json
 from random import randrange
 from operator import itemgetter
 from urlparse import urlparse
@@ -100,6 +101,8 @@ class MemexMongoUtils(object):
 
         return list(docs)
 
+    ##HOSTS
+
     def list_hosts(self, page=1, num_docs=28, filter_regex = None, filter_field = None):
 
         if filter_regex and filter_field:
@@ -113,8 +116,16 @@ class MemexMongoUtils(object):
             docs = docs.limit(num_docs)
 
         docs_list = list(docs.limit(num_docs))
-            
+
+        for doc in docs_list:
+            if 'tags' in doc:
+                tag_acum = ""
+                for tag in (doc["tags"]):
+                    tag_acum = tag_acum + ", " + str(tag)
+                if tag_acum != ", ":
+                    doc["tags"] = tag_acum[2:]
         return docs_list
+
 
     def list_all_hosts(self):
 
@@ -187,6 +198,8 @@ class MemexMongoUtils(object):
             return high_score_doc["score"]
         else:
             return 0
+
+    ##URL
 
     def insert_test_data(self, test_fn="test_sites.csv"):
 
@@ -316,6 +329,16 @@ class MemexMongoUtils(object):
         print "Dropping %s" % ("seedinfo" + "-" + name)
         db["seedinfo" + "-" + name].drop()
 
+############# TAGS #############
+    def save_tags(self, host, tags):
+        self.hostinfo_collection.update({"host" : host}, {'$set' : {"tags" : tags}})
+
+    def list_tags(self, host):
+        ws_doc = self.hostinfo_collection.find_one({"host" : host})
+        if None == ws_doc:
+            return None
+        else:
+            return ws_doc['tags']
 
 
 if __name__ == "__main__":

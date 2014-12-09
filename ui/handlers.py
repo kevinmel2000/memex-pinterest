@@ -100,10 +100,19 @@ def mark_interest_handler(interest, url):
 def set_score_handler(url, score):
     mmu = MemexMongoUtils()
     mmu.set_score(url, score)   
-    
 
 
-    
+############# TAGS #############
+
+def list_tags(host):
+    mmu = MemexMongoUtils()
+    return mmu.list_tags(host)
+
+def save_tags(host, tags):
+    mmu = MemexMongoUtils()
+    mmu.save_tags(host, tags)
+
+############# Workspaces #############
 def list_workspace():
     mmu = MemexMongoUtils()
     return mmu.list_workspace()
