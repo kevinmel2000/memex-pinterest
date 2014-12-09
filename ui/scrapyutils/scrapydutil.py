@@ -28,16 +28,10 @@ class ScrapydJob(object):
 
         if not self.screenshot_dir:
             raise Exception("Please set the screenshot path in the config before scheduling")
-        # self.job_id = self.scrapi.schedule(self.project, self.spider, seed_urls=seed, screenshot_dir = self.screenshot_dir)
-        # return self.job_id
-
-        # self.phrases = json.loads(phrases)
-        # phrases = ["ebola", "outbreak"]
-        # response = self.searchEngineSpider.start_requests_with_phrases(phrases)
 
         self.job_id = self.scrapi.schedule(self.project, self.spider, phrases=phrases, screenshot_dir=self.screenshot_dir, use_splash = int(use_splash))
 
-        return "1234"
+        return self.job_id
 
     def list_jobs(self):
         return self.scrapi.list_jobs(self.project)

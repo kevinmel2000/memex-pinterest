@@ -40,7 +40,7 @@ def discovery():
     return render_template('discovery.html', seeds=seeds)
 
 @app.route("/data")
-@app.route("/")
+#@app.route("/")
 @requires_auth
 def data(page=1):
 
@@ -192,7 +192,7 @@ def set_score(score):
 
 
 ############# Workspaces #############
-
+@app.route("/")
 @app.route("/workspace/" , methods=['GET'])
 @requires_auth
 def get_workspace_view():
@@ -313,8 +313,9 @@ def save_search_term_api():
 @app.route("/api/fetch-searchterm/", methods=['POST'])
 @requires_auth
 def fetch_search_terms_api():
-    #search_terms = request.json
+    search_terms = request.json
     #schedule_spider_handler(url)
+    search_terms = ",".join(search_terms)
     schedule_spider_searchengine_handler(search_terms, use_splash = False)
     return Response("OK")
 

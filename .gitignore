@@ -19,3 +19,4 @@ crawler/build
 eggs/
 logs/
 *.pid
+dbs/
