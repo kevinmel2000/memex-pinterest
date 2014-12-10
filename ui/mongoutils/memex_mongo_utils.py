@@ -106,10 +106,11 @@ class MemexMongoUtils(object):
     def list_hosts(self, page=1, num_docs=28, filter_regex = None, filter_field = None):
 
         if filter_regex and filter_field:
-            docs = self.hostinfo_collection.find({filter_field:{'$regex':filter_regex}})
+            #docs = self.hostinfo_collection.find({filter_field:{'$regex':filter_regex}})
+            docs = self.hostinfo_collection.find({'$or':[{filter_field:{'$regex':filter_regex}},{"tags":{'$regex':filter_regex}}]}).sort("host_score", -1)
         else:
             docs = self.hostinfo_collection.find().sort("host_score", -1)
-        
+
         try:
             docs = docs.skip(num_docs * (page - 1)).limit(num_docs)
         except Exception:
