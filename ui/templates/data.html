@@ -313,9 +313,8 @@
             var host = $("#host-placeholder").val();
             var tagsStr = "";
             $.each($(".keyword"), function(index, elem) {
-                //alert(elem.innerText.trim());
-                tags.push(elem.innerText.trim());
-                tagsStr = tagsStr + ", " + elem.innerText.trim();
+                tags.push($(elem).text().trim());
+                tagsStr = tagsStr + ", " + $(elem).text().trim();
             });
             var posting = $.ajax({
                 type : "PUT",
