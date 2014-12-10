@@ -12,3 +12,9 @@ crawler/twistd.pid
 .classpath
 .project
 *.iml
+.settings/org.eclipse.ltk.core.refactoring.prefs
+crawler/build/
+dbs/
+eggs/
+searchengine/
+twistd.pid
