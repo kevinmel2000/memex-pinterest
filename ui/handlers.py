@@ -36,7 +36,7 @@ def hosts_handler(page = 1, which_collection = "crawl-data", filter_field = None
         hsu = mmu.get_highest_scoring_url_with_screenshot(host_dic["host"])
         host_score = mmu.get_host_score(host_dic["host"])
         host_dic["host_score"] = host_score
-        
+
         if hsu:
             screenshot_path = get_screenshot_relative_path(hsu['screenshot_path'])
             host_dic["hsu_screenshot_path"] = screenshot_path
@@ -64,17 +64,20 @@ def urls_handler(host = None, which_collection  = "crawl-data"):
 def schedule_spider_handler(seed, spider_host = "localhost", spider_port = "6800"):
 
     mmu = MemexMongoUtils()
-    scrapyd_util = ScrapydJob(spider_host, spider_port, screenshot_dir = SCREENSHOT_DIR)
+    scrapyd_util = ScrapydJob(spider_host, spider_port, project = "discovery-project", screenshot_dir = SCREENSHOT_DIR)
     job_id = scrapyd_util.schedule(seed)
-    mmu.add_job(seed, job_id)
+    mmu.add_job(seed, job_id, project = "discovery-project", spider = "website_finder")
 
     return True
 
 def get_job_state_handler(url, spider_host = "localhost", spider_port = "6800"):
 
     mmu = MemexMongoUtils()
-    scrapyd_util = ScrapydJob(spider_host, spider_port)
-    job_id = mmu.get_seed_doc(url)["job_id"]
+    seed_doc = mmu.get_seed_doc(url)
+    job_id = seed_doc["job_id"]
+    project = seed_doc["project"]
+    
+    scrapyd_util = ScrapydJob(spider_host, spider_port, project = project)
 
     return scrapyd_util.get_state(job_id)
 
@@ -100,19 +103,10 @@ def mark_interest_handler(interest, url):
 def set_score_handler(url, score):
     mmu = MemexMongoUtils()
     mmu.set_score(url, score)   
+    
 
 
-############# TAGS #############
-
-def list_tags(host):
-    mmu = MemexMongoUtils()
-    return mmu.list_tags(host)
-
-def save_tags(host, tags):
-    mmu = MemexMongoUtils()
-    mmu.save_tags(host, tags)
-
-############# Workspaces #############
+##workspace    
 def list_workspace():
     mmu = MemexMongoUtils()
     return mmu.list_workspace()
@@ -129,7 +123,44 @@ def delete_workspace(id):
     mmu = MemexMongoUtils()
     mmu.delete_workspace(id)
 
+##keyword
+def list_keyword():
+    mmu = MemexMongoUtils()
+    return mmu.list_keyword()
+    
+def save_keyword(list):
+    mmu = MemexMongoUtils()
+    mmu.save_keyword(list)
 
+##searchTerm
+def list_search_term():
+    mmu = MemexMongoUtils()
+    return mmu.list_search_term()
+
+def save_search_term(list):
+    mmu = MemexMongoUtils()
+    mmu.save_search_term(list)
+
+def schedule_spider_searchengine_handler(search_terms, spider_host = "localhost", spider_port = "6800", use_splash = False):
+
+    mmu = MemexMongoUtils()
+    #scrapyd_util = ScrapydJob(spider_host, spider_port, screenshot_dir = SCREENSHOT_DIR)
+    #scrapyd_util = ScrapydJob(spider_host, spider_port, project="search-engine", screenshot_dir = SCREENSHOT_DIR)
+    scrapyd_util = ScrapydJob("localhost", 6800, project='searchengine-project', spider="google.com", screenshot_dir="blahblah")    
+    job_id = scrapyd_util.schedule_keywords(search_terms, use_splash = use_splash)
+    mmu.add_job(search_terms, job_id, project = 'searchengine-project', spider = 'google.com')
+
+    return True
+
+
+##tags
+def list_tags(host):
+    mmu = MemexMongoUtils()
+    return mmu.list_tags(host)
+
+def save_tags(host, tags):
+    mmu = MemexMongoUtils()
+    mmu.save_tags(host, tags)
 
 if __name__ == "__main__":
     print "HERE"
