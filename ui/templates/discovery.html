@@ -52,29 +52,10 @@
 
 <body>
 
-<!--
-<div class="container">
-  <form role="form">
-    <div class="row">
-      <div class="form-group">
-        <label for="code">Please enter a URL to Spider below</label>
-        <input id= "url-input" class="form-control input-lg" type="text">
-      </div>
-    </div>
-    
-    <div class="row">
-      <button type="button" class="btn btn-default" onclick="submitUrlForCrawl()">Submit</button>
-    </div>
-  </form>
-</div>
--->
-
-
-
 <script>
 function submitUrlForCrawl() {
 
-  url = document.getElementById('url-input').value
+  url = document.getElementById('addDiscoveryText').value
   scrapyd_url = "/schedule-spider/?url=" + url;
   console.log("Scheduled job");
   $.get(scrapyd_url, function( whatever ) {
@@ -135,7 +116,7 @@ function getUrlCrawlStatus(url, url_hash) {
 								<!--<button id="saveButton" class="btn btn-default " type="button">
 									Save Search Term
 								</button>--> 
-								<button id="fetchButton" class="btn btn-default " type="button">
+								<button id="fetchButtonSearch" class="btn btn-default " type="button">
 									Fetch by Search Terms
 								</button>
 							</span>
@@ -167,7 +148,7 @@ function getUrlCrawlStatus(url, url_hash) {
 						</div>
 						<div class="panel-footer">
 							<span class="input-group-btn">
-								<button id="fetchButton" class="btn btn-default " type="button">
+								<button id="fetchButtonDiscovery" class="btn btn-default " type="button">
 									Fetch by seed URL
 								</button>
 							</span>
@@ -248,14 +229,12 @@ function getUrlCrawlStatus(url, url_hash) {
 		
 		var renderTags = function(key){
 			var template =
-			'<button type="button" onclick="remove(this);" class="searchterm btn btn-default-inverse btn-sm" style="margin-top:10px">' + 
+			'<button type="button" onclick="remove(this); saveSearchTerms();" class="searchterm btn btn-default-inverse btn-sm" style="margin-top:10px">' + 
 				'<span class="glyphicon glyphicon-remove" aria-hidden="true"></span> ####' +
 			'</button>&nbsp;';
 			template = template.replace('####',key);
 			$('#tags').append(template);
-
 		};
-		
 
 		var renderSearchTerms = function(data) {
 			var obj = $.parseJSON(data);
@@ -278,12 +257,11 @@ function getUrlCrawlStatus(url, url_hash) {
   					dataType: 'json',
   					data: JSON.stringify(searchterms),
 					success : function(data) {
-						alert(data);
+						console.log(data);
 					}
 				});
+				location.reload();
 		}
-
-
 
 		$(document).ready(function() {
 			$('#addText').keypress(function(e) {
@@ -300,11 +278,8 @@ function getUrlCrawlStatus(url, url_hash) {
 			$('#addButton').click(newKey);
 			$('#saveButton').click(saveSearchTerms);
 
-			$('#fetchButton').click(fetchSearchTerms);
-
-
-
-
+			$('#fetchButtonSearch').click(fetchSearchTerms);
+			$('#fetchButtonDiscovery').click(submitUrlForCrawl);
 
 			var searchterms = $.get(url, function(data){
 				renderSearchTerms(data);

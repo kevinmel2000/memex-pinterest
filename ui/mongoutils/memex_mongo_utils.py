@@ -367,11 +367,14 @@ class MemexMongoUtils(object):
 
 if __name__ == "__main__":
 
-    mmu = MemexMongoUtils()
+    mmu = MemexMongoUtils(which_collection="known-data")
+    print mmu.list_all_urls()
+    print mmu.list_all_hosts()
+
     #mmu.save_search_term(['blahg'])
 #    print mmu.list_search_term()
-    print mmu.seed_collection
-    print mmu.list_seed_docs()
+#    print mmu.seed_collection
+#    print mmu.list_seed_docs()
     
     #MemexMongoUtils(which_collection="crawl-data", init_db=True)
     #MemexMongoUtils(which_collection="known-data", init_db=True)

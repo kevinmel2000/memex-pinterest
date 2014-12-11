@@ -11,6 +11,7 @@ import hashlib
 from handlers import set_score_handler
 from handlers import list_workspace, add_workspace, set_workspace_selected, delete_workspace
 from handlers import list_keyword, save_keyword, schedule_spider_searchengine_handler, list_search_term, save_search_term
+from handlers import add_known_urls_handler
 from auth import requires_auth
 from mongoutils.errors import DeletingSelectedWorkspaceError
 
@@ -145,6 +146,18 @@ def known_urls(host=None):
 
     # change this
     return render_template("urls.html", urls=urls, use_known_data=True)
+
+@app.route("/add-known", methods = ['GET', 'POST'])
+@requires_auth
+def add_known_urls():
+
+    if request.method == 'POST':
+        urls_raw = json.loads(request.data)[0]
+        add_known_urls_handler(urls_raw)
+        return Response(json.dumps({}), mimetype="application/json")
+
+    else:
+        return render_template("known.html")
 
 @app.route("/schedule-spider/")
 @requires_auth
