@@ -98,6 +98,41 @@
 			PAGE DOWN
 		</button>
 	</div>
+
+    <!-- Modal -->
+		<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal">
+                <span aria-hidden="true">&times;</span>
+                <span class="sr-only">Close</span></button>
+            <h4 class="modal-title">Edit Tags</h4>
+          </div>
+          <div class="modal-body">
+            <!--<p>One fine body&hellip;</p>-->
+			  <input id="host-placeholder" type="hidden" >
+            <div>
+                Enter comma separated values
+            </div>
+            <div class="input-group">
+                <input id="addText" type="text" class="form-control">
+                <span class="input-group-btn">
+                    <button id="addButton" class="btn btn-default" type="button">
+                        Add
+                    </button>
+                </span>
+            </div><!-- /input-group -->
+            <div id="tags">
+            </div>
+          </div>
+          <div class="modal-footer">
+            <!--<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>-->
+            <button id="saveButton" type="button" class="btn btn-primary">Save changes</button>
+          </div>
+        </div><!-- /.modal-content -->
+      </div><!-- /.modal-dialog -->
+    </div><!-- /.modal -->
 </body>
 <script>
 	var loaded_pages = [];
@@ -247,6 +282,102 @@
 		});
 
 	});
+
+
+//////////////////////////////////////////////////////
+        //TAGS FEATURES
+        var url = '/api/tags/';
+
+		var newTag = function(){
+			var tag = $('#addText').val();
+			if(tag == '')
+				return false;
+			renderTags(tag);
+			$('#addText').val('');
+		};
+
+		var renderTags = function(key){
+			if(key === "")
+				return;
+
+			var template =
+			'<button type="button" onclick="remove(this);" class="keyword btn btn-default-inverse btn-sm" style="margin-top:10px;margin-right:5px">' +
+				'<span class="glyphicon glyphicon-remove" aria-hidden="true"></span> ####' +
+			'</button>';
+			template = template.replace('####',key);
+			$('#tags').append(template);
+		};
+
+		var saveTags = function() {
+            var tags = [];
+            var host = $("#host-placeholder").val();
+            var tagsStr = "";
+            $.each($(".keyword"), function(index, elem) {
+                tags.push($(elem).text().trim());
+                tagsStr = tagsStr + ", " + $(elem).text().trim();
+			});
+            var posting = $.ajax({
+                type : "PUT",
+                url : url + host,
+                contentType: 'application/json',
+                dataType: 'json',
+                data: JSON.stringify(tags),
+                success : function(data) {
+                    //alert(data);
+					var tagSelector = "tag_" + host.replace(/\./g,'_');
+					$("#btn_" + tagSelector).attr('custom_tag', tagsStr.substring(2));
+					$("#span_" + tagSelector).html(tagsStr.substring(2));
+                    $('#myModal').modal('hide');
+                }
+            });
+        };
+
+		var renderKeywords = function(data) {
+			$('#tags').empty();
+			var obj = $.parseJSON(data);
+			$.each(obj, function(index, elem){
+				renderTags(elem);
+			});
+		};
+
+		$(document).ready(function() {
+			$('#addText').keypress(function(e) {
+				if (e.which == 13) {// enter pressed
+					newTag.apply();
+				}
+				else if (e.which == 44) {// ',' pressed
+					newTag.apply();
+					return false;
+				}
+			});
+			$('#addButton').click(newTag);
+			$('#saveButton').click(saveTags);
+
+			//var keywords = $.get(url, function(data){
+			//	renderKeywords(data);
+			//});
+			$('#myModal').on('show.bs.modal', function (event) {
+				var button = $(event.relatedTarget); // Button that triggered the modal
+				var host = button.data('host'); // Extract info from data-* attributes
+				var tagSelector = "tag_" + host.replace(/\./g,'_');
+				//var dataTags = button.data('tags');
+				var dataTags = $("#btn_" + tagSelector).attr('custom_tag');
+
+				// If necessary, you could initiate an AJAX request here (and then do the updating in a callback).
+				// Update the modal's content. We'll use jQuery here, but you could use a data binding library or other methods instead.
+				var modal = $(this);
+				modal.find('.modal-title').text('Edit Tags for ' + host);
+				modal.find('.modal-body #host-placeholder').val(host);
+				//modal.find('.modal-body #host-placeholder').val(tags);
+
+				$('#tags').empty();
+				var obj = dataTags.split(",");
+				$.each(obj, function(index, elem){
+					renderTags(elem.trim());
+				});
+				//button.data('tags').val("aadaf");
+			})
+		});
 
 </script>
 </html>

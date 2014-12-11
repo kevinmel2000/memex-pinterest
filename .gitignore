@@ -10,10 +10,13 @@ crawler/logs
 crawler/items
 crawler/twistd.pid
 crawler/build
+searchengine/build
+searchengine/build/
 .classpath
 .project
 *.iml
 .settings/org.eclipse.ltk.core.refactoring.prefs
+.settings/org.eclipse.core.resources.prefs
 .pydevproject
 .settings/
 eggs/

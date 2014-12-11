@@ -117,7 +117,7 @@ def set_score_handler(url, score):
     
 
 
-## workspace    
+##workspace    
 def list_workspace():
     mmu = MemexMongoUtils()
     return mmu.list_workspace()
@@ -143,6 +143,7 @@ def save_keyword(list):
     mmu = MemexMongoUtils()
     mmu.save_keyword(list)
 
+##searchTerm
 def list_search_term():
     mmu = MemexMongoUtils()
     return mmu.list_search_term()
@@ -161,6 +162,16 @@ def schedule_spider_searchengine_handler(search_terms, spider_host = "localhost"
     mmu.add_job(search_terms, job_id, project = 'searchengine-project', spider = 'google.com')
 
     return True
+
+
+##tags
+def list_tags(host):
+    mmu = MemexMongoUtils()
+    return mmu.list_tags(host)
+
+def save_tags(host, tags):
+    mmu = MemexMongoUtils()
+    mmu.save_tags(host, tags)
 
 if __name__ == "__main__":
     print "HERE"
