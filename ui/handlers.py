@@ -3,7 +3,7 @@ from mongoutils.memex_mongo_utils import MemexMongoUtils
 from scrapyutils.scrapydutil import ScrapydJob
 from settings import SCREENSHOT_DIR
 from mongoutils.known_hosts import KnownHostsCompare
-
+from mongoutils.validate import validate_url
     
 def get_screenshot_relative_path(real_path):
     try:
@@ -69,6 +69,17 @@ def schedule_spider_handler(seed, spider_host = "localhost", spider_port = "6800
     mmu.add_job(seed, job_id, project = "discovery-project", spider = "website_finder")
 
     return True
+
+def add_known_urls_handler(urls_raw):
+
+    mmu = MemexMongoUtils(which_collection = "known-data")
+    for url in urls_raw.splitlines():
+        validate_url(url)
+        try:
+            mmu.insert_url(url = url)
+        except:
+            print "Existing URL attempted to be uploaded, skipping it..."
+            
 
 def get_job_state_handler(url, spider_host = "localhost", spider_port = "6800"):
 
