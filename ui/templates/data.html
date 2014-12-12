@@ -12,23 +12,13 @@
 <input id="search" type="text" class="form-control input-lg" placeholder="Enter a search term and press enter to search hosts or tags" action="search();" method="GET">
 </input>
 
-<script>
-	$('#search').keypress(function(e) {
-		if (e.which == 13) {
-			var search = $('#search').val();
-			var search_url = "/?filter-field=host&filter-regex=" + search;
-			window.location.replace(search_url);
-			return false;
-		}
-	}); 
-</script>
 {% endif %}
+
 
 <head>
 	<meta charset="utf-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
-	<!--<link rel="stylesheet" href="http://netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css">-->
 	<style>
 		body {
 			background: #E9E9E9;
@@ -66,7 +56,6 @@
 		}
 	</style>
 
-	<!--<link href="http://www.jqueryscript.net/css/jquerysctipttop.css" rel="stylesheet" type="text/css">-->
 </head>
 <!-- NAVBAR
 ================================================== -->
@@ -82,10 +71,11 @@
 	</button>
 
 	<div class="jquery-script-clear"></div>
-	<!--<h1 style="margin-top:150px" align="center">Hyperion Gray SourceFinder</h1>-->
+
 	<div class="container marketing">
 		<section id="blog-landing"></section>
 	</div>
+
 
 	<!-- Bootstrap core JavaScript
 	================================================== -->
@@ -134,6 +124,7 @@
       </div><!-- /.modal-dialog -->
     </div><!-- /.modal -->
 </body>
+
 <script>
 	var loaded_pages = [];
 
@@ -286,7 +277,7 @@
 
 //////////////////////////////////////////////////////
         //TAGS FEATURES
-        var url = '/api/tags/';
+		var tagsUrl = '/api/tags/';
 
 		var newTag = function(){
 			var tag = $('#addText').val();
@@ -318,7 +309,7 @@
             });
             var posting = $.ajax({
                 type : "PUT",
-                url : url + host,
+                url : tagsUrl + host,
                 contentType: 'application/json',
                 dataType: 'json',
                 data: JSON.stringify(tags),
@@ -340,6 +331,14 @@
 			});
 		};
 
+		var SearchResponseItem = function(label, category){
+			this.label = label;
+			this.category = category;
+		}
+
+
+///////////////////////////////////////////
+
 		$(document).ready(function() {
 			$('#addText').keypress(function(e) {
 				if (e.which == 13) {// enter pressed
@@ -353,14 +352,10 @@
 			$('#addButton').click(newTag);
 			$('#saveButton').click(saveTags);
 
-			//var keywords = $.get(url, function(data){
-			//	renderKeywords(data);
-			//});
 			$('#myModal').on('show.bs.modal', function (event) {
 				var button = $(event.relatedTarget); // Button that triggered the modal
 				var host = button.data('host'); // Extract info from data-* attributes
 				var tagSelector = "tag_" + host.replace(/\./g,'_');
-				//var dataTags = button.data('tags');
 				var dataTags = $("#btn_" + tagSelector).attr('custom_tag');
 
 				// If necessary, you could initiate an AJAX request here (and then do the updating in a callback).
@@ -375,10 +370,50 @@
 				$.each(obj, function(index, elem){
 					renderTags(elem.trim());
 				});
-				//button.data('tags').val("aadaf");
 			})
+
+			/////// SEARCH //////////
+			$('#search').keypress(function(e) {
+				if (e.which == 13) {
+					return searchDo(search);
+				}
+			});
+
+			var searchDo = function(){
+				var search = $('#search').val();
+				var search_url = "/?filter-field=host&filter-regex=" + search;
+				window.location.replace(search_url);
+				return false;
+			}
+
+			$("#search").autocomplete({
+				minLength: 3,
+				delay: 200,
+				search: function( event, ui ) {console.log(ui);},
+				select: function( event, ui ) {
+					return searchDo();
+				},
+				source: function( request, response ) {
+			        var resultsArray = [];
+					$.ajax({
+						type: "GET",
+						url: tagsUrl + request.term,
+						async: false,
+						success: function(data){
+							var obj = $.parseJSON(data);
+							$.each(obj, function(index, elem){
+								resultsArray.push(new SearchResponseItem(elem.host, "host"));
+							});
+							return resultsArray;
+						}
+					})
+					return response(resultsArray);
+				}
+			});
+
 		});
 
 </script>
+
 </html>
 {% endblock %}

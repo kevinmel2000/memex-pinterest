@@ -108,9 +108,14 @@ def list_tags(host):
     mmu = MemexMongoUtils()
     return mmu.list_tags(host)
 
+
 def save_tags(host, tags):
     mmu = MemexMongoUtils()
     mmu.save_tags(host, tags)
+
+def search_tags(term):
+    mmu = MemexMongoUtils()
+    return mmu.search_tags(term)
 
 ############# Workspaces #############
 def list_workspace():

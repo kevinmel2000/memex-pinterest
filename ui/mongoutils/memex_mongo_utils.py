@@ -106,7 +106,6 @@ class MemexMongoUtils(object):
     def list_hosts(self, page=1, num_docs=28, filter_regex = None, filter_field = None):
 
         if filter_regex and filter_field:
-            #docs = self.hostinfo_collection.find({filter_field:{'$regex':filter_regex}})
             docs = self.hostinfo_collection.find({'$or':[{filter_field:{'$regex':filter_regex}},{"tags":{'$regex':filter_regex}}]}).sort("host_score", -1)
         else:
             docs = self.hostinfo_collection.find().sort("host_score", -1)
@@ -333,6 +332,13 @@ class MemexMongoUtils(object):
 ############# TAGS #############
     def save_tags(self, host, tags):
         self.hostinfo_collection.update({"host" : host}, {'$set' : {"tags" : tags}})
+
+    def search_tags(self, term):
+        ws_doc  = self.hostinfo_collection.find({'$or':[{"host":{'$regex':term}},{"tags":{'$regex':term}}]}).sort("host_score", -1)
+        if None == ws_doc:
+            return None
+        else:
+            return list(ws_doc)
 
     def list_tags(self, host):
         ws_doc = self.hostinfo_collection.find_one({"host" : host})

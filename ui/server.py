@@ -10,7 +10,7 @@ import json
 import hashlib
 from handlers import set_score_handler
 from handlers import list_workspace, add_workspace, set_workspace_selected, delete_workspace
-from handlers import list_tags, save_tags
+from handlers import list_tags, save_tags, search_tags
 from auth import requires_auth
 server_path = os.path.dirname(os.path.realpath(__file__))
 app = Flask(__name__)
@@ -189,10 +189,15 @@ def set_score(score):
 
 ############# TAGS #############
 
-# @app.route("/api/tags/host/<host>" , methods=['GET'])
-# @requires_auth
-# def api_get_tags(host):
-#      in_doc = list_tags(host)
+@app.route("/api/tags/<term>" , methods=['GET'])
+@requires_auth
+def api_search_term(term):
+    in_doc = search_tags(term)
+    if in_doc == None:
+        return Response("{}", mimetype="application/json")
+    else:
+        out_doc = JSONEncoder().encode(in_doc)
+        return Response(json.dumps(out_doc), mimetype="application/json")
 
 #upsert_tags_to_hosts
 @app.route("/api/tags/<host>", methods=['PUT'])
