@@ -9,14 +9,10 @@ def rescore_all():
     """ Rescore all items from mongo """
 
     mmu = MemexMongoUtils()
-    print "getting docs"
     docs = mmu.list_all_urls_iterator(return_html = True)
 
-    print "loading ranker"
     ranker = Ranker.load()
-    print "done loading ranker"
     for doc in docs:
-        print doc
         try:
             score = ranker.score_doc(doc)
         except:
