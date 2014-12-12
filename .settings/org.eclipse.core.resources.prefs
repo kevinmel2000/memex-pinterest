@@ -8,4 +8,7 @@ encoding//crawler/discovery/splash_ext/middleware.py=utf-8
 encoding//crawler/discovery/urlutils.py=utf-8
 encoding//docs/conf.py=utf-8
 encoding//ranker/ranker.py=utf-8
+encoding//ranker/rescore_mongo.py=utf-8
+encoding//ranker/train.py=utf-8
+encoding//ranker/train_keywords.py=utf-8
 encoding/fabfile.py=utf-8
