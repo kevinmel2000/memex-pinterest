@@ -1,31 +1,24 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-import pymongo
+
 from tqdm import tqdm
 from ranker import Ranker
-
-
-def _get_collection():
-    return pymongo.MongoClient()["MemexHack"].urlinfo
-
-
-def get_mdocs(collection):
-    return collection.find(
-        {},
-        #{"interest": {"$exists": False}},
-        {"html": 1, "html_rendered": 1}
-    )
-
+from ui.mongoutils.memex_mongo_utils import MemexMongoUtils
 
 def rescore_all():
     """ Rescore all items from mongo """
+
+    mmu = MemexMongoUtils()
+    docs = mmu.list_all_urls_iterator(return_html = True)
+
     ranker = Ranker.load()
-    coll = _get_collection()
-    for doc in tqdm(get_mdocs(coll), leave=True):
-        score = ranker.score_doc(doc)
-        coll.update({'_id': doc['_id']}, {"$set": {"score": score}})
-    print("")
+    for doc in docs:
+        try:
+            score = ranker.score_doc(doc)
+        except:
+            score = 0
 
-
+        mmu.set_score(doc["url"], score)
+        
 if __name__ == '__main__':
     rescore_all()

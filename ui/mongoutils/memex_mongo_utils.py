@@ -125,11 +125,21 @@ class MemexMongoUtils(object):
 
         return list(docs)
 
-    def list_all_urls(self, sort_by="host"):
+    def list_all_urls(self, sort_by="host", return_html = False):
 
-        docs = self.urlinfo_collection.find({}, {'html':0, 'html_rendered': 0})  # .sort(sort_by, 1)
+        docs = self.urlinfo_collection.find({}, {'html':int(return_html), 'html_rendered': int(return_html)})  # .sort(sort_by, 1)
 
         return sorted(list(docs), key=lambda rec: rec[sort_by])
+    
+    def list_all_urls_iterator(self, return_html):
+        
+        docs = self.urlinfo_collection.find({}, {'url':int(True), 'html':int(return_html), 'html_rendered': int(return_html)})  # .sort(sort_by, 1)
+        return docs        
+
+    def list_all_urls_with_interest(self, interest, return_html = False):
+
+        docs = self.urlinfo_collection.find({"interest": interest}, {"html": int(return_html)})
+        return list(docs)
 
     def list_seeds(self, sort_by="url"):
 
@@ -298,11 +308,9 @@ class MemexMongoUtils(object):
         db[host_collection_name].ensure_index("host", unique=True, drop_dups=True)
         db[seed_collection_name].ensure_index("url", unique=True, drop_dups=True)
 
-
     def get_workspace_by_id(self,id):
         return self.workspace_collection.find_one({"_id" : ObjectId( id )})
         
-
     def set_workspace_selected_by_name(self, name):
         self.workspace_collection.update({}, {'$set' : {"selected" : False}}, multi=True)
         self.workspace_collection.update({"name" : name}, {'$set' : {"selected" : True}})
@@ -377,15 +385,7 @@ class MemexMongoUtils(object):
 if __name__ == "__main__":
 
     mmu = MemexMongoUtils(which_collection="known-data")
-    print mmu.list_all_urls()
-    print mmu.list_all_hosts()
-
-    #mmu.save_search_term(['blahg'])
-#    print mmu.list_search_term()
-#    print mmu.seed_collection
-#    print mmu.list_seed_docs()
-    
-    #MemexMongoUtils(which_collection="crawl-data", init_db=True)
-    #MemexMongoUtils(which_collection="known-data", init_db=True)
-    #MemexMongoUtils(which_collection="cc-crawl-data", init_db=True)
-    #mmu.init_workspace()
+    MemexMongoUtils(which_collection="crawl-data", init_db=True)
+    MemexMongoUtils(which_collection="known-data", init_db=True)
+    MemexMongoUtils(which_collection="cc-crawl-data", init_db=True)
+    mmu.init_workspace()
