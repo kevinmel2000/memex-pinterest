@@ -121,6 +121,7 @@ def urls(host=None):
         screenshot_path = url_dic.get("screenshot_path")
         if screenshot_path:
             url_dic["screenshot_path"] = get_screenshot_relative_path(screenshot_path)
+        url_dic["url_hash"] = str(hashlib.md5(url_dic["url"]).hexdigest())
 
     return render_template("urls.html", urls=urls)
 
@@ -182,6 +183,7 @@ def get_spider_update():
 def mark_interest(interest):
 
     url = request.args.get('url')
+    print url
 
     if interest.strip().lower() == "false":
         interest = False

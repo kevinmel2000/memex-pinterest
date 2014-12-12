@@ -49,7 +49,7 @@ def urls_handler(host = None, which_collection  = "crawl-data"):
     """Put together host documents for use with hosts endpoint """
 
     mmu = MemexMongoUtils(which_collection = which_collection)
-    url_dics = mmu.list_urls(host = host)
+    url_dics = mmu.list_urls(host = host, limit = 1000)
 
     for url_dic in url_dics:
         url_dic.pop("_id")
@@ -175,4 +175,5 @@ def save_tags(host, tags):
 
 if __name__ == "__main__":
     print "HERE"
-    print hosts_handler()
+    for urldoc in urls_handler("www.amazon.com"):
+        print urldoc['url']

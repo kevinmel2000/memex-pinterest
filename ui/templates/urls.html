@@ -27,17 +27,17 @@
 	
         <td>
 	    {% if "interest" in url_dic and url_dic["interest"] %}
-	      <button class="btn btn-success" onclick="markInterest('true', '{{ url_dic["url"] }}');" disabled>yes</button>
-	      <button class="btn btn-danger" onclick="markInterest('false', '{{ url_dic["url"] }}');">no</button>
+	      <button id='yes-{{ url_dic["url_hash"] }}' class="btn btn-success" onclick="markInterest('true', '{{ url_dic["url"] }}', '{{ url_dic["url_hash"] }}', 'yes');" disabled>yes</button>
+	      <button id='no-{{ url_dic["url_hash"] }}' class="btn btn-danger" onclick="markInterest('false', '{{ url_dic["url"] }}', '{{ url_dic["url_hash"] }}', 'no');">no</button>
 	    {% elif "interest" in url_dic and not url_dic["interest"] %}
-  	      <button class="btn btn-success" onclick="markInterest('true', '{{ url_dic["url"] }}');">yes</button>
-	      <button class="btn btn-danger" onclick="markInterest('false', '{{ url_dic["url"] }}');" disabled>no</button>
+  	      <button id='yes-{{ url_dic["url_hash"] }}' class="btn btn-success" onclick="markInterest('true', '{{ url_dic["url"] }}', '{{ url_dic["url_hash"] }}', 'yes');">yes</button>
+	      <button id='no-{{ url_dic["url_hash"] }}' class="btn btn-danger" onclick="markInterest('false', '{{ url_dic["url"] }}', '{{ url_dic["url_hash"] }}', 'no');" disabled>no</button>
 	    {% else %}
-	      <button class="btn btn-success" onclick="markInterest('true', '{{ url_dic["url"] }}');">yes</button>
-	      <button class="btn btn-danger" onclick="markInterest('false', '{{ url_dic["url"] }}');">no</button>
+	      <button id='yes-{{ url_dic["url_hash"] }}' class="btn btn-success" onclick="markInterest('true', '{{ url_dic["url"] }}', '{{ url_dic["url_hash"] }}', 'yes');">yes</button>
+	      <button id='no-{{ url_dic["url_hash"] }}' class="btn btn-danger" onclick="markInterest('false', '{{ url_dic["url"] }}', '{{ url_dic["url_hash"] }}', 'no');">no</button>
 	    {% endif %}
 
-  	      <!--<p style="margin-top:4px;">Currently: {{ url_dic["interest"] }}</p>-->
+  	   <p style="margin-top:4px;">Currently: {{ url_dic["interest"] }}</p>-
 	  <!--<div onclick="markInterest('true', '{{ url_dic["url"] }}');">ddddddddddddd</div>-->
 	  <!--<span class="glyphicon glyphicon-screenshot"></span>-->
     	</td>
@@ -87,14 +87,27 @@
 </table>
 
 <script>
-function markInterest(interest, url) {
+function markInterest(interest, url, url_hash, mark_as) {
 
   console.log("Marking interest");
-  interest_url = "/mark-interest/" + interest + "?url=" + url;
+  console.log(url);
+  interest_url = "/mark-interest/" + interest + "?url=" + encodeURIComponent(url);
 
   $.get(interest_url, function( status ) {
-    console.log("Everything's good y'all, s'all good, s'all good interest");
-    location.reload();
+    console.log("Everything's good marking interest sent to url: " + interest_url);
+
+	dont_mark_as = "";
+	if (mark_as == 'yes') {
+		dont_mark_as = 'no';
+	}
+	else {
+		dont_mark_as = 'yes';
+	}
+
+	$("#" + mark_as + "-" + url_hash).prop('disabled', true);
+	$("#" + dont_mark_as + "-" + url_hash).prop('disabled', false);
+
+
   });
 }
 
@@ -105,10 +118,19 @@ function submitUrlForCrawl(url) {
   console.log("Scheduled job");
   $.get(scrapyd_url, function( whatever ) {
     console.log("The job was successfully scheduled")
-    location.reload()
+    //location.reload();
     //alert('success');
   });
 }
+
+$(document).ready(function() {
+	$.ajaxSetup ({
+	    // Disable caching of AJAX responses
+	    cache: false
+	});
+});
+
+
 </script>
 
 {% endblock %}
