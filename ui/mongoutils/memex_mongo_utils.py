@@ -95,7 +95,7 @@ class MemexMongoUtils(object):
     def list_urls(self, host=None, limit=20):
 
         if not host:
-            docs = self.urlinfo_collection.find().sort("score", -1).limit(limit)
+            docs = self.urlinfo_collection.find({ "display": { "$ne": 0 } }).sort("score", -1).limit(limit)
         else:
             docs = self.urlinfo_collection.find({"host" : host}).sort("score", -1).limit(limit)
 
@@ -106,9 +106,11 @@ class MemexMongoUtils(object):
     def list_hosts(self, page=1, num_docs=28, filter_regex = None, filter_field = None):
 
         if filter_regex and filter_field:
-            docs = self.hostinfo_collection.find({'$or':[{filter_field:{'$regex':filter_regex}},{"tags":{'$regex':filter_regex}}]}).sort("host_score", -1)
+            #docs = self.hostinfo_collection.find({'$and' : [{'$or':[{filter_field:{'$regex':filter_regex}},{"tags":{'$regex':filter_regex}}]}, { "display": { "$ne": 0 }}]}).sort("host_score", -1)
+            docs = self.get_hosts_filtered(filter_field, filter_field)
         else:
-            docs = self.hostinfo_collection.find().sort("host_score", -1)
+            #docs = self.hostinfo_collection.find({ "display": { "$ne": 0 } }).sort("host_score", -1)
+            docs = self.get_hosts()
 
         try:
             docs = docs.skip(num_docs * (page - 1)).limit(num_docs)
@@ -128,14 +130,13 @@ class MemexMongoUtils(object):
 
 
     def list_all_hosts(self):
-
-        docs = self.hostinfo_collection.find()
-
+        #docs = self.hostinfo_collection.find({ "display": { "$ne": 0 } })
+        docs = self.get_hosts()
         return list(docs)
 
     def list_all_urls(self, sort_by="host"):
 
-        docs = self.urlinfo_collection.find({}, {'html':0, 'html_rendered': 0})  # .sort(sort_by, 1)
+        docs = self.urlinfo_collection.find({{ "display": { "$ne": 0 } }}, {'html':0, 'html_rendered': 0})  # .sort(sort_by, 1)
 
         return sorted(list(docs), key=lambda rec: rec[sort_by])
 
@@ -283,6 +284,7 @@ class MemexMongoUtils(object):
         self.delete_hosts_by_match(match, negative_match = negative_match)
 
 #####################   workspace  #####################
+
     def list_workspace(self):
         docs = self.workspace_collection.find()
         return list(docs)
@@ -305,15 +307,12 @@ class MemexMongoUtils(object):
         db[host_collection_name].ensure_index("host", unique=True, drop_dups=True)
         db[seed_collection_name].ensure_index("url", unique=True, drop_dups=True)
 
-
-
     def set_workspace_selected(self, id):
         self.workspace_collection.update({}, {'$set' : {"selected" : False}}, multi=True)
         self.workspace_collection.update({"_id" : ObjectId( id )}, {'$set' : {"selected" : True}})
 
     def get_workspace_selected(self):
         return self.workspace_collection.find_one({"selected" : True})
-
 
     def delete_workspace(self, id):
         ws_doc = self.workspace_collection.find_one({"_id" : ObjectId( id )})
@@ -329,12 +328,26 @@ class MemexMongoUtils(object):
         print "Dropping %s" % ("seedinfo" + "-" + name)
         db["seedinfo" + "-" + name].drop()
 
+
+############# HOST HELPERS ###########
+
+    def get_hosts(self):
+        docs = self.hostinfo_collection.find({ "display": { "$ne": 0 } })
+        return docs
+
+    def get_hosts_filtered(self, filter_field, filter_regex):
+        docs = self.hostinfo_collection.find({'$and' : [{'$or':[{filter_field:{'$regex':filter_regex}},{"tags":{'$regex':filter_regex}}]}, { "display": { "$ne": 0 }}]}).sort("host_score", -1)
+        return docs
+
+
 ############# TAGS #############
+
     def save_tags(self, host, tags):
         self.hostinfo_collection.update({"host" : host}, {'$set' : {"tags" : tags}})
 
     def search_tags(self, term):
-        ws_doc  = self.hostinfo_collection.find({'$or':[{"host":{'$regex':term}},{"tags":{'$regex':term}}]}).sort("host_score", -1)
+        #ws_doc  = self.hostinfo_collection.find({'$or':[{"host":{'$regex':term}},{"tags":{'$regex':term}}]}).sort("host_score", -1)
+        ws_doc  = self.get_hosts_filtered("host", term)
         if None == ws_doc:
             return None
         else:
@@ -346,6 +359,15 @@ class MemexMongoUtils(object):
             return None
         else:
             return ws_doc['tags']
+
+
+############# Display Hosts #############
+
+############# Display Hosts #############
+
+    def save_display(self, host, displayable):
+        self.hostinfo_collection.update({"host" : host}, {'$set': {'display': displayable}})
+        self.urlinfo_collection.update({"host" : host}, {'$set': {'display': displayable}}, multi=True)
 
 
 if __name__ == "__main__":

@@ -1,19 +1,16 @@
 {% extends "layout.html" %}
 {% block content %}
-<table id="" class="table table-striped" style="margin-top:50px;">
+<table id="" class="table table-striped" style="margin-top:50px; font-size:12px">
   <thead>
     <tr>
       <th>URL</th>
-      {% if not use_cc_data and not use_known_data %}
-        <th>Interesting</th>
-      {% endif %}
       <th>Host</th>
       <th>Score</th>
-      <th>Crawled At</th>
+      <th>Crawled at</th>
       <th>Seed</th>
       <th>Title</th>
       <th>Screenshot</th>
-      <th>Crawl</th>
+      <th></th>
     </tr>
   </thead>
   <tbody>
@@ -23,26 +20,6 @@
 	  <!--<span class="glyphicon glyphicon-screenshot"></span>-->
 	  &nbsp;<a href="{{ url_dic["url"] }}">{{ url_dic["url"][:40] }}</a>
 	</td>
-      {% if not use_cc_data and not use_known_data  %}
-	
-        <td>
-	    {% if "interest" in url_dic and url_dic["interest"] %}
-	      <button class="btn btn-success" onclick="markInterest('true', '{{ url_dic["url"] }}');" disabled>yes</button>
-	      <button class="btn btn-danger" onclick="markInterest('false', '{{ url_dic["url"] }}');">no</button>
-	    {% elif "interest" in url_dic and not url_dic["interest"] %}
-  	      <button class="btn btn-success" onclick="markInterest('true', '{{ url_dic["url"] }}');">yes</button>
-	      <button class="btn btn-danger" onclick="markInterest('false', '{{ url_dic["url"] }}');" disabled>no</button>
-	    {% else %}
-	      <button class="btn btn-success" onclick="markInterest('true', '{{ url_dic["url"] }}');">yes</button>
-	      <button class="btn btn-danger" onclick="markInterest('false', '{{ url_dic["url"] }}');">no</button>
-	    {% endif %}
-
-  	      <!--<p style="margin-top:4px;">Currently: {{ url_dic["interest"] }}</p>-->
-	  <!--<div onclick="markInterest('true', '{{ url_dic["url"] }}');">ddddddddddddd</div>-->
-	  <!--<span class="glyphicon glyphicon-screenshot"></span>-->
-    	</td>
-      {% endif %}	
-
 	{% if "host" in url_dic and url_dic["host"] %}
           <td>{{ url_dic["host"] }}</td>
         {% else %}
@@ -56,7 +33,7 @@
 	{% endif %}
 
 	{% if "crawled_at" in url_dic and url_dic["crawled_at"] %}
-          <td>{{ url_dic["crawled_at"] }}</td>
+          <td>{{ url_dic["crawled_at"]}}</td>
         {% else %}
           <td></td>
 	{% endif %}
@@ -79,7 +56,7 @@
         {% else %}
           <td></td>
 	{% endif %}
-		<td><button class="btn btn-primary" onclick="submitUrlForCrawl('{{ url_dic["url"] }}')">Crawl from here</button></td>
+		<td><button class="btn btn-primary btn-sm" onclick="submitUrlForCrawl('{{ url_dic["url"] }}')">Crawl from here</button></td>
 
       </tr>
   {% endfor %}

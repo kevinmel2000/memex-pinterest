@@ -11,6 +11,7 @@ import hashlib
 from handlers import set_score_handler
 from handlers import list_workspace, add_workspace, set_workspace_selected, delete_workspace
 from handlers import list_tags, save_tags, search_tags
+from handlers import save_display
 from auth import requires_auth
 server_path = os.path.dirname(os.path.realpath(__file__))
 app = Flask(__name__)
@@ -213,6 +214,14 @@ def api_save_tags(host):
         out_doc = JSONEncoder().encode(in_doc)
         return Response(json.dumps(out_doc), mimetype="application/json")
 
+############# Display Hosts #############
+@app.route("/api/host/display/<host>", methods=['PUT'])
+@requires_auth
+def api_save_display(host):
+    data = request.json
+    displayable = data['display']
+    save_display(host, displayable)
+    return Response("{}", mimetype="application/json")
 
 ############# Workspaces #############
 

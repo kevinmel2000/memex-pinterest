@@ -123,6 +123,24 @@
         </div><!-- /.modal-content -->
       </div><!-- /.modal-dialog -->
     </div><!-- /.modal -->
+
+	<!-- Confirm Hide Modal -->
+	<div class="modal fade" id="confirm-delete" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-header">
+					Do you want to exclude this Host from the results?
+				</div>
+				<div class="modal-body">
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+					<a href="#" class="btn btn-danger danger">Exclude</a>
+				</div>
+			</div>
+		</div>
+	</div>
+
 </body>
 
 <script>
@@ -353,6 +371,7 @@
 			$('#saveButton').click(saveTags);
 
 			$('#myModal').on('show.bs.modal', function (event) {
+				$('#addText').val("");
 				var button = $(event.relatedTarget); // Button that triggered the modal
 				var host = button.data('host'); // Extract info from data-* attributes
 				var tagSelector = "tag_" + host.replace(/\./g,'_');
@@ -384,7 +403,7 @@
 				var search_url = "/?filter-field=host&filter-regex=" + search;
 				window.location.replace(search_url);
 				return false;
-			}
+			};
 
 			$("#search").autocomplete({
 				minLength: 3,
@@ -410,6 +429,26 @@
 					return response(resultsArray);
 				}
 			});
+
+			//  Display Hosts
+			$( document ).on( "click", ".btn-remove", function() {
+				console.log(this);
+				var displayHostUrl = '/api/host/display/';
+				var host = this.dataset.host;
+				$.ajax({
+					type: "PUT",
+					url: displayHostUrl + host,
+					contentType: 'application/json',
+					dataType: 'json',
+					data: '{"display": 0}',
+					async: false,
+					success: function(data){
+						document.getElementById(host).remove();
+					}
+				})
+			});
+
+
 
 		});
 

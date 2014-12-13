@@ -55,7 +55,7 @@ def urls_handler(host = None, which_collection  = "crawl-data"):
         url_dic.pop("_id")
         date = url_dic["crawled_at"]
         try:
-            url_dic["crawled_at"] = date.isoformat()
+            url_dic["crawled_at"] = date.strftime("%Y-%m-%d %H:%M:%S")
         except:
             url_dic["crawled_at"] = str(date)
 
@@ -116,6 +116,13 @@ def save_tags(host, tags):
 def search_tags(term):
     mmu = MemexMongoUtils()
     return mmu.search_tags(term)
+
+############# Display Hosts #############
+
+def save_display(host, displayable):
+    mmu = MemexMongoUtils()
+    return mmu.save_display(host, displayable)
+
 
 ############# Workspaces #############
 def list_workspace():
