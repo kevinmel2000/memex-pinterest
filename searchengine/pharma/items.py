@@ -27,6 +27,7 @@ class WebpageItem(scrapy.Item):
     is_seed = scrapy.Field()  # this is True for pages from seed websites
     png = scrapy.Field()  # temporary field for storing raw png screenshot
     screenshot_url = scrapy.Field()
+    screenshot_path = scrapy.Field()
     html_url = scrapy.Field()
 
 
