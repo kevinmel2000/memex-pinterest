@@ -105,8 +105,8 @@ def prepare_doc(doc):
     html = doc.get('html_rendered', doc['html'])
     return prepare_htmltext(html.encode('utf8'))
 
+def train_on_user_input():
 
-if __name__ == "__main__":
     #docs_pos = list(load_documents('../data/train/pos/*.html'))
     #docs_neg = list(load_documents('../data/train/neg/*.html'))
     
@@ -116,16 +116,15 @@ if __name__ == "__main__":
     docs_mongo_pos = [prepare_doc(doc) for doc in get_mdocs(True)]
     docs_mongo_neg = [prepare_doc(doc) for doc in get_mdocs(False)]
     
-    print docs_mongo_pos
-    print docs_mongo_neg
+    print "Positive examples: " + str(len(docs_mongo_pos))
+    print "Negative examples: " + str(len(docs_mongo_neg))
     
     X_mongo, y_mongo = posneg2xy(docs_mongo_pos, docs_mongo_neg)
     
     #X = X_Amanda + X_mongo
     #y = y_Amanda + y_mongo
     X = X_mongo
-    y = y_mongo
-    
+    y = y_mongo    
     
     X_train, X_test, y_train, y_test = train_test_split(X, y)
     
@@ -147,7 +146,8 @@ if __name__ == "__main__":
         
     pipe.fit(X, y)
     
-    joblib.dump(pipe, 'models/model.joblib', compress=1)
+    MODEL = os.path.join(os.path.dirname(__file__), 'models', 'model.joblib')    
+    joblib.dump(pipe, MODEL, compress=1)
     #get_ipython().system(u"ls -lh '../../ranker/models/'")
     
 #    ranker = Ranker.load()

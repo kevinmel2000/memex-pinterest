@@ -4,6 +4,7 @@ from scrapyutils.scrapydutil import ScrapydJob
 from settings import SCREENSHOT_DIR
 from mongoutils.known_hosts import KnownHostsCompare
 from mongoutils.validate import validate_url
+from ranker.rescore_mongo import train_and_score_mongo
     
 def get_screenshot_relative_path(real_path):
     try:
@@ -172,6 +173,19 @@ def list_tags(host):
 def save_tags(host, tags):
     mmu = MemexMongoUtils()
     mmu.save_tags(host, tags)
+    
+    
+##ranking/scoring
+def get_score_handler():
+
+    mmu = MemexMongoUtils()
+    yes_interest_docs = mmu.list_all_urls_with_interest(True, return_html = True)
+    no_interest_docs = mmu.list_all_urls_with_interest(False, return_html = True)
+    return yes_interest_docs, no_interest_docs
+
+def rescore_db_handler():
+
+    train_and_score_mongo()
 
 if __name__ == "__main__":
     print "HERE"

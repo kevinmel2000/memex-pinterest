@@ -13,6 +13,7 @@ from handlers import list_workspace, add_workspace, set_workspace_selected, dele
 from handlers import list_keyword, save_keyword, schedule_spider_searchengine_handler, list_search_term, save_search_term
 from handlers import add_known_urls_handler
 from handlers import list_tags, save_tags
+from handlers import get_score_handler
 from auth import requires_auth
 from mongoutils.errors import DeletingSelectedWorkspaceError
 
@@ -29,7 +30,6 @@ class JSONEncoder(json.JSONEncoder):
         if isinstance(o, ObjectId):
             return str(o)
         return json.JSONEncoder.default(self, o)
-
 
 # ui
 @app.route("/discovery")
@@ -352,6 +352,28 @@ def api_save_tags(host):
     else:
         out_doc = JSONEncoder().encode(in_doc)
         return Response(json.dumps(out_doc), mimetype="application/json")
+
+################ SCORING #########################
+@app.route("/score", methods = ["GET"])
+@requires_auth
+def get_scoring_page():
+
+    if request.method == "GET":
+        yes_interest_docs, no_interest_docs = get_score_handler()
+
+        return render_template('score.html', num_yes_interest = len(yes_interest_docs), num_no_interest = len(no_interest_docs))
+
+    if request.method == "POST":
+        print "Scoring!!!!"
+        return Response("{}", mimetype="application/json")
+
+@app.route("/api/score", methods = ["POST"])
+@requires_auth
+def start_ranker():
+
+    if request.method == "POST":
+        print "Scoring!!!!"
+        return Response("{}", mimetype="application/json")
 
 if __name__ == "__main__":
 
