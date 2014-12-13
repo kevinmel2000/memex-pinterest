@@ -5,7 +5,7 @@ from settings import SCREENSHOT_DIR
 from mongoutils.known_hosts import KnownHostsCompare
 from mongoutils.validate import validate_url
 from ranker.rescore_mongo import train_and_score_mongo
-    
+
 def get_screenshot_relative_path(real_path):
     try:
         return real_path.split("static/")[1]
@@ -56,7 +56,7 @@ def urls_handler(host = None, which_collection  = "crawl-data"):
         url_dic.pop("_id")
         date = url_dic["crawled_at"]
         try:
-            url_dic["crawled_at"] = date.isoformat()
+            url_dic["crawled_at"] = date.strftime("%Y-%m-%d %H:%M:%S")
         except:
             url_dic["crawled_at"] = str(date)
 
@@ -119,6 +119,32 @@ def set_score_handler(url, score):
 
 
 ##workspace    
+############# TAGS #############
+
+def list_tags(host):
+    mmu = MemexMongoUtils()
+    return mmu.list_tags(host)
+
+
+def save_tags(host, tags):
+    mmu = MemexMongoUtils()
+    mmu.save_tags(host, tags)
+
+def search_tags(term):
+    mmu = MemexMongoUtils()
+    return mmu.search_tags(term)
+
+############# Display Hosts #############
+
+def save_display(host, displayable):
+    mmu = MemexMongoUtils()
+    if not bool(displayable):
+        for url_doc in mmu.list_urls(host = host, limit=100000000):
+            mmu.set_interest(url_doc["url"], False)
+        
+    return mmu.save_display(host, displayable)
+
+############# Workspaces #############
 def list_workspace():
     mmu = MemexMongoUtils()
     return mmu.list_workspace()
@@ -163,17 +189,6 @@ def schedule_spider_searchengine_handler(search_terms, spider_host = "localhost"
     mmu.add_job(search_terms, job_id, project = 'searchengine-project', spider = 'google.com')
 
     return True
-
-
-##tags
-def list_tags(host):
-    mmu = MemexMongoUtils()
-    return mmu.list_tags(host)
-
-def save_tags(host, tags):
-    mmu = MemexMongoUtils()
-    mmu.save_tags(host, tags)
-    
     
 ##ranking/scoring
 def get_score_handler():

@@ -26,3 +26,8 @@ dbs/
 target/
 output/
 .settings/
+crawler/build/
+dbs/
+eggs/
+searchengine/
+twistd.pid

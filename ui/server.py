@@ -12,8 +12,9 @@ from handlers import set_score_handler
 from handlers import list_workspace, add_workspace, set_workspace_selected, delete_workspace
 from handlers import list_keyword, save_keyword, schedule_spider_searchengine_handler, list_search_term, save_search_term
 from handlers import add_known_urls_handler
-from handlers import list_tags, save_tags
 from handlers import get_score_handler
+from handlers import list_tags, save_tags, search_tags
+from handlers import save_display
 from auth import requires_auth
 from mongoutils.errors import DeletingSelectedWorkspaceError
 
@@ -206,6 +207,40 @@ def set_score(score):
 
     return Response("OK")
 
+############# TAGS #############
+
+@app.route("/api/tags/<term>" , methods=['GET'])
+@requires_auth
+def api_search_term(term):
+    in_doc = search_tags(term)
+    if in_doc == None:
+        return Response("{}", mimetype="application/json")
+    else:
+        out_doc = JSONEncoder().encode(in_doc)
+        return Response(json.dumps(out_doc), mimetype="application/json")
+
+#upsert_tags_to_hosts
+@app.route("/api/tags/<host>", methods=['PUT'])
+@requires_auth
+def api_save_tags(host):
+    tags = request.json
+    save_tags(host, tags)
+
+    in_doc = list_tags(host)
+    if in_doc == None:
+        return Response("{}", mimetype="application/json")
+    else:
+        out_doc = JSONEncoder().encode(in_doc)
+        return Response(json.dumps(out_doc), mimetype="application/json")
+
+############# Display Hosts #############
+@app.route("/api/host/display/<host>", methods=['PUT'])
+@requires_auth
+def api_save_display(host):
+    data = request.json
+    displayable = data['display']
+    save_display(host, displayable)
+    return Response("{}", mimetype="application/json")
 
 ############# Workspaces #############
 @app.route("/")
@@ -334,24 +369,6 @@ def fetch_search_terms_api():
     search_terms = ",".join(search_terms)
     schedule_spider_searchengine_handler(search_terms, use_splash = False)
     return Response("OK")
-
-
-
-############# TAGS #############
-
-#upsert_tags_to_hosts
-@app.route("/api/tags/<host>", methods=['PUT'])
-@requires_auth
-def api_save_tags(host):
-    tags = request.json
-    save_tags(host, tags)
-
-    in_doc = list_tags(host)
-    if in_doc == None:
-        return Response("{}", mimetype="application/json")
-    else:
-        out_doc = JSONEncoder().encode(in_doc)
-        return Response(json.dumps(out_doc), mimetype="application/json")
 
 ################ SCORING #########################
 @app.route("/score", methods = ["GET"])

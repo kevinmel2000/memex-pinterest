@@ -22,8 +22,8 @@
 <!--  <img src="" alt="No Image Available">-->
 {% endif %}
 
-<h1><a href="{{ url_path }}/{{ host_dic["host"] }}">Host: {{ host_dic["host"] }}<br /></a></h1>
-<p>Number of URLs found: {{ host_dic["num_urls"] }}</p>
+<h1>Host: <a href="http://{{ host_dic["host"] }}" target="_blank">{{ host_dic["host"] }}</a></h1>
+<p>URLs found: <a href="{{ url_path }}/{{ host_dic["host"] }}">{{ host_dic["num_urls"] }}</a></p>
 
 {% if host_dic["host_score"] != 0 %}
   <p>Score: {{ host_dic["host_score"] }}</p>
@@ -35,6 +35,11 @@
     <button id='btn_tag_{{host_dic["host"].replace(".","_")}}' custom_tag='{{host_dic["tags"]}}' type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-host='{{host_dic["host"]}}' data-tags='{{host_dic["tags"]}}' data-target='#myModal'>
         Edit Tags
     </button>
+
+    <button type="button" class="btn-remove btn btn-primary btn-sm" data-host='{{host_dic["host"]}}' >
+        Remove
+    </button>
+
 
 {% if "is_known_host" in host_dic %}
   {% if host_dic["is_known_host"] %}
