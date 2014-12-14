@@ -432,7 +432,7 @@
 			});
 
 			//  Display Hosts
-			$( document ).on( "click", ".btn-remove", function() {
+			$( document ).on( "click", ".check-no-interest", function() {
 				console.log(this);
 				var displayHostUrl = '/api/host/display/';
 				var host = this.dataset.host;
@@ -444,10 +444,34 @@
 					data: '{"display": 0}',
 					async: false,
 					success: function(data){
+						
 						document.getElementById(host).remove();
 					}
 				})
 			});
+
+			//  Display Hosts
+			$( document ).on( "click", ".check-yes-interest", function() {
+				console.log(this);
+				var displayHostUrl = '/api/host/display/';
+				var host = this.dataset.host;
+				var hosthash = this.dataset.hosthash
+				$.ajax({
+					type: "PUT",
+					url: displayHostUrl + host,
+					contentType: 'application/json',
+					dataType: 'json',
+					data: '{"display": 1}',
+					async: false,
+					success: function(data){
+					    console.log(hosthash);
+						$("#" + hosthash).hide();
+						console.log("done disappearing");
+					    
+					}
+				})
+			});
+
 
 
 

@@ -30,13 +30,14 @@ def hosts_handler(page = 1, which_collection = "crawl-data", filter_field = None
 
     for host_dic in host_dics:
 
+        print host_dic
         #host scoring is added here as is known hostedness
         host_dic.pop("_id")
         is_known_host = khc.is_known_host(host_dic["host"])
         host_dic["is_known_host"] = is_known_host
         hsu = mmu.get_highest_scoring_url_with_screenshot(host_dic["host"])
-        host_score = mmu.get_host_score(host_dic["host"])
-        host_dic["host_score"] = host_score
+        #host_score = mmu.get_host_score(host_dic["host"])
+        #host_dic["host_score"] = host_score
 
         if hsu:
             screenshot_path = get_screenshot_relative_path(hsu['screenshot_path'])
@@ -141,7 +142,12 @@ def save_display(host, displayable):
     if not bool(displayable):
         for url_doc in mmu.list_urls(host = host, limit=100000000):
             mmu.set_interest(url_doc["url"], False)
-        
+
+    else:
+
+        for url_doc in mmu.list_urls(host = host, limit=100000000):
+            mmu.set_interest(url_doc["url"], True)
+
     return mmu.save_display(host, displayable)
 
 ############# Workspaces #############

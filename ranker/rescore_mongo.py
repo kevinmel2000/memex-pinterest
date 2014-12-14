@@ -6,6 +6,14 @@ from ranker import Ranker
 from ui.mongoutils.memex_mongo_utils import MemexMongoUtils
 from train import train_on_user_input
 
+def _score_hosts():
+
+    mmu = MemexMongoUtils()
+    for host_doc in mmu.list_all_hosts():
+        print host_doc
+        score = mmu.get_host_score(host_doc["host"])
+        mmu.set_host_score(host_doc["host"], score)
+
 def train_and_score_mongo():
     """ Rescore all items from mongo """
     
@@ -25,6 +33,9 @@ def train_and_score_mongo():
             score = 0
 
         mmu.set_score(doc["url"], score)
-        
+
+    _score_hosts()
+
+
 if __name__ == '__main__':
-    train_and_score_mongo()
+   train_and_score_mongo()

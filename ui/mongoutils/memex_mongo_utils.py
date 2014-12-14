@@ -74,6 +74,8 @@ class MemexMongoUtils(object):
             self.urlinfo_collection.ensure_index("url", unique=True, drop_dups=True)
             self.hostinfo_collection.ensure_index("host", unique=True, drop_dups=True)
             self.seed_collection.ensure_index("url", unique=True, drop_dups=True)
+            self.hostinfo_collection.ensure_index("host_score")
+            self.urlinfo_collection.ensure_index("score")
 
     def init_workspace(self, address="localhost", port=27017):
         db = self.client["MemexHack"]
@@ -131,7 +133,7 @@ class MemexMongoUtils(object):
         if list_deleted:
             docs = self.urlinfo_collection.find({}, {'html':int(return_html), 'html_rendered': int(return_html)})  # .sort(sort_by, 1)
         else:
-            docs = self.urlinfo_collection.find({{ "display": { "$ne": 0 } }}, {'html':int(return_html), 'html_rendered': int(return_html)})  # .sort(sort_by, 1)
+            docs = self.urlinfo_collection.find({ "display": { "$ne": 0 } }, {'html':int(return_html), 'html_rendered': int(return_html)})  # .sort(sort_by, 1)
 
         return sorted(list(docs), key=lambda rec: rec[sort_by])
     
@@ -183,8 +185,7 @@ class MemexMongoUtils(object):
             host = host.split(":")[0]
             
         url_doc = kwargs
-        if not "host" in url_doc:
-            url_doc["host"] = host
+        url_doc["host"] = host
         
         #throws exception if URL already exists, user of method
         #should take this into account
@@ -250,6 +251,10 @@ class MemexMongoUtils(object):
     def set_score(self, url, score_set):
 
         self.urlinfo_collection.update({"url" : url}, {'$set' : {"score" : score_set}})
+
+    def set_host_score(self, host, score_set):
+
+        self.hostinfo_collection.update({"host" : host}, {'$set' : {"host_score" : score_set}})
         
     def set_screenshot_path(self, url, screenshot_path):
 
@@ -380,7 +385,7 @@ class MemexMongoUtils(object):
 ############# HOST HELPERS ###########
 
     def get_hosts(self):
-        docs = self.hostinfo_collection.find({ "display": { "$ne": 0 } })
+        docs = self.hostinfo_collection.find({ "display": { "$ne": 0 } }).sort("host_score", -1)
         return docs
 
     def get_hosts_filtered(self, filter_field, filter_regex):
@@ -418,16 +423,25 @@ class MemexMongoUtils(object):
 if __name__ == "__main__":
 
     mmu = MemexMongoUtils()
+    mmu.list_hosts(page, num_docs, filter_regex, filter_field)
+    
     #MemexMongoUtils(which_collection="crawl-data", init_db=True)
     #MemexMongoUtils(which_collection="known-data", init_db=True)
     #MemexMongoUtils(which_collection="cc-crawl-data", init_db=True)
     #mmu.init_workspace()
-    c=0
-    for url in mmu.list_all_urls(return_html  = False, list_deleted = True):
-        try:
-            print url["interest"]
-            c += 1
-        except:
-            pass
+#    for host in mmu.get_hosts():
+#        print host
+#    for url in mmu.list_all_urls(return_html = False, list_deleted = True):
+#        if ("barnesandnoble" and "locator") in url["host"]:
+#            print url
 
-    print c
+#    for url_dic in mmu.list_all_urls():
+#        print url_dic["host"]
+#        host = urlparse(url_dic["url"]).netloc
+#        if ":" in host:
+#            host = host.split(":")[0]
+#        mmu.urlinfo_collection.update({"url" : url_dic["url"]}, {'$set' : {"host" : host}})
+
+        
+
+

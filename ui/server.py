@@ -12,7 +12,7 @@ from handlers import set_score_handler
 from handlers import list_workspace, add_workspace, set_workspace_selected, delete_workspace
 from handlers import list_keyword, save_keyword, schedule_spider_searchengine_handler, list_search_term, save_search_term
 from handlers import add_known_urls_handler
-from handlers import get_score_handler
+from handlers import get_score_handler, train_and_score_mongo
 from handlers import list_tags, save_tags, search_tags
 from handlers import save_display
 from auth import requires_auth
@@ -80,6 +80,8 @@ def load_hosts(page=1):
     filter_regex = request.args.get('filter-regex')
 
     hosts = hosts_handler(page=int(page) + 1, filter_field = filter_field, filter_regex = filter_regex)
+    for host_dic in hosts:
+        host_dic["host_hash"] = str(hashlib.md5(host_dic["host"]).hexdigest())
 
     if request_wants_json():
         return Response(json.dumps(hosts), mimetype="application/json")
@@ -233,7 +235,7 @@ def api_save_tags(host):
         out_doc = JSONEncoder().encode(in_doc)
         return Response(json.dumps(out_doc), mimetype="application/json")
 
-############# Display Hosts #############
+############# /host Hosts #############
 @app.route("/api/host/display/<host>", methods=['PUT'])
 @requires_auth
 def api_save_display(host):
@@ -380,16 +382,12 @@ def get_scoring_page():
 
         return render_template('score.html', num_yes_interest = len(yes_interest_docs), num_no_interest = len(no_interest_docs))
 
-    if request.method == "POST":
-        print "Scoring!!!!"
-        return Response("{}", mimetype="application/json")
-
-@app.route("/api/score", methods = ["POST"])
+@app.route("/api/rescore", methods = ["POST"])
 @requires_auth
 def start_ranker():
 
     if request.method == "POST":
-        print "Scoring!!!!"
+        train_and_score_mongo()
         return Response("{}", mimetype="application/json")
 
 if __name__ == "__main__":

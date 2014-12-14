@@ -20,3 +20,8 @@ cursor: pointer;
 
   text-decoration: underline;
 }
+
+.list-group-item {
+  width:1000px;
+
+}
