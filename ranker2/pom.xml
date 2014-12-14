@@ -9,7 +9,9 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.source>1.7</maven.compiler.source>
         <maven.compiler.target>1.7</maven.compiler.target>
+        <jettyVersion>9.2.5.v20141112</jettyVersion>
     </properties>
+
     <dependencies>
         <dependency>
             <groupId>commons-cli</groupId>
@@ -57,9 +59,19 @@
             <version>4.10.2</version>
         </dependency>
         <dependency>
+            <groupId>org.apache.lucene</groupId>
+            <artifactId>lucene-memory</artifactId>
+            <version>4.10.2</version>
+        </dependency>
+        <dependency>
             <groupId>com.google.guava</groupId>
             <artifactId>guava</artifactId>
             <version>18.0</version>
+        </dependency>
+        <dependency>
+            <groupId>org.eclipse.jetty</groupId>
+            <artifactId>jetty-server</artifactId>
+            <version>${jettyVersion}</version>
         </dependency>
     </dependencies>
     <build>
@@ -119,6 +131,23 @@
                         </configuration>
                     </execution>
                 </executions>
+            </plugin>
+            <plugin>
+                <!-- This plugin is needed for the servlet example -->
+                <groupId>org.mortbay.jetty</groupId>
+                <artifactId>jetty-maven-plugin</artifactId>
+                <version>${jettyVersion}</version>
+            </plugin>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>exec-maven-plugin</artifactId>
+                <version>1.1</version>
+                <executions>
+                    <execution><goals><goal>java</goal></goals></execution>
+                </executions>
+                <configuration>
+                    <mainClass>com.hyperiongray.ranker2.jetty.JettyRun</mainClass>
+                </configuration>
             </plugin>
         </plugins>
     </build>
