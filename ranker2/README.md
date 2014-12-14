@@ -24,6 +24,16 @@ curl --data "html=my%20suspicious%20text&keyPhrase=pay%20per%20click" http://loc
 
 http://localhost:8080/?html=my%20suspicious%20text%20click&keyPhrase=pay%20per%20click
 
+<i>where<i>
+
+html is the input we are ranking, and
+
+keyPhrase is the search key phrase
+
+#### response in the above examples is
+
+0.01
+
 #### To run stand-alone ranking application
 
 * see sample script in scripts/ directory
