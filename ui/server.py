@@ -10,7 +10,17 @@ import json
 import hashlib
 from handlers import set_score_handler
 from handlers import list_workspace, add_workspace, set_workspace_selected, delete_workspace
+from handlers import list_keyword, save_keyword, schedule_spider_searchengine_handler, list_search_term, save_search_term
+from handlers import add_known_urls_handler
+from handlers import get_score_handler, train_and_score_mongo
+from handlers import list_tags, save_tags, search_tags
+from handlers import save_display
 from auth import requires_auth
+from mongoutils.errors import DeletingSelectedWorkspaceError
+
+from searchengine.pharma.spiders.basesearchengine import BaseSearchEngineSpider
+from searchengine.pharma.spiders.google_com import GoogleComSpider
+
 server_path = os.path.dirname(os.path.realpath(__file__))
 app = Flask(__name__)
 app.config.from_object('settings')
@@ -21,7 +31,6 @@ class JSONEncoder(json.JSONEncoder):
         if isinstance(o, ObjectId):
             return str(o)
         return json.JSONEncoder.default(self, o)
-
 
 # ui
 @app.route("/discovery")
@@ -34,7 +43,7 @@ def discovery():
     return render_template('discovery.html', seeds=seeds)
 
 @app.route("/data")
-@app.route("/")
+#@app.route("/")
 @requires_auth
 def data(page=1):
 
@@ -43,7 +52,7 @@ def data(page=1):
 
     hosts = hosts_handler(page=int(page))
 
-    return render_template('data.html', hosts=hosts, which_collection="crawl-data", 
+    return render_template('data.html', hosts=hosts, which_collection="crawl-data",
                            filter_field = filter_field, filter_regex = filter_regex, use_cc_data=False)
 
 @app.route("/cc-data")
@@ -71,6 +80,8 @@ def load_hosts(page=1):
     filter_regex = request.args.get('filter-regex')
 
     hosts = hosts_handler(page=int(page) + 1, filter_field = filter_field, filter_regex = filter_regex)
+    for host_dic in hosts:
+        host_dic["host_hash"] = str(hashlib.md5(host_dic["host"]).hexdigest())
 
     if request_wants_json():
         return Response(json.dumps(hosts), mimetype="application/json")
@@ -113,6 +124,7 @@ def urls(host=None):
         screenshot_path = url_dic.get("screenshot_path")
         if screenshot_path:
             url_dic["screenshot_path"] = get_screenshot_relative_path(screenshot_path)
+        url_dic["url_hash"] = str(hashlib.md5(url_dic["url"]).hexdigest())
 
     return render_template("urls.html", urls=urls)
 
@@ -140,6 +152,18 @@ def known_urls(host=None):
     # change this
     return render_template("urls.html", urls=urls, use_known_data=True)
 
+@app.route("/add-known", methods = ['GET', 'POST'])
+@requires_auth
+def add_known_urls():
+
+    if request.method == 'POST':
+        urls_raw = json.loads(request.data)[0]
+        add_known_urls_handler(urls_raw)
+        return Response(json.dumps({}), mimetype="application/json")
+
+    else:
+        return render_template("known.html")
+
 @app.route("/schedule-spider/")
 @requires_auth
 def schedule_spider():
@@ -162,6 +186,7 @@ def get_spider_update():
 def mark_interest(interest):
 
     url = request.args.get('url')
+    print url
 
     if interest.strip().lower() == "false":
         interest = False
@@ -184,9 +209,43 @@ def set_score(score):
 
     return Response("OK")
 
+############# TAGS #############
+
+@app.route("/api/tags/<term>" , methods=['GET'])
+@requires_auth
+def api_search_term(term):
+    in_doc = search_tags(term)
+    if in_doc == None:
+        return Response("{}", mimetype="application/json")
+    else:
+        out_doc = JSONEncoder().encode(in_doc)
+        return Response(json.dumps(out_doc), mimetype="application/json")
+
+#upsert_tags_to_hosts
+@app.route("/api/tags/<host>", methods=['PUT'])
+@requires_auth
+def api_save_tags(host):
+    tags = request.json
+    save_tags(host, tags)
+
+    in_doc = list_tags(host)
+    if in_doc == None:
+        return Response("{}", mimetype="application/json")
+    else:
+        out_doc = JSONEncoder().encode(in_doc)
+        return Response(json.dumps(out_doc), mimetype="application/json")
+
+############# /host Hosts #############
+@app.route("/api/host/display/<host>", methods=['PUT'])
+@requires_auth
+def api_save_display(host):
+    data = request.json
+    displayable = data['display']
+    save_display(host, displayable)
+    return Response("{}", mimetype="application/json")
 
 ############# Workspaces #############
-
+@app.route("/")
 @app.route("/workspace/" , methods=['GET'])
 @requires_auth
 def get_workspace_view():
@@ -222,12 +281,114 @@ def selected_workspace_api(id):
 @app.route("/api/workspace/<id>/", methods=['DELETE'])
 @requires_auth
 def delete_workspace_api(id):
-    delete_workspace(id)
+    try:
+        delete_workspace(id)
+    except DeletingSelectedWorkspaceError:
+        ui_response = '{"error":"Is not allowed to delete the workspace while it is selected."}'
+        return Response(json.dumps(ui_response), mimetype="application/json")
 
     in_doc = list_workspace()
     out_doc = JSONEncoder().encode(in_doc)
     return Response(json.dumps(out_doc), mimetype="application/json")
 
+############# Keywords #############
+
+@app.route("/keyword/" , methods=['GET'])
+@requires_auth
+def get_keyword_view():
+    return render_template("keyword.html")
+
+@app.route("/api/keyword/", methods=['GET'])
+@requires_auth
+def get_keyword_api():
+    in_doc = list_keyword()
+    out_doc = JSONEncoder().encode(in_doc)
+    return Response(json.dumps(out_doc), mimetype="application/json")
+
+
+@app.route("/api/keyword/", methods=['PUT'])
+@requires_auth
+def save_keyword_api():
+   # print(request)
+   # keywords = request.data
+   # print("keywords:" + keywords)
+    keywords = request.json
+   # print(_json)
+
+    save_keyword(keywords)
+
+    in_doc = list_keyword()
+    if in_doc == None:
+        out_doc = JSONEncoder().encode(in_doc)
+        return Response("{}", mimetype="application/json")
+    else:
+        out_doc = JSONEncoder().encode(in_doc)
+
+        return Response(json.dumps(out_doc), mimetype="application/json")
+
+@app.route("/api/fetch-keyword/", methods=['POST'])
+@requires_auth
+def fetch_keyword_api():
+    #url = request.args.get('keywords')
+    keywords = request.json
+    #schedule_spider_handler(url)
+    schedule_spider_searchengine_handler(keywords)
+    return Response("OK")
+
+########## Search Terms ################
+@app.route("/searchterm/" , methods=['GET'])
+@requires_auth
+def get_search_term_view():
+    return render_template("searchterm.html")
+
+@app.route("/api/searchterm/", methods=['GET'])
+@requires_auth
+def get_search_term_api():
+    in_doc = list_search_term()
+    out_doc = JSONEncoder().encode(in_doc)
+    return Response(json.dumps(out_doc), mimetype="application/json")
+
+@app.route("/api/searchterm/", methods=['PUT'])
+@requires_auth
+def save_search_term_api():
+    search_terms = request.json
+    save_search_term(search_terms)
+
+    in_doc = list_search_term()
+    if in_doc == None:
+        out_doc = JSONEncoder().encode(in_doc)
+        return Response("{}", mimetype="application/json")
+    else:
+        out_doc = JSONEncoder().encode(in_doc)
+
+        return Response(json.dumps(out_doc), mimetype="application/json")
+
+@app.route("/api/fetch-searchterm/", methods=['POST'])
+@requires_auth
+def fetch_search_terms_api():
+    search_terms = request.json
+    #schedule_spider_handler(url)
+    search_terms = ",".join(search_terms)
+    schedule_spider_searchengine_handler(search_terms)
+    return Response("OK")
+
+################ SCORING #########################
+@app.route("/score", methods = ["GET"])
+@requires_auth
+def get_scoring_page():
+
+    if request.method == "GET":
+        yes_interest_docs, no_interest_docs = get_score_handler()
+
+        return render_template('score.html', num_yes_interest = len(yes_interest_docs), num_no_interest = len(no_interest_docs))
+
+@app.route("/api/rescore", methods = ["POST"])
+@requires_auth
+def start_ranker():
+
+    if request.method == "POST":
+        train_and_score_mongo()
+        return Response("{}", mimetype="application/json")
 
 if __name__ == "__main__":
 

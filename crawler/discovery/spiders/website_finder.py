@@ -23,6 +23,7 @@ from discovery.urlutils import (
     is_external_url,
     get_domain,
 )
+from discovery.screenshots import save_screenshot
 
 
 class WebpageItem(scrapy.Item):
@@ -111,6 +112,9 @@ class WebsiteFinderSpider(scrapy.Spider):
         self.req_count = defaultdict(int)
         super(WebsiteFinderSpider, self).__init__(name=None, **kwargs)
         self.screenshot_dir = screenshot_dir
+        print "****************SCREENSHOT DIR**************************"
+        print self.screenshot_dir
+        print "****************SCREENSHOT DIR**************************"
 
     def parse(self, response):
         if 'referrer_url' in response.meta:
@@ -161,7 +165,6 @@ class WebsiteFinderSpider(scrapy.Spider):
             splash_resp = yield self._splash_request(response.url)
             response.meta['depth'] += 1
 
-                        
             self._process_splash_response(response, splash_resp, ld)
 
         yield ld.load_item()
@@ -202,21 +205,15 @@ class WebsiteFinderSpider(scrapy.Spider):
     def _process_splash_response(self, response, splash_response, ld):
         data = json.loads(splash_response.body, encoding='utf8')
 
-        screenshot_path = self._save_screenshot(get_domain(response.url), data)
+        screenshot_path = save_screenshot(
+            screenshot_dir=self.screenshot_dir,
+            prefix=get_domain(response.url),
+            png=base64.b64decode(data["png"]),
+        )
         ld.add_value('screenshot_path', screenshot_path)
 
         if self.save_html:
             ld.add_value('html_rendered', data['html'])
-
-    def _save_screenshot(self, prefix, data):
-        png = base64.b64decode(data['png'])
-        dirname = os.path.join(self.screenshot_dir, prefix)
-        makedir(dirname)
-
-        fn = os.path.join(dirname, md5(png).hexdigest() + '.png')
-        with open(fn, 'wb') as fp:
-            fp.write(png)
-        return fn
 
     def _get_links(self, response):
         links = LinkExtractor().extract_links(response)
@@ -286,10 +283,3 @@ class WebsiteFinderSpider(scrapy.Spider):
             ld.add_value('referrer_depth', response.meta['referrer_depth'])
 
         return ld
-
-
-def makedir(path):
-    try:
-        os.makedirs(path)
-    except OSError:
-        pass

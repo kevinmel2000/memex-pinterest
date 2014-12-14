@@ -60,7 +60,7 @@
 		<div class="container marketing">
 			<div class="row" >
 				<div class="col-lg-8">
-					<h1 style="margin-top:50px;margin-left: 20px"> Switch Workspace</h1>
+					<h1 style="margin-top:50px;margin-left: 20px"> Select or Create a Workspace</h1>
 					<div id="wsList" class="list-group">
 						<!-- 
 						<a href="#" class="list-group-item">Human Trafficking <span class="badge">1540</span></a>
@@ -91,10 +91,11 @@
 	<script>
 
 		$(document).ready(function() {
-			
+
 			var url = '/api/workspace/';
 			var store;
-			
+			var workspace_span = $("#workspace-name");
+
 			var renderWsFn = function(data){
 				store = data;
 				var obj = $.parseJSON(data);
@@ -102,14 +103,34 @@
 				$('#wsList').empty();
 		  		var wsList = $('#wsList');
 				$.each(obj, function(index,elem){
+				    console.log(elem._id);
 					//var clickme = ;
 					var span ='<span name="'+elem.name+'" onclick=deleteme("'+elem._id +'") class="badge" style="z-index:100" ><span class="glyphicon glyphicon-trash"></span></span>';
 					var clazz = (elem.selected?'list-group-item-info':'');
 					var li = '<a href="#" id="'+elem._id+'" class="list-group-item '+ clazz +'">';
-						li = li + '<span  class="selectionable">'+elem.name +'</span>'+ span +'</a>';
+						li = li + '<span class="selectionable">'+elem.name +'</span>'+ span;
+					    li = li + '<span class="spanlink subselect-' + elem._id + '" style="display:none;" class="spanlink" onclick="window.location.href = \'/keyword\'">Define Keywords</span>'
+					    li = li + '<span class="spanlink subselect-' + elem._id + '" style="display:none;" "class="spanlink" onclick="window.location.href = \'/add-known\'">Upload Known Sites</span>'
+					    li = li + '<span class="spanlink subselect-' + elem._id + '" style="display:none;" class="spanlink" onclick="window.location.href = \'/discovery\'">Manage Crawls</span>'
+					    li = li + '<span class="spanlink subselect-' + elem._id + '" style="display:none;" class="spanlink" onclick="window.location.href = \'/score\'">Score Results</span>'					    
+						li = li + '</a>';
 					wsList.append(li);
+					
+				//populate workspace name in layout
+		        if (elem.selected == true) {
+			        var selected_workspace = elem.name;
+			        workspace_span.text(selected_workspace);
+			        show_subselect_options(elem._id);
+		        }
+					
 				});
-				
+
+				function show_subselect_options(id)
+				{
+				    console.log("here with id: " + id);
+   				    $('.subselect-'+ id).css({'display': ''});
+   				}
+
 				$('.list-group-item').click(function(){
 					var id = this.id;
 					var posting = $.ajax({
@@ -120,10 +141,9 @@
 											$('#'+id).focus();
 										}
 									});
-	
 				});
 			};
-			
+
 			deleteme = function(id){
 				$('.list-group-item').unbind();
 				var confirmed = confirm('Are you sure you want to remove the workspace?');
@@ -132,7 +152,17 @@
 										type: "DELETE",
 										url: url + id + '/',
 										success: function(data) {
-											renderWsFn(data);
+											var obj = $.parseJSON(data);
+											if(obj.error)
+											{
+												alert(obj.error);
+											}
+											else{
+												renderWsFn(data);
+											}
+										},
+										error: function(data){
+											alert(data);
 										}
 									});
 				}
@@ -173,7 +203,7 @@
 				  }
 				});
   
-		});
+		});		
 		
 	</script>
 </body>

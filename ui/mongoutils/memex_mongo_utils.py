@@ -2,11 +2,13 @@ import itertools
 import csv
 from pymongo import MongoClient
 import traceback
+import json
 from random import randrange
 from operator import itemgetter
 from urlparse import urlparse
 from pymongo.errors import DuplicateKeyError
 from bson.objectid import ObjectId
+from errors import DeletingSelectedWorkspaceError
 
 class MemexMongoUtils(object):
 
@@ -24,7 +26,7 @@ class MemexMongoUtils(object):
 
         workspace_collection_name = "workspace"
         self.workspace_collection = db[workspace_collection_name]
-        
+
         seed_collection_name = "seedinfo"
 
         if which_collection == "cc-crawl-data":
@@ -59,7 +61,7 @@ class MemexMongoUtils(object):
                 db.drop_collection(url_collection_name)
                 db.drop_collection(host_collection_name)
                 db.drop_collection(seed_collection_name)
-                
+
             except:
                 print "handled:"
                 traceback.print_exc()
@@ -67,13 +69,14 @@ class MemexMongoUtils(object):
             db.create_collection(url_collection_name)
             db.create_collection(host_collection_name)
             db.create_collection(seed_collection_name)
-            
+
             # create index and drop any dupes
             self.urlinfo_collection.ensure_index("url", unique=True, drop_dups=True)
             self.hostinfo_collection.ensure_index("host", unique=True, drop_dups=True)
             self.seed_collection.ensure_index("url", unique=True, drop_dups=True)
+            self.hostinfo_collection.ensure_index("host_score")
+            self.urlinfo_collection.ensure_index("score")
 
-            
     def init_workspace(self, address="localhost", port=27017):
         db = self.client["MemexHack"]
         workspace_collection_name = "workspace"
@@ -86,6 +89,8 @@ class MemexMongoUtils(object):
         print "Dropping %s" % (workspace_collection_name)
         db.drop_collection(workspace_collection_name)
         db.create_collection(workspace_collection_name)
+        self.add_workspace("default")
+        self.set_workspace_selected_by_name("default")
         
     def list_indexes(self):
         
@@ -94,7 +99,7 @@ class MemexMongoUtils(object):
     def list_urls(self, host=None, limit=20):
 
         if not host:
-            docs = self.urlinfo_collection.find().sort("score", -1).limit(limit)
+            docs = self.urlinfo_collection.find({ "display": { "$ne": 0 } }).sort("score", -1).limit(limit)
         else:
             docs = self.urlinfo_collection.find({"host" : host}).sort("score", -1).limit(limit)
 
@@ -103,28 +108,32 @@ class MemexMongoUtils(object):
     def list_hosts(self, page=1, num_docs=28, filter_regex = None, filter_field = None):
 
         if filter_regex and filter_field:
-            docs = self.hostinfo_collection.find({filter_field:{'$regex':filter_regex}})
+            #docs = self.hostinfo_collection.find({'$and' : [{'$or':[{filter_field:{'$regex':filter_regex}},{"tags":{'$regex':filter_regex}}]}, { "display": { "$ne": 0 }}]}).sort("host_score", -1)
+            docs = self.get_hosts_filtered(filter_field, filter_field)
         else:
-            docs = self.hostinfo_collection.find().sort("host_score", -1)
-        
+            #docs = self.hostinfo_collection.find({ "display": { "$ne": 0 } }).sort("host_score", -1)
+            docs = self.get_hosts()
+
         try:
             docs = docs.skip(num_docs * (page - 1)).limit(num_docs)
         except Exception:
             docs = docs.limit(num_docs)
 
         docs_list = list(docs.limit(num_docs))
-            
+
         return docs_list
 
     def list_all_hosts(self):
-
-        docs = self.hostinfo_collection.find()
-
+        #docs = self.hostinfo_collection.find({ "display": { "$ne": 0 } })
+        docs = self.get_hosts()
         return list(docs)
 
-    def list_all_urls(self, sort_by="host", return_html = False):
+    def list_all_urls(self, sort_by="host", return_html = False, list_deleted = False):
 
-        docs = self.urlinfo_collection.find({}, {'html':int(return_html), 'html_rendered': int(return_html)})  # .sort(sort_by, 1)
+        if list_deleted:
+            docs = self.urlinfo_collection.find({}, {'html':int(return_html), 'html_rendered': int(return_html)})  # .sort(sort_by, 1)
+        else:
+            docs = self.urlinfo_collection.find({ "display": { "$ne": 0 } }, {'html':int(return_html), 'html_rendered': int(return_html)})  # .sort(sort_by, 1)
 
         return sorted(list(docs), key=lambda rec: rec[sort_by])
     
@@ -176,8 +185,7 @@ class MemexMongoUtils(object):
             host = host.split(":")[0]
             
         url_doc = kwargs
-        if not "host" in url_doc:
-            url_doc["host"] = host
+        url_doc["host"] = host
         
         #throws exception if URL already exists, user of method
         #should take this into account
@@ -202,13 +210,16 @@ class MemexMongoUtils(object):
 
         self.__insert_url_test_data(test_fn=test_fn)
 
-    def add_job(self, url, job_id, default_state="Initializing"):
+    def add_job(self, url, job_id, project, spider, default_state="Initializing"):
 
         try:
-            seed_doc = {"url" : url, "state" : default_state, "job_id" : job_id}
+            seed_doc = {"url" : url, "state" : default_state, "job_id" : job_id, "project" : project, "spider" : spider}
             self.seed_collection.save(seed_doc)
         except Exception:
             self.seed_collection.update({"url" : url}, {'$set' : {"job_id" : job_id}})
+
+    def list_seed_docs(self):
+        return list(self.seed_collection.find())        
 
     def mark_seed_state(self, url, state):
 
@@ -240,6 +251,10 @@ class MemexMongoUtils(object):
     def set_score(self, url, score_set):
 
         self.urlinfo_collection.update({"url" : url}, {'$set' : {"score" : score_set}})
+
+    def set_host_score(self, host, score_set):
+
+        self.hostinfo_collection.update({"host" : host}, {'$set' : {"host_score" : score_set}})
         
     def set_screenshot_path(self, url, screenshot_path):
 
@@ -280,6 +295,7 @@ class MemexMongoUtils(object):
         self.delete_hosts_by_match(match, negative_match = negative_match)
 
 #####################   workspace  #####################
+
     def list_workspace(self):
         docs = self.workspace_collection.find()
         return list(docs)
@@ -302,6 +318,13 @@ class MemexMongoUtils(object):
         db[host_collection_name].ensure_index("host", unique=True, drop_dups=True)
         db[seed_collection_name].ensure_index("url", unique=True, drop_dups=True)
 
+    def get_workspace_by_id(self,id):
+        return self.workspace_collection.find_one({"_id" : ObjectId( id )})
+        
+    def set_workspace_selected_by_name(self, name):
+        self.workspace_collection.update({}, {'$set' : {"selected" : False}}, multi=True)
+        self.workspace_collection.update({"name" : name}, {'$set' : {"selected" : True}})
+
     def set_workspace_selected(self, id):
         self.workspace_collection.update({}, {'$set' : {"selected" : False}}, multi=True)
         self.workspace_collection.update({"_id" : ObjectId( id )}, {'$set' : {"selected" : True}})
@@ -309,11 +332,13 @@ class MemexMongoUtils(object):
     def get_workspace_selected(self):
         return self.workspace_collection.find_one({"selected" : True})
 
-
     def delete_workspace(self, id):
         ws_doc = self.workspace_collection.find_one({"_id" : ObjectId( id )})
-        self.delete_workspace_related(ws_doc['name'])
-        self.workspace_collection.remove({"_id" : ObjectId( id )})
+        if ws_doc["selected"] == True:
+            raise DeletingSelectedWorkspaceError('Deleting the selected workspace is not allowed')
+        else:
+            self.delete_workspace_related(ws_doc['name'])
+            self.workspace_collection.remove({"_id" : ObjectId( id )})
 
     def delete_workspace_related(self,name):
         db = self.client["MemexHack"]
@@ -324,15 +349,99 @@ class MemexMongoUtils(object):
         print "Dropping %s" % ("seedinfo" + "-" + name)
         db["seedinfo" + "-" + name].drop()
 
+#####################   keyword  #####################
+    def list_keyword(self):
+        ws = self.get_workspace_selected()
 
+        if ws == None or "keyword" not in ws or ws["keyword"] == None:
+            return []
+        else:
+            return list(ws["keyword"])
+
+    def save_keyword(self, keywords):
+        ws = self.get_workspace_selected()
+        if ws == None:
+            self.workspace_collection.upsert({"_id" : "_default"}, {'$set' : {"keyword" : keywords}})
+        else:
+            self.workspace_collection.update({"_id" : ObjectId(ws["_id"] )}, {'$set' : {"keyword" : keywords}})
+
+####################   search term  #####################
+    def list_search_term(self):
+        ws = self.get_workspace_selected()
+
+        if ws == None or "searchterm" not in ws or ws["searchterm"] == None:
+            return []
+        else:
+            return list(ws["searchterm"])
+
+    def save_search_term(self, search_terms):
+
+        ws = self.get_workspace_selected()
+        if ws == None:
+            self.workspace_collection.upsert({"_id" : "_default"}, {'$set' : {"searchterm" : search_terms}})
+        else:
+            self.workspace_collection.update({"_id" : ObjectId(ws["_id"] )}, {'$set' : {"searchterm" : search_terms}})
+
+############# HOST HELPERS ###########
+
+    def get_hosts(self):
+        docs = self.hostinfo_collection.find({ "display": { "$ne": 0 } }).sort("host_score", -1)
+        return docs
+
+    def get_hosts_filtered(self, filter_field, filter_regex):
+        docs = self.hostinfo_collection.find({'$and' : [{'$or':[{filter_field:{'$regex':filter_regex}},{"tags":{'$regex':filter_regex}}]}, { "display": { "$ne": 0 }}]}).sort("host_score", -1)
+        return docs
+
+############# TAGS #############
+
+    def save_tags(self, host, tags):
+        self.hostinfo_collection.update({"host" : host}, {'$set' : {"tags" : tags}})
+
+    def search_tags(self, term):
+        #ws_doc  = self.hostinfo_collection.find({'$or':[{"host":{'$regex':term}},{"tags":{'$regex':term}}]}).sort("host_score", -1)
+        ws_doc  = self.get_hosts_filtered("host", term)
+        if None == ws_doc:
+            return None
+        else:
+            return list(ws_doc)
+
+    def list_tags(self, host):
+        ws_doc = self.hostinfo_collection.find_one({"host" : host})
+        if None == ws_doc:
+            return None
+        else:
+            return ws_doc['tags']
+
+############# Display Hosts #############
+
+############# Display Hosts #############
+
+    def save_display(self, host, displayable):
+        self.hostinfo_collection.update({"host" : host}, {'$set': {'display': displayable}})
+        self.urlinfo_collection.update({"host" : host}, {'$set': {'display': displayable}}, multi=True)
 
 if __name__ == "__main__":
 
     mmu = MemexMongoUtils()
-    print len(mmu.list_all_urls_with_interest(False, return_html = True))
-#    MemexMongoUtils(which_collection="crawl-data", init_db=True)
-#    MemexMongoUtils(which_collection="known-data", init_db=True)
-#    MemexMongoUtils(which_collection="cc-crawl-data", init_db=True)
-    #mmu.init_workspace()
+    #mmu.list_hosts(1, 28, filter_regex, filter_field)
     
-    
+    MemexMongoUtils(which_collection="crawl-data", init_db=True)
+    MemexMongoUtils(which_collection="known-data", init_db=True)
+    MemexMongoUtils(which_collection="cc-crawl-data", init_db=True)
+    mmu.init_workspace()
+#    for host in mmu.get_hosts():
+#        print host
+#    for url in mmu.list_all_urls(return_html = False, list_deleted = True):
+#        if ("barnesandnoble" and "locator") in url["host"]:
+#            print url
+
+#    for url_dic in mmu.list_all_urls():
+#        print url_dic["host"]
+#        host = urlparse(url_dic["url"]).netloc
+#        if ":" in host:
+#            host = host.split(":")[0]
+#        mmu.urlinfo_collection.update({"url" : url_dic["url"]}, {'$set' : {"host" : host}})
+
+        
+
+

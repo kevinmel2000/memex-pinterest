@@ -9,26 +9,16 @@
 {% else %}
 {% set host_path = '/hosts' %}
 {% set url_path = '/urls' %}
-<input id="search" type="text" class="form-control input-lg" placeholder="Enter a search term and press enter to search hosts" action="search();" method="GET">
+<input id="search" type="text" class="form-control input-lg" placeholder="Enter a search term and press enter to search hosts or tags" action="search();" method="GET">
 </input>
 
-<script>
-	$('#search').keypress(function(e) {
-		if (e.which == 13) {
-			var search = $('#search').val();
-			var search_url = "/?filter-field=host&filter-regex=" + search;
-			window.location.replace(search_url);
-			return false;
-		}
-	}); 
-</script>
 {% endif %}
+
 
 <head>
 	<meta charset="utf-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
-	<!--<link rel="stylesheet" href="http://netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css">-->
 	<style>
 		body {
 			background: #E9E9E9;
@@ -66,7 +56,6 @@
 		}
 	</style>
 
-	<!--<link href="http://www.jqueryscript.net/css/jquerysctipttop.css" rel="stylesheet" type="text/css">-->
 </head>
 <!-- NAVBAR
 ================================================== -->
@@ -82,10 +71,11 @@
 	</button>
 
 	<div class="jquery-script-clear"></div>
-	<!--<h1 style="margin-top:150px" align="center">Hyperion Gray SourceFinder</h1>-->
+
 	<div class="container marketing">
 		<section id="blog-landing"></section>
 	</div>
+
 
 	<!-- Bootstrap core JavaScript
 	================================================== -->
@@ -98,7 +88,61 @@
 			PAGE DOWN
 		</button>
 	</div>
+
+    <!-- Modal -->
+		<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal">
+                <span aria-hidden="true">&times;</span>
+                <span class="sr-only">Close</span></button>
+            <h4 class="modal-title">Edit Tags</h4>
+          </div>
+          <div class="modal-body">
+            <!--<p>One fine body&hellip;</p>-->
+			  <input id="host-placeholder" type="hidden" >
+            <div>
+                Enter comma separated values
+            </div>
+            <div class="input-group">
+                <input id="addText" type="text" class="form-control">
+                <span class="input-group-btn">
+                    <button id="addButton" class="btn btn-default" type="button">
+                        Add
+                    </button>
+                </span>
+            </div><!-- /input-group -->
+            <div id="tags">
+            </div>
+          </div>
+          <div class="modal-footer">
+            <!--<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>-->
+            <button id="saveButton" type="button" class="btn btn-primary">Save changes</button>
+          </div>
+        </div><!-- /.modal-content -->
+      </div><!-- /.modal-dialog -->
+    </div><!-- /.modal -->
+
+	<!-- Confirm Hide Modal -->
+	<div class="modal fade" id="confirm-delete" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-header">
+					Do you want to exclude this Host from the results?
+				</div>
+				<div class="modal-body">
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+					<a href="#" class="btn btn-danger danger">Exclude</a>
+				</div>
+			</div>
+		</div>
+	</div>
+
 </body>
+
 <script>
 	var loaded_pages = [];
 
@@ -248,6 +292,192 @@
 
 	});
 
+
+//////////////////////////////////////////////////////
+        //TAGS FEATURES
+		var tagsUrl = '/api/tags/';
+
+		var newTag = function(){
+			var tag = $('#addText').val();
+			if(tag == '')
+				return false;
+			renderTags(tag);
+			$('#addText').val('');
+		};
+
+		var renderTags = function(key){
+			if(key === "")
+				return;
+
+			var template =
+			'<button type="button" onclick="remove(this);" class="keyword btn btn-default-inverse btn-sm" style="margin-top:10px;margin-right:5px">' +
+				'<span class="glyphicon glyphicon-remove" aria-hidden="true"></span> ####' +
+			'</button>';
+			template = template.replace('####',key);
+			$('#tags').append(template);
+		};
+
+		var saveTags = function() {
+            var tags = [];
+            var host = $("#host-placeholder").val();
+            var tagsStr = "";
+            $.each($(".keyword"), function(index, elem) {
+                tags.push($(elem).text().trim());
+                tagsStr = tagsStr + ", " + $(elem).text().trim();
+			});
+
+            var posting = $.ajax({
+                type : "PUT",
+                url : tagsUrl + host,
+                contentType: 'application/json',
+                dataType: 'json',
+                data: JSON.stringify(tags),
+                success : function(data) {
+                    //alert(data);
+					var tagSelector = "tag_" + host.replace(/\./g,'_');
+					$("#btn_" + tagSelector).attr('custom_tag', tagsStr.substring(2));
+					$("#span_" + tagSelector).html(tagsStr.substring(2));
+                    $('#myModal').modal('hide');
+                }
+            });
+        };
+
+		var renderKeywords = function(data) {
+			$('#tags').empty();
+			var obj = $.parseJSON(data);
+			$.each(obj, function(index, elem){
+				renderTags(elem);
+			});
+		};
+
+		var SearchResponseItem = function(label, category){
+			this.label = label;
+			this.category = category;
+		}
+
+
+///////////////////////////////////////////
+
+		$(document).ready(function() {
+			$('#addText').keypress(function(e) {
+				if (e.which == 13) {// enter pressed
+					newTag.apply();
+				}
+				else if (e.which == 44) {// ',' pressed
+					newTag.apply();
+					return false;
+				}
+			});
+			$('#addButton').click(newTag);
+			$('#saveButton').click(saveTags);
+
+			$('#myModal').on('show.bs.modal', function (event) {
+				$('#addText').val("");
+				var button = $(event.relatedTarget); // Button that triggered the modal
+				var host = button.data('host'); // Extract info from data-* attributes
+				var tagSelector = "tag_" + host.replace(/\./g,'_');
+				var dataTags = $("#btn_" + tagSelector).attr('custom_tag');
+
+				// If necessary, you could initiate an AJAX request here (and then do the updating in a callback).
+				// Update the modal's content. We'll use jQuery here, but you could use a data binding library or other methods instead.
+				var modal = $(this);
+				modal.find('.modal-title').text('Edit Tags for ' + host);
+				modal.find('.modal-body #host-placeholder').val(host);
+				//modal.find('.modal-body #host-placeholder').val(tags);
+
+				$('#tags').empty();
+				var obj = dataTags.split(",");
+				$.each(obj, function(index, elem){
+					renderTags(elem.trim());
+				});
+			})
+
+			/////// SEARCH //////////
+			$('#search').keypress(function(e) {
+				if (e.which == 13) {
+					return searchDo(search);
+				}
+			});
+
+			var searchDo = function(){
+				var search = $('#search').val();
+				var search_url = "/?filter-field=host&filter-regex=" + search;
+				window.location.replace(search_url);
+				return false;
+			};
+
+			$("#search").autocomplete({
+				minLength: 3,
+				delay: 200,
+				search: function( event, ui ) {console.log(ui);},
+				select: function( event, ui ) {
+					return searchDo();
+				},
+				source: function( request, response ) {
+			        var resultsArray = [];
+					$.ajax({
+						type: "GET",
+						url: tagsUrl + request.term,
+						async: false,
+						success: function(data){
+							var obj = $.parseJSON(data);
+							$.each(obj, function(index, elem){
+								resultsArray.push(new SearchResponseItem(elem.host, "host"));
+							});
+							return resultsArray;
+						}
+					})
+					return response(resultsArray);
+				}
+			});
+
+			//  Display Hosts
+			$( document ).on( "click", ".check-no-interest", function() {
+				console.log(this);
+				var displayHostUrl = '/api/host/display/';
+				var host = this.dataset.host;
+				$.ajax({
+					type: "PUT",
+					url: displayHostUrl + host,
+					contentType: 'application/json',
+					dataType: 'json',
+					data: '{"display": 0}',
+					async: false,
+					success: function(data){
+						
+						document.getElementById(host).remove();
+					}
+				})
+			});
+
+			//  Display Hosts
+			$( document ).on( "click", ".check-yes-interest", function() {
+				console.log(this);
+				var displayHostUrl = '/api/host/display/';
+				var host = this.dataset.host;
+				var hosthash = this.dataset.hosthash
+				$.ajax({
+					type: "PUT",
+					url: displayHostUrl + host,
+					contentType: 'application/json',
+					dataType: 'json',
+					data: '{"display": 1}',
+					async: false,
+					success: function(data){
+					    console.log(hosthash);
+						$("#" + hosthash).hide();
+						console.log("done disappearing");
+					    
+					}
+				})
+			});
+
+
+
+
+		});
+
 </script>
+
 </html>
 {% endblock %}

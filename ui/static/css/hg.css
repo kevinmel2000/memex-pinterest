@@ -10,3 +10,18 @@ body {
 a {
 cursor: pointer;
 }
+
+.spanlink {
+  padding-left:40px; 
+  font-weight:bold;
+}
+
+.spanlink:hover {
+
+  text-decoration: underline;
+}
+
+.list-group-item {
+  width:1000px;
+
+}

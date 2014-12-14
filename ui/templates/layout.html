@@ -39,23 +39,42 @@
 
 <div class="navbar navbar-default navbar-fixed-top">
     <div class="navbar-header">
-      <div class="navbar-brand">SourcePin</div>
+      <div class="navbar-brand">SourcePin (Workspace: <span id="workspace-name"></span>)</div>
     </div>
 
     <ul class="nav navbar-nav">
-      <li><a href="/"><span class="glyphicon glyphicon-screenshot"></span> View Crawl Data</a>
-      <li><a href="/?filter-field=host&filter-regex=\.onion$"><span class="glyphicon glyphicon-screenshot"></span> View Darkweb Data</a>
-      <li><a href="/known-data"><span class="glyphicon glyphicon-globe"></span> Known Sites</a>
-      <li><a href="/discovery"><span class="glyphicon glyphicon-globe"></span> Crawl New Sites</a>
-      <li><a href="/workspace"><span class="glyphicon glyphicon-list-alt"></span> Switch Workspace <!--Human Trafficking--></a>
+      <li><a href="/workspace"><span class="glyphicon glyphicon-list-alt"></span> Select Workspace</a></li>
+	  <!--
+      <li><a href="/keyword"><span class="glyphicon glyphicon-tags"></span> Define Keywords</a></li>
+      <li><a href="/add-known"><span class="glyphicon glyphicon-globe"></span> Upload Known Sites</a></li>
+      <li><a href="/discovery"><span class="glyphicon glyphicon-globe"></span> Crawl New Sites</a></li>
+      -->
+
+      <li><a href="/known-data"><span class="glyphicon glyphicon-globe"></span> View Known Sites</a></li>      
+      <li><a href="/data"><span class="glyphicon glyphicon-screenshot"></span> Crawl Results</a></li>
+      <li><a href="/?filter-field=host&filter-regex=\.onion$"><span class="glyphicon glyphicon-screenshot"></span> Darkweb Results</a></li>
 <!--      <li><a href="/"><span class="glyphicon glyphicon-user"></span> Admin</a> -->
-      <li><a data-toggle=modal data-target=#info-panel><span class="glyphicon glyphicon-info-sign"></span> Info</a>
-</ul>
+<!--      <li><a data-toggle=modal data-target=#info-panel><span class="glyphicon glyphicon-info-sign"></span> Info</a></li>-->
+	</ul>
 	<p class="navbar-text navbar-right" style="margin-right: 10px">
 				Signed in as <a href="#" class="navbar-link">Admin</a>
-			</p>
+	</p>
 
 </div>
+<script>
+
+var url = '/api/workspace/';
+var workspace_span = $("#workspace-name");
+var posting = $.get( url, function(data){
+	var obj = $.parseJSON(data);
+    $.each(obj, function(index,elem){
+        if (elem.selected == true) {
+	        var selected_workspace = elem.name;
+	        workspace_span.text(selected_workspace);
+        }
+    });	
+});
+</script>
 
 <!--<div id="content">-->
 {% block content %}

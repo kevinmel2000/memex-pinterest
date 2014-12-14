@@ -5,7 +5,7 @@
     {% set url_path = '/cc-urls' %}
 {% elif use_known_data %}
     {% set host_path = '/known-hosts' %}
-    {% set url_path = '/known-urls' %}    
+    {% set url_path = '/known-urls' %}
 {% else %}
     {% set host_path = '/hosts' %}
     {% set url_path = '/urls' %}
@@ -19,27 +19,50 @@
   {% set hsu_screenshot_path = host_dic['hsu_screenshot_path'] %}
   <img src="{{ url_for('static', filename=hsu_screenshot_path) }}" alt="ALT">
 {% else %}
-  <img src="" alt="No Image Available">
+<!--  <img src="" alt="No Image Available">-->
 {% endif %}
 
-<h1><a href="{{ url_path }}/{{ host_dic["host"] }}">Host: {{ host_dic["host"] }}<br /></a></h1>
-<p>Number of URLs found: {{ host_dic["num_urls"] }}</p>
+<span style="float:right; margin-right:5px;margin-left:5px; cursor: pointer; cursor: hand;" class="glyphicon glyphicon-remove check-no-interest" data-host='{{host_dic["host"]}}'></span>
+
+{% if host_dic["display"] == 1 %}
+  <span id="{{ host_dic["host_hash"] }}" style="float:right;cursor: pointer; cursor: hand; display:none;" class="glyphicon glyphicon-ok check-yes-interest" data-host='{{host_dic["host"]}}'  data-hosthash='{{ host_dic["host_hash"] }}'></span>
+{% else %}
+  <span id="{{ host_dic["host_hash"] }}" style="float:right;cursor: pointer; cursor: hand;" class="glyphicon glyphicon-ok check-yes-interest" data-host='{{host_dic["host"]}}'  data-hosthash='{{ host_dic["host_hash"] }}'></span>
+{% endif %}
+
+<h1>Host: <a href="http://{{ host_dic["host"] }}" target="_blank">{{ host_dic["host"] }}</a></h1>
+
+<p>URLs found: <a href="{{ url_path }}/{{ host_dic["host"] }}">{{ host_dic["num_urls"] }}</a></p>
 
 {% if host_dic["host_score"] != 0 %}
   <p>Score: {{ host_dic["host_score"] }}</p>
 {% endif %}
 
+
+
+    <p>Tags: <span id='span_tag_{{host_dic["host"].replace(".","_")}}'>{{host_dic["tags"]}}</span></p>
+    <button id='btn_tag_{{host_dic["host"].replace(".","_")}}' custom_tag='{{host_dic["tags"]}}' type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-host='{{host_dic["host"]}}' data-tags='{{host_dic["tags"]}}' data-target='#myModal'>
+        Edit Tags
+    </button>
+
+    <!--<button type="button" class="btn-remove btn btn-primary btn-sm" data-host='{{host_dic["host"]}}' >
+        Remove
+    </button>-->
+
+
 {% if "is_known_host" in host_dic %}
   {% if host_dic["is_known_host"] %}
-    <button style="float:right;" class="btn btn-danger" disabled>Known</button>  
+    <button style="float:right;" class="btn btn-default btn-sm" disabled>Known</button>
   {% else %}
-    <button style="float:right;"class="btn btn-success" disabled>New Host</button>  
+    <button style="float:right;"class="btn btn-default btn-sm" disabled>New Host</button>
   <!--<p>Known host: {{ host_dic["is_known_host"] }}</p>-->
   {% endif %}
 {% endif %}
+
 
 
 </article>
 
 {% endif %}
 {% endfor %}
+
