@@ -370,7 +370,7 @@ def fetch_search_terms_api():
     #schedule_spider_handler(url)
     search_terms = ",".join(search_terms)
     schedule_spider_searchengine_handler(search_terms)
-    return Response("OK")
+    return Response(json.dumps({}), mimetype="application/json")
 
 ################ SCORING #########################
 @app.route("/score", methods = ["GET"])

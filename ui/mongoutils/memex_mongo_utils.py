@@ -425,25 +425,8 @@ class MemexMongoUtils(object):
 if __name__ == "__main__":
 
     mmu = MemexMongoUtils()
-    #mmu.list_hosts(1, 28, filter_regex, filter_field)
     
-    #MemexMongoUtils(which_collection="crawl-data", init_db=True)
-    #MemexMongoUtils(which_collection="known-data", init_db=True)
-    #MemexMongoUtils(which_collection="cc-crawl-data", init_db=True)
-    #mmu.init_workspace()
-#    for host in mmu.get_hosts():
-#        print host
-#    for url in mmu.list_all_urls(return_html = False, list_deleted = True):
-#        if ("barnesandnoble" and "locator") in url["host"]:
-#            print url
-
-#    for url_dic in mmu.list_all_urls():
-#        print url_dic["host"]
-#        host = urlparse(url_dic["url"]).netloc
-#        if ":" in host:
-#            host = host.split(":")[0]
-#        mmu.urlinfo_collection.update({"url" : url_dic["url"]}, {'$set' : {"host" : host}})
-
-        
-
-
+    MemexMongoUtils(which_collection="crawl-data", init_db=True)
+    MemexMongoUtils(which_collection="known-data", init_db=True)
+    MemexMongoUtils(which_collection="cc-crawl-data", init_db=True)
+    mmu.init_workspace()

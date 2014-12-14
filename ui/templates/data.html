@@ -271,12 +271,16 @@
 			margin_bottom : 50,
 			single_column_breakpoint : 700
 		});
+		
+		//remove this if scroll to page down is reimplemented
+		loadMore();
 
 		//user scrolls up and hits top of page
 		$('#top-of-page').waypoint(function(direction) {
 			console.log("Got upward action at top of page...");
 			if (direction == "up") {
-				loadPrevious();
+			    //do nothing because this breaks easily
+				//loadPrevious();
 			}
 		});
 
@@ -284,7 +288,8 @@
 		$('#bottom-of-page').waypoint(function(direction) {
 			console.log("Got downward action at bottom of page...");
 			if (direction == "down") {
-				loadMore();
+			    //do nothing because this breaks easily
+				//loadMore();
 			}
 		}, {
 			offset : 'bottom-in-view'

@@ -258,9 +258,12 @@ function getUrlCrawlStatus(url, url_hash) {
   					data: JSON.stringify(searchterms),
 					success : function(data) {
 						console.log(data);
+						window.location.reload(true);
 					}
 				});
-				location.reload();
+				
+				
+				
 		}
 
 		$(document).ready(function() {
