@@ -52,7 +52,7 @@ def data(page=1):
 
     hosts = hosts_handler(page=int(page))
 
-    return render_template('data.html', hosts=hosts, which_collection="crawl-data", 
+    return render_template('data.html', hosts=hosts, which_collection="crawl-data",
                            filter_field = filter_field, filter_regex = filter_regex, use_cc_data=False)
 
 @app.route("/cc-data")
@@ -311,9 +311,9 @@ def get_keyword_api():
 def save_keyword_api():
    # print(request)
    # keywords = request.data
-   # print("keywords:" + keywords) 
+   # print("keywords:" + keywords)
     keywords = request.json
-   # print(_json) 
+   # print(_json)
 
     save_keyword(keywords)
 
@@ -323,7 +323,7 @@ def save_keyword_api():
         return Response("{}", mimetype="application/json")
     else:
         out_doc = JSONEncoder().encode(in_doc)
-        
+
         return Response(json.dumps(out_doc), mimetype="application/json")
 
 @app.route("/api/fetch-keyword/", methods=['POST'])
@@ -360,7 +360,7 @@ def save_search_term_api():
         return Response("{}", mimetype="application/json")
     else:
         out_doc = JSONEncoder().encode(in_doc)
-        
+
         return Response(json.dumps(out_doc), mimetype="application/json")
 
 @app.route("/api/fetch-searchterm/", methods=['POST'])
@@ -369,7 +369,7 @@ def fetch_search_terms_api():
     search_terms = request.json
     #schedule_spider_handler(url)
     search_terms = ",".join(search_terms)
-    schedule_spider_searchengine_handler(search_terms, use_splash = False)
+    schedule_spider_searchengine_handler(search_terms)
     return Response("OK")
 
 ################ SCORING #########################
