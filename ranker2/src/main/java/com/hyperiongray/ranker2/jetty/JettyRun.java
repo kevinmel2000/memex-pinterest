@@ -13,6 +13,8 @@ import org.apache.lucene.queryparser.classic.QueryParser;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.Request;
 import org.eclipse.jetty.server.handler.AbstractHandler;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
 
 /**
  * Created by mark on 12/14/14.
@@ -49,18 +51,29 @@ public class JettyRun extends AbstractHandler {
         server.join();
     }
     private String getRank(String html, String keyPhrase) {
-        String rank = "";
-        try {
-            //Analyzer analyzer = PatternAnalyzer.DEFAULT_ANALYZER;
-            Analyzer analyzer = new SimpleAnalyzer();
-            MemoryIndex index = new MemoryIndex();
-            index.addField("content", html, analyzer);
-            QueryParser parser = new QueryParser("content", analyzer);
-            double score = index.search(parser.parse(keyPhrase));
-            rank = df.format(score);
-        } catch (Exception e) {
-            e.printStackTrace();
+        String rankStr = "";
+        String[] keyPhrases = keyPhrase.split(",");
+        double rank = 0;
+        for (String searchOn : keyPhrases) {
+            try {
+                Analyzer analyzer = new SimpleAnalyzer();
+                MemoryIndex index = new MemoryIndex();
+                index.addField("content", htmlToText(html), analyzer);
+                QueryParser parser = new QueryParser("content", analyzer);
+                double score = index.search(parser.parse(searchOn));
+                rank += score;
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
-        return rank;
+        if (keyPhrases.length > 0) {
+            rankStr = df.format(rank / keyPhrases.length);
+        }
+        return rankStr;
+    }
+
+    private String htmlToText(String html) {
+        Document doc = Jsoup.parse(html);
+        return doc.text();
     }
 }

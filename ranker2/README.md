@@ -28,11 +28,19 @@ http://localhost:8080/?html=my%20suspicious%20text%20click&keyPhrase=pay%20per%2
 
 html is the input we are ranking, and
 
-keyPhrase is the search key phrase
+keyPhrase is the search key phrase. Multiple key phrases can be given, separated by comma
 
 #### response in the above examples is
 
 0.01
+
+for
+
+http://localhost:8080/?html=my%20suspicious%20text%20click&keyPhrase=pay%20per%20click,my%20suspicious%20text%20click
+
+the response is
+
+0.16
 
 #### To run stand-alone ranking application
 
