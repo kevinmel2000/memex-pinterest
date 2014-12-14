@@ -109,7 +109,7 @@ class MemexMongoUtils(object):
 
         if filter_regex and filter_field:
             #docs = self.hostinfo_collection.find({'$and' : [{'$or':[{filter_field:{'$regex':filter_regex}},{"tags":{'$regex':filter_regex}}]}, { "display": { "$ne": 0 }}]}).sort("host_score", -1)
-            docs = self.get_hosts_filtered(filter_field, filter_field)
+            docs = self.get_hosts_filtered(filter_field = filter_field, filter_regex = filter_regex)
         else:
             #docs = self.hostinfo_collection.find({ "display": { "$ne": 0 } }).sort("host_score", -1)
             docs = self.get_hosts()
@@ -389,7 +389,9 @@ class MemexMongoUtils(object):
         return docs
 
     def get_hosts_filtered(self, filter_field, filter_regex):
-        docs = self.hostinfo_collection.find({'$and' : [{'$or':[{filter_field:{'$regex':filter_regex}},{"tags":{'$regex':filter_regex}}]}, { "display": { "$ne": 0 }}]}).sort("host_score", -1)
+        query = {'$and' : [{'$or':[{filter_field:{'$regex':filter_regex}},{"tags":{'$regex':filter_regex}}]}, { "display": { "$ne": 0 }}]}
+        docs = self.hostinfo_collection.find(query).sort("host_score", -1)
+        #docs = self.hostinfo_collection.find({filter_field:{'$regex':filter_regex}}).sort("host_score", -1)
         return docs
 
 ############# TAGS #############
@@ -425,10 +427,10 @@ if __name__ == "__main__":
     mmu = MemexMongoUtils()
     #mmu.list_hosts(1, 28, filter_regex, filter_field)
     
-    MemexMongoUtils(which_collection="crawl-data", init_db=True)
-    MemexMongoUtils(which_collection="known-data", init_db=True)
-    MemexMongoUtils(which_collection="cc-crawl-data", init_db=True)
-    mmu.init_workspace()
+    #MemexMongoUtils(which_collection="crawl-data", init_db=True)
+    #MemexMongoUtils(which_collection="known-data", init_db=True)
+    #MemexMongoUtils(which_collection="cc-crawl-data", init_db=True)
+    #mmu.init_workspace()
 #    for host in mmu.get_hosts():
 #        print host
 #    for url in mmu.list_all_urls(return_html = False, list_deleted = True):

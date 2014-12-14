@@ -24,6 +24,10 @@ def hosts_handler(page = 1, which_collection = "crawl-data", filter_field = None
     """Put together host documents for use with hosts endpoint """
 
     mmu = MemexMongoUtils(which_collection = which_collection)
+    for host in mmu.get_hosts_filtered(filter_field = "host", filter_regex = "windows"):
+        print "b"
+        print host
+    
     khc = KnownHostsCompare()
 
     host_dics = mmu.list_hosts(page = page, filter_field = filter_field, filter_regex = filter_regex)
@@ -212,6 +216,8 @@ def rescore_db_handler():
     train_and_score_mongo()
 
 if __name__ == "__main__":
-    print "HERE"
-    for urldoc in urls_handler("www.amazon.com"):
-        print urldoc['url']
+
+    print hosts_handler(filter_field = "host", filter_regex=".*")
+    
+    
+    

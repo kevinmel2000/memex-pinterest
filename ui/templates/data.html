@@ -401,7 +401,7 @@
 
 			var searchDo = function(){
 				var search = $('#search').val();
-				var search_url = "/?filter-field=host&filter-regex=" + search;
+				var search_url = "/data?filter-field=host&filter-regex=" + search;
 				window.location.replace(search_url);
 				return false;
 			};
