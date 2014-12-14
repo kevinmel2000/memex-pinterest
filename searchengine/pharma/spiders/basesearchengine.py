@@ -75,6 +75,11 @@ class BaseSearchEngineSpider(scrapy.Spider):
         else:
             self.splash_meta = {}
 
+        print "****************SCREENSHOT DIR**************************"
+        print self.screenshot_dir
+        print "****************SCREENSHOT DIR**************************"
+
+
     def start_requests(self):
 #        phrases_response = urllib.urlopen(self.phrases_url).read()
 #        self.phrases = json.loads(phrases_response)

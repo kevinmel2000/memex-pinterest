@@ -112,6 +112,9 @@ class WebsiteFinderSpider(scrapy.Spider):
         self.req_count = defaultdict(int)
         super(WebsiteFinderSpider, self).__init__(name=None, **kwargs)
         self.screenshot_dir = screenshot_dir
+        print "****************SCREENSHOT DIR**************************"
+        print self.screenshot_dir
+        print "****************SCREENSHOT DIR**************************"
 
     def parse(self, response):
         if 'referrer_url' in response.meta:

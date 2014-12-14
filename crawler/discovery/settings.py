@@ -31,8 +31,8 @@ ROBOTS_CRAWLDELAY_ENABLED = True
 AUTOTHROTTLE_ENABLED = False  # it doesn't play well with RobotsCrawlDelayMiddleware
 DUPEFILTER_CLASS = 'discovery.splash_ext.SplashAwareDupeFilter'  # needed by SplashMiddleware
 HTTPCACHE_STORAGE = 'discovery.splash_ext.SplashAwareFSCacheStorage'  # needed by SplashMiddleware
-SPLASH_URL = 'http://127.0.0.1:8050'
-SPLASH_PROXY_URL = 'http://127.0.0.1:8051'
+SPLASH_URL = 'http://54.148.140.10:8050'
+SPLASH_PROXY_URL = 'http://54.148.140.10:8051'
 
 MONGO_URI = "localhost:27017"
 MONGO_DATABASE = 'MemexHack'
