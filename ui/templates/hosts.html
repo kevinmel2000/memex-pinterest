@@ -32,18 +32,22 @@
 
 <h1>Host: <a href="http://{{ host_dic["host"] }}" target="_blank">{{ host_dic["host"] }}</a></h1>
 
-<p>URLs found: <a href="{{ url_path }}/{{ host_dic["host"] }}">{{ host_dic["num_urls"] }}</a></p>
+<p><a href="{{ url_path }}/{{ host_dic["host"] }}">URLs: {{ host_dic["num_urls"] }}</a></p>
 
-{% if host_dic["host_score"] != 0 %}
+{% if host_dic["host_score"] != 0 and not use_known_data %}
   <p>Score: {{ host_dic["host_score"] }}</p>
 {% endif %}
 
 
 
-    <p>Tags: <span id='span_tag_{{host_dic["host"].replace(".","_")}}'>{{ host_dic["tags_joined"] }}</span></p>
-    <button id='btn_tag_{{host_dic["host"].replace(".","_")}}' custom_tag='{{host_dic["tags_joined"]}}' type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-host='{{host_dic["host"]}}' data-tags='{{host_dic["tags_joined"]}}' data-target='#myModal'>
-        Edit Tags
-    </button>
+	{% if use_known_data %}
+	  <!-- No tags for known data -->
+	{% else %}
+      <p>Tags: <span id='span_tag_{{host_dic["host"].replace(".","_")}}'>{{ host_dic["tags_joined"] }}</span></p>        
+      <button id='btn_tag_{{host_dic["host"].replace(".","_")}}' custom_tag='{{host_dic["tags_joined"]}}' type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-host='{{host_dic["host"]}}' data-tags='{{host_dic["tags_joined"]}}' data-target='#myModal'>
+          Edit Tags
+      </button>
+    {% endif %}
 
     <!--<button type="button" class="btn-remove btn btn-primary btn-sm" data-host='{{host_dic["host"]}}' >
         Remove
