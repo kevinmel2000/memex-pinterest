@@ -67,11 +67,12 @@
 	{% else %}	
 	  <p>You have marked {{ num_no_interest }} URLs as not interesting, this is enough to run scoring and get good results.</p>
 	{% endif %}
+	<p>Note: In order to get scores for new URLs picked up by crawls you need to run a rescore from this page.</p>
 	
 	
 	
 	<button id="rescoreDb" class="btn" style="width:550px; background-color:black; height:100px; color:white;" type="button">
-		Score Hosts
+		Rescore Hosts
 	</button>
 	<p id="scoreRunning" style="display:none; margin-top:5px;">Scoring is now running in the background, once it is done the <a href="/data">Crawl Results</a> page will
 	include updated scoring.</p>
