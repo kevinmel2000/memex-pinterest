@@ -40,8 +40,8 @@
 
 
 
-    <p>Tags: <span id='span_tag_{{host_dic["host"].replace(".","_")}}'>{{host_dic["tags"]}}</span></p>
-    <button id='btn_tag_{{host_dic["host"].replace(".","_")}}' custom_tag='{{host_dic["tags"]}}' type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-host='{{host_dic["host"]}}' data-tags='{{host_dic["tags"]}}' data-target='#myModal'>
+    <p>Tags: <span id='span_tag_{{host_dic["host"].replace(".","_")}}'>{{ host_dic["tags_joined"] }}</span></p>
+    <button id='btn_tag_{{host_dic["host"].replace(".","_")}}' custom_tag='{{host_dic["tags_joined"]}}' type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-host='{{host_dic["host"]}}' data-tags='{{host_dic["tags_joined"]}}' data-target='#myModal'>
         Edit Tags
     </button>
 

@@ -82,6 +82,8 @@ def load_hosts(page=1):
     hosts = hosts_handler(page=int(page) + 1, filter_field = filter_field, filter_regex = filter_regex)
     for host_dic in hosts:
         host_dic["host_hash"] = str(hashlib.md5(host_dic["host"]).hexdigest())
+        if "tags" in host_dic:
+            host_dic["tags_joined"] = ",".join(host_dic["tags"])
 
     if request_wants_json():
         return Response(json.dumps(hosts), mimetype="application/json")

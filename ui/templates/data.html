@@ -304,6 +304,7 @@
 
 		var newTag = function(){
 			var tag = $('#addText').val();
+			//console.log(tag);
 			if(tag == '')
 				return false;
 			renderTags(tag);
@@ -318,8 +319,10 @@
 			'<button type="button" onclick="remove(this);" class="keyword btn btn-default-inverse btn-sm" style="margin-top:10px;margin-right:5px">' +
 				'<span class="glyphicon glyphicon-remove" aria-hidden="true"></span> ####' +
 			'</button>';
+			//console.log(key);
 			template = template.replace('####',key);
 			$('#tags').append(template);
+			console.log($('#tags').text());
 		};
 
 		var saveTags = function() {
@@ -327,6 +330,7 @@
             var host = $("#host-placeholder").val();
             var tagsStr = "";
             $.each($(".keyword"), function(index, elem) {
+            	console.log($(elem).text());
                 tags.push($(elem).text().trim());
                 tagsStr = tagsStr + ", " + $(elem).text().trim();
 			});
@@ -352,6 +356,7 @@
 			var obj = $.parseJSON(data);
 			$.each(obj, function(index, elem){
 				renderTags(elem);
+				console.log(elem);
 			});
 		};
 
@@ -393,6 +398,8 @@
 				$('#tags').empty();
 				var obj = dataTags.split(",");
 				$.each(obj, function(index, elem){
+					console.log("in doc.ready: ");
+					console.log(elem);
 					renderTags(elem.trim());
 				});
 			})
@@ -410,13 +417,24 @@
 				window.location.replace(search_url);
 				return false;
 			};
+			
+			var searchDoAuto = function(search_term){
+				var search_url = "/data?filter-field=host&filter-regex=" + search_term;
+				window.location.replace(search_url);
+				return false;
+			};
 
+			var tag_host_identifier = "Host: ";
+			var tag_search_identifier = "Tag: ";
 			$("#search").autocomplete({
 				minLength: 3,
 				delay: 200,
 				search: function( event, ui ) {console.log(ui);},
 				select: function( event, ui ) {
-					return searchDo();
+
+					search_term = ui.item.value.replace(tag_search_identifier, "").replace(tag_host_identifier, "").trim()
+					console.log(ui.item.value.replace(tag_search_identifier, "").replace(tag_host_identifier, "").trim());
+					return searchDoAuto(search_term);
 				},
 				source: function( request, response ) {
 			        var resultsArray = [];
@@ -425,14 +443,23 @@
 						url: tagsUrl + request.term,
 						async: false,
 						success: function(data){
+							console.log("JSON search data:");
+							console.log(data);
 							var obj = $.parseJSON(data);
-							$.each(obj, function(index, elem){
-								resultsArray.push(new SearchResponseItem(elem.host, "host"));
+							$.each(obj.tag_matches, function(index, elem){
+								//resultsArray.push(new SearchResponseItem(elem.host, "host"));
+								resultsArray.push(new SearchResponseItem("Tag: " + String(elem.tags_filtered), "tags_filtered"));
 							});
+							$.each(obj.host_matches, function(index, elem){
+								//resultsArray.push(new SearchResponseItem(elem.host, "host"));
+								resultsArray.push(new SearchResponseItem("Host: " + String(elem.host), "hosts"));
+							});							
+							
 							return resultsArray;
 						}
 					})
-					return response(resultsArray);
+					console.log($.unique(resultsArray));
+					return response($.unique(resultsArray));
 				}
 			});
 

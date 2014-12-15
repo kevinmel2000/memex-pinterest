@@ -9,6 +9,7 @@ from urlparse import urlparse
 from pymongo.errors import DuplicateKeyError
 from bson.objectid import ObjectId
 from errors import DeletingSelectedWorkspaceError
+import re
 
 class MemexMongoUtils(object):
 
@@ -394,6 +395,18 @@ class MemexMongoUtils(object):
         #docs = self.hostinfo_collection.find({filter_field:{'$regex':filter_regex}}).sort("host_score", -1)
         return docs
 
+    def get_hosts_by_tag_match(self, filter_regex):
+        query = {'$and' : [{"tags" : {'$regex' : filter_regex}}, { "display": { "$ne": 0 }}]}
+        docs = self.hostinfo_collection.find(query).sort("host_score", -1)
+        #docs = self.hostinfo_collection.find({filter_field:{'$regex':filter_regex}}).sort("host_score", -1)
+        return docs
+
+    def get_hosts_by_host_match(self, filter_regex):
+        query = {'$and' : [{"host" : {'$regex' : filter_regex}}, { "display": { "$ne": 0 }}]}
+        docs = self.hostinfo_collection.find(query).sort("host_score", -1)
+        #docs = self.hostinfo_collection.find({filter_field:{'$regex':filter_regex}}).sort("host_score", -1)
+        return docs
+
 ############# TAGS #############
 
     def save_tags(self, host, tags):
@@ -401,11 +414,15 @@ class MemexMongoUtils(object):
 
     def search_tags(self, term):
         #ws_doc  = self.hostinfo_collection.find({'$or':[{"host":{'$regex':term}},{"tags":{'$regex':term}}]}).sort("host_score", -1)
-        ws_doc  = self.get_hosts_filtered("host", term)
-        if None == ws_doc:
+        #ws_doc  = self.get_hosts_filtered("host", term)
+        tag_matches = self.get_hosts_by_tag_match(term)
+        host_matches = self.get_hosts_by_host_match(term)
+        ws_doc = {"tag_matches" : list(tag_matches), "host_matches" : list(host_matches)}
+
+        if not tag_matches and not host_matches:
             return None
         else:
-            return list(ws_doc)
+            return ws_doc
 
     def list_tags(self, host):
         ws_doc = self.hostinfo_collection.find_one({"host" : host})
@@ -416,8 +433,6 @@ class MemexMongoUtils(object):
 
 ############# Display Hosts #############
 
-############# Display Hosts #############
-
     def save_display(self, host, displayable):
         self.hostinfo_collection.update({"host" : host}, {'$set': {'display': displayable}})
         self.urlinfo_collection.update({"host" : host}, {'$set': {'display': displayable}}, multi=True)
@@ -425,7 +440,6 @@ class MemexMongoUtils(object):
 if __name__ == "__main__":
 
     mmu = MemexMongoUtils()
-    
     MemexMongoUtils(which_collection="crawl-data", init_db=True)
     MemexMongoUtils(which_collection="known-data", init_db=True)
     MemexMongoUtils(which_collection="cc-crawl-data", init_db=True)

@@ -5,6 +5,7 @@ from settings import SCREENSHOT_DIR
 from mongoutils.known_hosts import KnownHostsCompare
 from mongoutils.validate import validate_url
 from ranker.rescore_mongo import train_and_score_mongo
+import re
 
 def get_screenshot_relative_path(real_path):
     try:
@@ -135,7 +136,22 @@ def save_tags(host, tags):
 
 def search_tags(term):
     mmu = MemexMongoUtils()
-    return mmu.search_tags(term)
+    search_results_docs = mmu.search_tags(term)
+    tag_search_results_docs = search_results_docs["tag_matches"]
+    for doc in tag_search_results_docs:
+        _add_filtered_tags(doc, term)
+
+    return search_results_docs
+
+def _add_filtered_tags(doc, term):
+    #adds tags_filtered field
+    tags_filtered = []
+    if "tags" in doc:
+        for tag in doc["tags"]:
+            if re.search(term, tag, re.IGNORECASE):
+                tags_filtered.append(tag)
+            
+    doc["tags_filtered"] = tags_filtered
 
 ############# Display Hosts #############
 
