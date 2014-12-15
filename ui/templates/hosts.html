@@ -35,7 +35,7 @@
 <p><a href="{{ url_path }}/{{ host_dic["host"] }}">URLs: {{ host_dic["num_urls"] }}</a></p>
 
 {% if host_dic["host_score"] != 0 and not use_known_data %}
-  <p>Score: {{ host_dic["host_score"] }}</p>
+  <p>Score: {{ (host_dic["host_score"]*10)|round(1, "common") }}</p>
 {% endif %}
 
 
