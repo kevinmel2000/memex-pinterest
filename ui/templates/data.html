@@ -61,7 +61,8 @@
 ================================================== -->
 
 <body>
-	<div id="top-of-page"></div>
+	<div id="top-of-page"><a id="memtool" class="glyphicon glyphicon-question-sign" style="opacity:1; font-size:20px;float:right;margin-right:240px;margin-top:50px;"></a></div>
+	
 	<div class="jquery-script-ads">
 		<script type="text/javascript"></script>
 	</div>
@@ -263,6 +264,19 @@
 	//return $.waypoints('viewportHeight') - $(this).height() + 100;
 
 	$(document).ready(function() {
+
+			var tooltip_message = "<span>" +
+			"This page allows you to view the results of your various crawls. The x's and check marks in each pin allow you to mark interest or disinterest in a webpage. " +
+			"This will help to train the crawler and provide scores to these websites. If some results on this page are not scored (a pin will have a 'score' field " +
+			"once scoring has taken place), that is because scoring must be triggered by the user whenever webpages are added to the system. " +
+			"But don't worry, it's really easy, just train the crawler by clicking x's and checks, then head on over to the Score Results link in the navigation bar. " +
+			"</span>";
+		
+			console.log("before");
+            $('#memtool').tooltipster({
+                content: $(tooltip_message)
+            });
+			console.log("after");
 
 		$('#blog-landing').pinterest_grid({
 			no_columns : 4,

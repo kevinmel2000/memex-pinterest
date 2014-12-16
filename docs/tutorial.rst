@@ -27,6 +27,7 @@ SourcePin is easy to install, here are the steps.
     pip install tldextract
     pip install reppy
     pip install scrapy-inline-requests
+    pip install html2text
 
 If any of the previous commands fail, please see the documentation 
 for each respective project or email acaceres@hyperiongray.com for help. 
@@ -72,7 +73,13 @@ Now it's time to instantiate the database. You can do this by doing the followin
     cd ui/mongoutils
     python memex_mongo_utils.py
 
-You should see some messages that the db is being instantiated, and you're good to go!
+You should see some messages that the db is being instantiated!
+
+Now we must install the memex-scrapy-utils, which has various utilities that the spiders use ::
+
+   git clone https://github.com/TeamHG-Memex/memex-scrapy-utils.git
+   sudo python setup.py install
+
 
 Using the UI
 ============

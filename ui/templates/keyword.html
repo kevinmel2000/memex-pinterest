@@ -62,7 +62,7 @@
 				<div class="col-lg-12">
 					<div class="panel panel-default">
 						<div class="panel-heading">
-							<h3 class="panel-title">Target Keywords</h3>
+							<h3 class="panel-title" style="display:inline;">Target Keywords </h3><a id="memtool" class="glyphicon glyphicon-question-sign" style="opacity:1; font-size:20px;"></a>
 						</div>
 						<div class="panel-body">
 							<div>
@@ -172,6 +172,17 @@
 
 
 		$(document).ready(function() {
+
+			var tooltip_message = "<span>" +
+			"Use this to upload keywords about your domain. These should be words that would typically show up in the HTML of the pages you are interested in." +
+			"</span>";
+		
+			console.log("before");
+            $('#memtool').tooltipster({
+                content: $(tooltip_message)
+            });
+			console.log("after");
+
 			$('#addText').keypress(function(e) {
 					if (e.which == 13) {// enter pressed
 						newKey.apply();

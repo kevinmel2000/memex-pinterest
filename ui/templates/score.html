@@ -73,7 +73,7 @@
 	
 	<button id="rescoreDb" class="btn" style="width:550px; background-color:black; height:100px; color:white;" type="button">
 		Rescore Hosts
-	</button>
+	</button><a id="memtool" class="glyphicon glyphicon-question-sign" style="opacity:1; font-size:20px;margin-left:7px;"></a>
 	<p id="scoreRunning" style="display:none; margin-top:5px;">Scoring is now running in the background, once it is done the <a href="/data">Crawl Results</a> page will
 	include updated scoring.</p>
 	
@@ -99,6 +99,24 @@
 	}
 
 	$(document).ready(function() {
+	
+			var tooltip_message = "<span>" +
+			"Use this page to score your crawl results. Once scored, crawl results will contain a score and will " +
+			"be organized by those that the system thinks are of most relevance to you. To train the crawler, simple " +
+			"head over to the View Crawl Results link and click check marks and x's next to hosts. Clicking a check mark will show interest in the content of a webpage while " +
+			"clicking an x will tell the system that you are not interested in a webpage's content. Once you have done " +
+			"that for a good amount of hosts, click the Rescore Hosts button to run scoring.<br /><br /> <strong>Scoring can take a while, so be patient! Anytime URLs " +
+			"are added (for example if you've run a new crawl, or ran this when a crawl was still running), rescoring should be performed.<strong>" +
+			"</span>";
+		
+			console.log("before");
+            $('#memtool').tooltipster({
+                content: $(tooltip_message)
+            });
+			console.log("after");
+	
+	
+	
 		$('#rescoreDb').click(startScoring);
 		
 	});

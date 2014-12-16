@@ -5,12 +5,16 @@
 <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
 <script src="{{ url_for('static', filename='js/jquery-1.9.1.min.js') }}"></script>
 <script src="{{ url_for('static', filename='js/jquery-ui.min.js') }}"></script>
+<script src="{{ url_for('static', filename='js/jquery.tooltipster.min.js') }}"></script>
 <script src="{{ url_for('static', filename='js/waypoints.min.js') }}"></script>
 <script src="{{ url_for('static', filename='js/d3.v3.min.js') }}" charset=utf-8></script>
 <link href="{{ url_for('static', filename='css/jquery-ui.css') }}" rel=stylesheet>
 <link href="{{ url_for('static', filename='css/bootstrap.min.css') }}" rel=stylesheet>
 <link href="{{ url_for('static', filename='css/d3.slider.css') }}" rel=stylesheet>
 <link href="{{ url_for('static', filename='css/hg.css') }}" rel=stylesheet>
+<link href="{{ url_for('static', filename='css/tooltipster.css') }}" rel=stylesheet>
+
+
 <link href=https://netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap-glyphicons.css rel=stylesheet>
 <script src=https://netdna.bootstrapcdn.com/bootstrap/3.0.3/js/bootstrap.min.js></script>
 
@@ -76,6 +80,12 @@ var posting = $.get( url, function(data){
         }
     });	
 });
+
+
+$(document).ready(function() {
+    $('.tooltip').tooltipster();
+});
+
 </script>
 
 <!--<div id="content">-->

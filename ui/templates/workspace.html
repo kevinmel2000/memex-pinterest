@@ -60,7 +60,7 @@
 		<div class="container marketing">
 			<div class="row" >
 				<div class="col-lg-8">
-					<h1 style="margin-top:50px;margin-left: 20px"> Select or Create a Workspace</h1>
+					<h1 style="margin-top:50px;margin-left: 20px"> Select or Create a Workspace <a id="memtool" class="glyphicon glyphicon-question-sign" style="opacity:1; font-size:20px;"></a></h1>
 					<div id="wsList" class="list-group">
 						<!-- 
 						<a href="#" class="list-group-item">Human Trafficking <span class="badge">1540</span></a>
@@ -91,6 +91,24 @@
 	<script>
 
 		$(document).ready(function() {
+		
+		
+			var tooltip_message = "<span>" +
+			"Use the menu to select your workspace. The links within the menu will allow you to:" +
+			"<ul>" +
+			"<li><strong>Define Keyword:</strong> Keywords can be defined for this workspace. Adding keywords improves site scoring, allowing you to find sites you are interested in faster.</li>" +
+			"<li><strong>Upload Known Sites:</strong> Specify sites that you know about so the system can recognize them when you are viewing your crawl results.</li>" +
+			"<li><strong>Manage Crawls:</strong> Start new crawls and view crawls that are running.</li>" +
+			"<li><strong>Score Results:</strong> Run our scoring system on your crawl results. When this is run your results will include scores and be displayed with highest scoring results first.</li>" +	
+			"</ul>" +
+			"</span>";
+		
+			console.log("before");
+            $('#memtool').tooltipster({
+                content: $(tooltip_message)
+            });
+			console.log("after");
+
 
 			var url = '/api/workspace/';
 			var store;
