@@ -261,6 +261,10 @@ class MemexMongoUtils(object):
 
         self.urlinfo_collection.update({"url" : url}, {'$set' : {"screenshot_path" : screenshot_path}})        
 
+    def set_html_rendered(self, url, html_rendered):
+
+        self.urlinfo_collection.update({"url" : url}, {'$set' : {"html_rendered" : html_rendered}})
+
     def delete_urls_by_match(self, match, negative_match = False):
         """Remove hosts and urls by matching URLs"""
 

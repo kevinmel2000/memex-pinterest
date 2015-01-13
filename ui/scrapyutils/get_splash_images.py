@@ -23,8 +23,6 @@ class SplashGet(object):
     def __init__(self, screenshot_dir, which_collection = "crawl-data"):
         self.mmu = MemexMongoUtils(which_collection = which_collection)
         self.screenshot_dir = screenshot_dir
-        self.splash_base = open("")
-
 
     def makedir(self, path):
         try:
@@ -51,13 +49,16 @@ class SplashGet(object):
         data = json.loads(splash_response.text, encoding='utf8')
     
         screenshot_path = self.save_screenshot(get_domain(url), data)
-        return screenshot_path
+        html_rendered = data["html"]
+        
+        return screenshot_path, html_rendered
 
     def request_and_save(self, url):
         print "Getting screenshot for %s" % url
         splash_response = self.splash_request(url)
-        screenshot_path = self.process_splash_response(url, splash_response)
+        screenshot_path, html_rendered = self.process_splash_response(url, splash_response)
         self.mmu.set_screenshot_path(url, screenshot_path)
+        self.mmu.set_html_rendered(url, html_rendered)
 
     def resolve_images_by_host(self, host):
         url_dics = self.mmu.list_urls(host, limit=2000)
@@ -84,6 +85,6 @@ class SplashGet(object):
 
 if __name__ == "__main__":
     
-    sg = SplashGet(screenshot_dir = "/home/memex-punk/memex-dev/workspace/memex-pinterest/ui/static/images/screenshots")
+    sg = SplashGet(screenshot_dir = "/home/ubuntu/memex-pinterest-git/ui/static/images/screenshots")
     #sg.request_and_save("http://duskgytldkxiuqc6.onion/fedpapers/federa23.htm")
     sg.resolve_images_by_host_match(".onion")
