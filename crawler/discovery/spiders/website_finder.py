@@ -197,6 +197,7 @@ class WebsiteFinderSpider(scrapy.Spider):
                 'width': '640',
                 'height': '480',
                 'timeout': '60',
+                'images' : 0
             },
             'download_timeout': 60,
         })
