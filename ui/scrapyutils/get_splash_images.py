@@ -14,6 +14,8 @@ from crawler.discovery.urlutils import (
     get_domain,
 )
 from ui.mongoutils.memex_mongo_utils import MemexMongoUtils
+from crawler.discovery.settings import SPLASH_URL
+
 
 class SplashGet(object):
     """Manually get a splash screenshot"""
@@ -21,6 +23,8 @@ class SplashGet(object):
     def __init__(self, screenshot_dir, which_collection = "crawl-data"):
         self.mmu = MemexMongoUtils(which_collection = which_collection)
         self.screenshot_dir = screenshot_dir
+        self.splash_base = open("")
+
 
     def makedir(self, path):
         try:
@@ -30,7 +34,7 @@ class SplashGet(object):
     
     def splash_request(self, url):
 
-        splash_response = requests.get('http://localhost:8050/render.json?url=%s&html=1&png=1&wait=2.0&width=640&height=480&timeout=60' % url)
+        splash_response = requests.get(SPLASH_URL + '/render.json?url=%s&html=1&png=1&wait=2.0&width=640&height=480&timeout=60&images=0' % url)
         return splash_response
 
     def save_screenshot(self, prefix, data):
