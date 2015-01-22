@@ -13,7 +13,7 @@ import re
 
 class MemexMongoUtils(object):
 
-    def __init__(self, init_db=False, address="localhost", port=27017, which_collection="crawl-data"):
+    def __init__(self, init_db=False, address="mongodb", port=27017, which_collection="crawl-data"):
         """This class  initializes a Memex Mongo object and rebuilds the db collections if you want.
 
         Warning: init_db will delete your collection when set to True
@@ -23,6 +23,7 @@ class MemexMongoUtils(object):
         """
 
         self.client = MongoClient(address, port)
+        
         db = self.client["MemexHack"]
 
         workspace_collection_name = "workspace"
@@ -448,3 +449,6 @@ if __name__ == "__main__":
     MemexMongoUtils(which_collection="known-data", init_db=True)
     MemexMongoUtils(which_collection="cc-crawl-data", init_db=True)
     mmu.init_workspace()
+#    mmu.insert_url(url = "http://www.google.com/")
+#    print mmu.list_all_urls()
+    

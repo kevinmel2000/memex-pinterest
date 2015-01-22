@@ -101,8 +101,7 @@ class WebsiteFinderSpider(scrapy.Spider):
     max_external_links_per_seed_per_domain = 5
     max_external_links_per_domain = 10
 
-    # screenshot_dir = 'data/screenshots'
-    # screenshot_dir = '/Users/kmike/scrap/memex-hackathon-1/ui/static/images/screenshots'
+    screenshot_dir = '/ui/static/images/screenshots'
 
     def __init__(self, seed_urls, save_html=1, use_splash=1, screenshot_dir=None, **kwargs):
         self.save_html = bool(int(save_html))
