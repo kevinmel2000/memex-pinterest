@@ -1,0 +1,14 @@
+mongodb:
+  image: dockerfile/mongodb:latest
+splash:
+  image: scrapinghub/splash
+sourcepin:
+  build: .
+  volumes: 
+    - /data/db:/data/db
+  ports:
+    - "80:80"
+    - "6800:6800"
+  links:
+    - mongodb
+    - splash

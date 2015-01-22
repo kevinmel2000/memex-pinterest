@@ -25,16 +25,16 @@ USER_AGENT_LIST = [
     'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_7_3) AppleWebKit/534.55.3 (KHTML, like Gecko) Version/5.1.3 Safari/534.53.10'
 ]
 
-ONION_HTTP_PROXY = 'http://127.0.0.1:8123'
+ONION_HTTP_PROXY = 'http://onionprox:8123'
 
 ROBOTS_CRAWLDELAY_ENABLED = True
 AUTOTHROTTLE_ENABLED = False  # it doesn't play well with RobotsCrawlDelayMiddleware
 DUPEFILTER_CLASS = 'discovery.splash_ext.SplashAwareDupeFilter'  # needed by SplashMiddleware
 HTTPCACHE_STORAGE = 'discovery.splash_ext.SplashAwareFSCacheStorage'  # needed by SplashMiddleware
-SPLASH_URL = 'http://54.148.140.10:8050'
-SPLASH_PROXY_URL = 'http://54.148.140.10:8051'
+SPLASH_URL = 'http://splash:8050'
+SPLASH_PROXY_URL = 'http://splash:8051'
 
-MONGO_URI = "localhost:27017"
+MONGO_URI = "mongodb:27017"
 MONGO_DATABASE = 'MemexHack'
 ITEM_PIPELINES = {
     'discovery.pipelines.SourcePinPipeline': 100,
