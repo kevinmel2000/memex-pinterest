@@ -1,9 +1,15 @@
 mongodb:
   image: dockerfile/mongodb:latest
+sourcetor:
+   image: acaceres2176/sourcetor
 splash:
   image: scrapinghub/splash
+  volumes: 
+    - "./torstuff/proxy-profiles:/etc/splash/proxy-profiles"
+  links:
+    - sourcetor
 sourcepin:
-  build: .
+  image: acaceres2176/sourcepin
   volumes: 
     - /data/db:/data/db
   ports:
@@ -12,3 +18,4 @@ sourcepin:
   links:
     - mongodb
     - splash
+    - sourcetor

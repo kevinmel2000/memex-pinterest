@@ -25,7 +25,7 @@ USER_AGENT_LIST = [
     'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_7_3) AppleWebKit/534.55.3 (KHTML, like Gecko) Version/5.1.3 Safari/534.53.10'
 ]
 
-ONION_HTTP_PROXY = 'http://onionprox:8123'
+ONION_HTTP_PROXY = 'http://sourcetor:8123'
 
 ROBOTS_CRAWLDELAY_ENABLED = True
 AUTOTHROTTLE_ENABLED = False  # it doesn't play well with RobotsCrawlDelayMiddleware
