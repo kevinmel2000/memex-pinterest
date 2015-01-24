@@ -1,0 +1,41 @@
+FROM ubuntu:12.04
+ENV DEBIAN_FRONTEND noninteractive
+
+# software-properties-common contains "add-apt-repository" command for PPA conf
+RUN apt-get update && apt-get install -y software-properties-common python-software-properties libxml2-dev libxslt1-dev python-dev build-essential python-lxml python-pip libffi-dev
+
+# Add the package verification key
+RUN apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv 7F0CEB10
+
+# Add MongoDB to the repository sources list
+RUN echo 'deb http://downloads-distro.mongodb.org/repo/ubuntu-upstart dist 10gen' | tee /etc/apt/sources.list.d/mongodb.list
+
+# Update the repository sources list once more
+RUN apt-get update
+
+# Install MongoDB package (.deb)
+RUN apt-get install -y mongodb-org
+
+# Create the default data directory
+RUN mkdir -p /data/db
+
+RUN pip install \
+	pymongo \
+	scrapy \
+	scrapyd \
+	python-scrapyd-api \
+	lxml \
+	service_identity \
+	pytest \
+	tldextract \
+	reppy \
+	scrapy-inline-requests \
+	flask
+
+ADD . /memex-pinterest
+
+EXPOSE 80
+
+WORKDIR /memex-pinterest
+
+ENTRYPOINT ["bash", "start_all_services.bash"]

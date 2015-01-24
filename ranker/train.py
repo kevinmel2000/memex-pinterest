@@ -141,8 +141,10 @@ def train_on_user_input():
     print classification_report(y_test, y_pred)
         
     cross_val_score(pipe, np.array(X), np.array(y), cv=10, scoring='f1').mean()
-    
-    print get_informative_features_binary(vec, clf, 200)
+    try:
+        print get_informative_features_binary(vec, clf, 200)
+    except:
+        print "Couldn't print all informative features, but scoring anyway"
         
     pipe.fit(X, y)
     

@@ -5,3 +5,10 @@ tqdm
 # numpy==1.9.0
 # scipy==0.14
 # scikit-learn==0.15.2
+
+#apt-get install python-pip
+#apt-get install python-dev
+#apt-get install python-numpy
+#pip install numpy --upgrade
+#apt-get install python-scipy
+#apt-get install gfortran libopenblas-dev liblapack-dev

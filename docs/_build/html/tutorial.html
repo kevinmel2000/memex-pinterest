@@ -55,89 +55,31 @@
 <ul class="simple">
 </ul>
 </div>
-<div class="section" id="install">
-<h2>Install<a class="headerlink" href="#install" title="Permalink to this headline">¶</a></h2>
-<p>SourcePin is easy to install, here are the steps.</p>
-<ul>
-<li><p class="first">Install dependencies</p>
-<div class="highlight-python"><div class="highlight"><pre>sudo apt-get install mongodb
-sudo apt-get install libxml2-dev libxslt1-dev python-dev
-sudo apt-get build-dep python-lxml
-pip install pymongo
-pip install scrapy
-pip install scrapyd
-pip install splash
-pip install python-scrapyd-api
-pip install lxml
-pip install service_identity
-pip install pytest
-pip install tldextract
-pip install reppy
-pip install scrapy-inline-requests
+<div class="section" id="install-usage">
+<h2>Install &amp; Usage<a class="headerlink" href="#install-usage" title="Permalink to this headline">¶</a></h2>
+<p>Download the <a class="reference external" href="https://github.com/TeamHG-Memex/memex-pinterest">SourcePin source code</a>.</p>
+<p>SourcePin is Docker and Fig based. First you need to install docker, see instructions
+<a class="reference external" href="https://docs.docker.com/installation/#installation">here</a>. Next install fig</p>
+<div class="highlight-python"><div class="highlight"><pre>$ sudo pip install fig
 </pre></div>
 </div>
-</li>
-</ul>
-<p>If any of the previous commands fail, please see the documentation
-for each respective project or email <a class="reference external" href="mailto:acaceres&#37;&#52;&#48;hyperiongray&#46;com">acaceres<span>&#64;</span>hyperiongray<span>&#46;</span>com</a> for help
-(Splash in particular can cause some trouble).</p>
-<p>Once dependencies have been installed please check out the SourcePin code by doing</p>
-<div class="highlight-python"><div class="highlight"><pre>git@github.com:acaceres2176/memex-hackathon-1.git
+<p>Now start SourcePin from the repo root directory by typing</p>
+<div class="highlight-python"><div class="highlight"><pre>$ sudo fig up
 </pre></div>
 </div>
-<p>If you don&#8217;t have access to this repo please email <a class="reference external" href="mailto:acaceres&#37;&#52;&#48;hyperiongray&#46;com">acaceres<span>&#64;</span>hyperiongray<span>&#46;</span>com</a>.</p>
-<p>Once dependencies are installed and the code is checked out head on over to the scrapy crawler
-&#8220;discovery&#8221; crawler directory, from the project root:</p>
-<div class="highlight-python"><div class="highlight"><pre>cd crawler
-scrapyd
+<p>This will take a little while, be patient. Then open up a web browser and go to <a class="reference external" href="http://localhost">http://localhost</a>. You should
+see SourcePin running.</p>
+<p>In order to stop SourcePin go to the root directory of the cloned repo and type</p>
+<div class="highlight-python"><div class="highlight"><pre>$ sudo fig stop
 </pre></div>
 </div>
-<p>This will start scrapyd on your local machine on port 6800. Next, start the Splash server by doing</p>
-<div class="highlight-python"><div class="highlight"><pre>python -m splash.server
+<p>To restart SourcePin type</p>
+<div class="highlight-python"><div class="highlight"><pre>$ sudo fig start
 </pre></div>
 </div>
-<p>This will start splash on your local machine.</p>
-<p>Almost there... now it&#8217;s time to configure the server application, pop open <em>ui/settings.py</em>. The only
-config value that you really need to worry about is</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="n">SCREENSHOT_DIR</span> <span class="o">=</span> <span class="s">&#39;/home/memex-punk/memex-dev/workspace/memex-pinterest/ui/static/images/screenshots&#39;</span>
-</pre></div>
-</div>
-<p>Replace the above with the equivalent directory on your filesystem, for example yours may be <em>&#8216;/home/your-user/memex-hackathon-1/ui/static/images/screenshots&#8217;</em>.</p>
-<p>Now you&#8217;re ready to start the SourcePin application,
-from the project root</p>
-<div class="highlight-python"><div class="highlight"><pre>python server.py
-</pre></div>
-</div>
-<p>Now open up your web browser and go to <a class="reference external" href="http://localhost:5000">http://localhost:5000</a>. You should see a blank page with
-the Hyperion Gray SourcePin title at the top.</p>
-<p>Now it&#8217;s time to instantiate the database. You can do this by doing the following from the project root</p>
-<div class="highlight-python"><div class="highlight"><pre>cd ui/mongoutils
-python memex_mongo_utils.py
-</pre></div>
-</div>
-<p>You should see some messages that the db is being instantiated, and you&#8217;re good to go!</p>
-</div>
-<div class="section" id="using-the-ui">
-<h2>Using the UI<a class="headerlink" href="#using-the-ui" title="Permalink to this headline">¶</a></h2>
-<p>In the base install the UI provides 2 important interfaces. The first is the ability to provide
-a seed URL, which performs crawls and the other an interface to view these results to make a decision
-on their relevance to your particular interest set.</p>
-<p>To get started click over to the Crawl New Sites tab, it should look like this:</p>
-<a class="reference internal image-reference" href="_images/crawl-new.png"><img alt="Crawl a new website from here" class="align-center" src="_images/crawl-new.png" style="width: 800px; height: 400px;" /></a>
-<p>Enter a website that you want to seed from in the box and click Submit. You should see the website
-inerted into a table on the screen and go into a state of &#8220;Running&#8221;. At this point, the site has
-been sent to our Scrapy based crawler, is being crawled and screenshotted, and being inserted into
-the database. Feel free to test this out on <a class="reference external" href="http://www.hyperiongray.com/">http://www.hyperiongray.com/</a> at your leisure. It should
-look like this:</p>
-<a class="reference internal image-reference" href="_images/running-crawl.png"><img alt="A running crawl" class="align-center" src="_images/running-crawl.png" style="width: 800px; height: 400px;" /></a>
-<p>Once you&#8217;ve entered some seeds in there, the system is crawling using Scrapy/Scrapyd, sending web pages
-to be rendered in a WebKit browser using Splash, and storing information in the database. To browse the
-results, check out the View Crawl Data link. It should look like this:</p>
-<a class="reference internal image-reference" href="_images/success-crawl.png"><img alt="Viewing successful crawl data" class="align-center" src="_images/success-crawl.png" style="width: 800px; height: 400px;" /></a>
-<p>Once you are viewing the crawl data successfully, you can drill down on specific hosts. In doing so
-you&#8217;ll open a &#8220;URL-level view&#8221; of the data. You should see screenshots of individual pages associated
-with a host. You can then mark interest or disinterst in them. This information gets stored in the database
-and can be used as generic user feedback and training data when plugging in to the scoring API.</p>
+<p>An important note: be careful with the sudo fig up command, it will clear your data and give you a clean
+instance of SourcePin. Instead, if you want to stop and start without clearing the database, use start/stop.
+This is important.</p>
 </div>
 <div class="section" id="using-the-api">
 <h2>Using the API<a class="headerlink" href="#using-the-api" title="Permalink to this headline">¶</a></h2>
@@ -369,8 +311,7 @@ server.py.</p>
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="intro.html">Introduction</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="">Tutorial</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="#install">Install</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#using-the-ui">Using the UI</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#install-usage">Install &amp; Usage</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#using-the-api">Using the API</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#writing-an-analysis-plugin">Writing an analysis plugin</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#troubleshooting">Troubleshooting</a></li>

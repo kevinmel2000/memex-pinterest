@@ -6,7 +6,7 @@ from scrapyd_api import ScrapydAPI
 
 class ScrapydJob(object):
 
-    def __init__(self, scrapyd_host="localhost", scrapyd_port="6800", project="default", spider="website_finder", screenshot_dir=""):
+    def __init__(self, scrapyd_host="localhost", scrapyd_port="6800", project="default", spider="website_finder", screenshot_dir='/memex-pinterest/ui/static/images/screenshots'):
 
         scrapy_url = "http://" + scrapyd_host + ":" + str(scrapyd_port)
         self.scrapi = ScrapydAPI(scrapy_url)

@@ -6,122 +6,34 @@ Tutorial
    :maxdepth: 2
 
 
-Install
-=======
+Install & Usage
+===============
 
-SourcePin is easy to install, here are the steps.
+Download the `SourcePin source code <https://github.com/TeamHG-Memex/memex-pinterest>`_.
 
-* Install dependencies ::
+SourcePin is Docker and Fig based. First you need to install docker, see instructions
+`here <https://docs.docker.com/installation/#installation>`_. Next install fig ::
 
-    sudo apt-get install mongodb
-    sudo apt-get install libxml2-dev libxslt1-dev python-dev
-    sudo apt-get build-dep python-lxml
-    pip install pymongo
-    pip install scrapy
-    pip install scrapyd
-    pip install splash
-    pip install python-scrapyd-api
-    pip install lxml
-    pip install service_identity
-    pip install pytest
-    pip install tldextract
-    pip install reppy
-    pip install scrapy-inline-requests
-    pip install html2text
-
-If any of the previous commands fail, please see the documentation 
-for each respective project or email acaceres@hyperiongray.com for help. 
-Splash in particular can cause some trouble - it has a bunch of requirements to run properly,
-see here: http://splash.readthedocs.org/en/latest/install.html.
-
-Once dependencies have been installed please check out the SourcePin code by doing ::
-
-    git@github.com:acaceres2176/memex-pinterest.git
+    $ sudo pip install fig
     
-If you don't have access to this repo please email acaceres@hyperiongray.com.
-
-Once dependencies are installed and the code is checked out head on over to the scrapy crawler
-"discovery" crawler directory, from the project root: ::
-
-    cd crawler
-    scrapyd
+Now start SourcePin from the repo root directory by typing ::
+     
+     $ sudo fig up
     
-This will start scrapyd on your local machine on port 6800. Next, start the Splash server by doing ::
+This will take a little while, be patient. Then open up a web browser and go to http://localhost. You should
+see SourcePin running.
 
-    python -m splash.server
-
-This will start splash on your local machine.
-
-Almost there... now it's time to configure the server application, pop open *ui/settings.py*. The only
-config value that you really need to worry about is ::
-
-   SCREENSHOT_DIR = '/home/memex-punk/memex-dev/workspace/memex-pinterest/ui/static/images/screenshots'
-
-Replace the above with the equivalent directory on your filesystem, for example yours may be *'/home/your-user/memex-hackathon-1/ui/static/images/screenshots'*.
-
-Now you're ready to start the SourcePin application,
-from the project root ::
-
-   cd ui
-   python server.py
+In order to stop SourcePin go to the root directory of the cloned repo and type ::
     
-Now open up your web browser and go to http://localhost:5000. You should see a blank page with
-the Hyperion Gray SourcePin title at the top.
-
-Now it's time to instantiate the database. You can do this by doing the following from the project root ::
-
-    cd ui/mongoutils
-    python memex_mongo_utils.py
-
-You should see some messages that the db is being instantiated!
-
-Now we must install the memex-scrapy-utils, which has various utilities that the spiders use ::
-
-   git clone https://github.com/TeamHG-Memex/memex-scrapy-utils.git
-   sudo python setup.py install
-
-
-Using the UI
-============
-
-In the base install the UI provides 2 important interfaces. The first is the ability to provide 
-a seed URL, which performs crawls and the other an interface to view these results to make a decision
-on their relevance to your particular interest set.
-
-To get started click over to the Crawl New Sites tab, it should look like this:
-
-.. image:: _static/crawl-new.png
-    :width: 800px
-    :align: center
-    :height: 400px
-    :alt: Crawl a new website from here
+    $ sudo fig stop
     
-Enter a website that you want to seed from in the box and click Submit. You should see the website
-inerted into a table on the screen and go into a state of "Running". At this point, the site has
-been sent to our Scrapy based crawler, is being crawled and screenshotted, and being inserted into
-the database. Feel free to test this out on http://www.hyperiongray.com/ at your leisure. It should
-look like this:
+To restart SourcePin type ::
 
-.. image:: _static/running-crawl.png
-    :width: 800px
-    :align: center
-    :height: 400px
-    :alt: A running crawl
-
-Once you've entered some seeds in there, the system is crawling using Scrapy/Scrapyd, sending web pages
-to be rendered in a WebKit browser using Splash, and storing information in the database. To browse the
-results, check out the View Crawl Data link. It should look like this:
+    $ sudo fig start
     
-.. image:: _static/success-crawl.png
-    :width: 800px
-    :align: center
-    :height: 400px
-    :alt: Viewing successful crawl data
-
-Once you are viewing the crawl data successfully, you can drill down on specific hosts. In doing so
-you'll open a "URL-level view" of the data. You should see screenshots of individual pages associated
-with a host. You can then mark interest or disinterst in them. This information gets stored in the database
-and can be used as generic user feedback and training data when plugging in to the scoring API.
+An important note: be careful with the sudo fig up command, it will clear your data and give you a clean
+instance of SourcePin. Instead, if you want to stop and start without clearing the database, use start/stop.
+This is important.
 
 Using the API
 =============

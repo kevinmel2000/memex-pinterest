@@ -14,6 +14,9 @@ from crawler.discovery.urlutils import (
     get_domain,
 )
 from ui.mongoutils.memex_mongo_utils import MemexMongoUtils
+from crawler.discovery.settings import SPLASH_URL
+import grequests
+
 
 class SplashGet(object):
     """Manually get a splash screenshot"""
@@ -30,7 +33,7 @@ class SplashGet(object):
     
     def splash_request(self, url):
 
-        splash_response = requests.get('http://localhost:8050/render.json?url=%s&html=1&png=1&wait=2.0&width=640&height=480&timeout=60' % url)
+        splash_response = requests.get(SPLASH_URL + '/render.json?url=%s&html=1&png=1&wait=2.0&width=640&height=480&timeout=60&images=0' % url)
         return splash_response
 
     def save_screenshot(self, prefix, data):
@@ -39,6 +42,7 @@ class SplashGet(object):
         self.makedir(dirname)
     
         fn = os.path.join(dirname, md5(png).hexdigest() + '.png')
+        print fn
         with open(fn, 'wb') as fp:
             fp.write(png)
         return fn
@@ -47,13 +51,16 @@ class SplashGet(object):
         data = json.loads(splash_response.text, encoding='utf8')
     
         screenshot_path = self.save_screenshot(get_domain(url), data)
-        return screenshot_path
+        html_rendered = data["html"]
+        
+        return screenshot_path, html_rendered
 
     def request_and_save(self, url):
         print "Getting screenshot for %s" % url
         splash_response = self.splash_request(url)
-        screenshot_path = self.process_splash_response(url, splash_response)
+        screenshot_path, html_rendered = self.process_splash_response(url, splash_response)
         self.mmu.set_screenshot_path(url, screenshot_path)
+        self.mmu.set_html_rendered(url, html_rendered)
 
     def resolve_images_by_host(self, host):
         url_dics = self.mmu.list_urls(host, limit=2000)
@@ -78,8 +85,43 @@ class SplashGet(object):
                 if match_term in url_dic["host"]:
                     self.request_and_save(url_dic["url"])
 
+    def get_url_chunks(self, chunk_size):
+        url_dics = self.mmu.list_all_urls()
+        for i in xrange(0, len(url_dics), chunk_size):
+            yield url_dics[i:i+chunk_size]
+
+
+    """
+    def async_resolve_images_by_host_match(self, match_term, num_simul_urls):
+
+        url_dics = self.get_url_chunks(num_simul_urls)
+        print url_dics
+        for url_dic_chunk in url_dics:
+
+            splash_url_chunk = []
+            for url_dic in url_dic_chunk:
+                if "screenshot_path" not in url_dic:
+                    if match_term in url_dic["host"]:
+                        splash_url = SPLASH_URL + '/render.json?url=' + url_dic["url"] + '&html=1&png=1&wait=2.0&width=640&height=480&timeout=60&images=0'
+                        splash_url_chunk.append((splash_url, url_dic["url"])
+
+            rs = (grequests.get(u) for u in splash_url_chunk[0])
+            responses = grequests.map(rs)
+            for response in responses:
+                url = response.url
+                print response.url
+                screenshot_path, html_rendered = self.process_splash_response(url, response)
+                self.mmu.set_screenshot_path(url, screenshot_path)
+                self.mmu.set_html_rendered(url, html_rendered)
+                
+    """
+
 if __name__ == "__main__":
     
     sg = SplashGet(screenshot_dir = "/home/memex-punk/memex-dev/workspace/memex-pinterest/ui/static/images/screenshots")
     #sg.request_and_save("http://duskgytldkxiuqc6.onion/fedpapers/federa23.htm")
-    sg.resolve_images_by_host_match(".onion")
+    #sg.resolve_images_by_host_match(".onion")
+    sg.async_resolve_images_by_host_match(".", 10)
+    
+    
+    

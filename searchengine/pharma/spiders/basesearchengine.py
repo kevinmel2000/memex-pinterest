@@ -70,6 +70,7 @@ class BaseSearchEngineSpider(scrapy.Spider):
                     'width': '640',
                     'height': '480',
                     'timeout': '60',
+                    'images' : 0
                 },
             }
         else:

@@ -11,6 +11,7 @@ from hashlib import md5
 from urllib import urlencode
 from urlparse import urljoin
 from collections import defaultdict
+from scrapy import log
 
 import scrapy
 from scrapy.contrib.linkextractors import LinkExtractor
@@ -101,8 +102,7 @@ class WebsiteFinderSpider(scrapy.Spider):
     max_external_links_per_seed_per_domain = 5
     max_external_links_per_domain = 10
 
-    # screenshot_dir = 'data/screenshots'
-    # screenshot_dir = '/Users/kmike/scrap/memex-hackathon-1/ui/static/images/screenshots'
+    #screenshot_dir = '/memex-pinterest/ui/static/images/screenshots'
 
     def __init__(self, seed_urls, save_html=1, use_splash=1, screenshot_dir=None, **kwargs):
         self.save_html = bool(int(save_html))
@@ -112,9 +112,8 @@ class WebsiteFinderSpider(scrapy.Spider):
         self.req_count = defaultdict(int)
         super(WebsiteFinderSpider, self).__init__(name=None, **kwargs)
         self.screenshot_dir = screenshot_dir
-        print "****************SCREENSHOT DIR**************************"
-        print self.screenshot_dir
-        print "****************SCREENSHOT DIR**************************"
+        log.msg("Screenshot dir: ", log.INFO)
+        log.msg(self.screenshot_dir, log.INFO)
 
     def parse(self, response):
         if 'referrer_url' in response.meta:
@@ -197,6 +196,7 @@ class WebsiteFinderSpider(scrapy.Spider):
                 'width': '640',
                 'height': '480',
                 'timeout': '60',
+                'images' : 0
             },
             'download_timeout': 60,
         })
