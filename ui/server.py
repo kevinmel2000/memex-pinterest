@@ -31,7 +31,7 @@ from bson.objectid import ObjectId
 
 class StaticSettings:
     def __init__(self):
-        self.page_size = 1
+        self.page_size = 10
 
 
 class JSONEncoder(json.JSONEncoder):
@@ -50,9 +50,6 @@ def discovery():
         seed["url_hash"] = str(hashlib.md5(seed["url"]).hexdigest())
     return render_template('discovery.html', seeds=seeds)
 
-#http://localhost:5000/back?path=data&current-host=www.ine.mx
-#http://localhost:5000/back?path=data&current-host=ine.mx
-#http://localhost:5000/back?path=data&filter-field=host&filter-regex=www&current-host=ine.mx
 @app.route("/back")
 @requires_auth
 def back(page=1):
