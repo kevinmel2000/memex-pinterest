@@ -15,6 +15,7 @@ from handlers import add_known_urls_handler
 from handlers import get_score_handler, train_and_score_mongo
 from handlers import list_tags, save_tags, search_tags
 from handlers import save_display
+from handlers import get_blur_level, save_blur_level
 from auth import requires_auth
 from mongoutils.errors import DeletingSelectedWorkspaceError
 
@@ -392,12 +393,29 @@ def start_ranker():
         train_and_score_mongo()
         return Response("{}", mimetype="application/json")
 
+
+
+################ BLURRING #########################
+@app.route("/blur", methods = ["GET"])
+@requires_auth
+def get_blur_page():
+    blur_level = get_blur_level()
+    return render_template('blur.html', blur_level=blur_level)
+
+@app.route("/api/blur/<level>", methods = ["POST"])
+@requires_auth
+def save_blur_page(level):
+    save_blur_level(level)
+
+
+
+
 if __name__ == "__main__":
 
-    if app.config["INIT_DB_ON_START"]:
-        MemexMongoUtils(init_db=True)
+    # if app.config["INIT_DB_ON_START"]:
+    #     MemexMongoUtils(init_db=True)
 
     if app.config['DEBUG']:
         app.debug = True
 
-    app.run('0.0.0.0', port=80, threaded=True)
+    app.run('0.0.0.0', port=5000, threaded=True)
