@@ -120,10 +120,20 @@ function getUrlLocationParameter(sParam){
 */
 function extendHrefWithBackInfo(linkElement){
     var newHref = linkElement.href;
-    var split = linkElement.baseURI.split('?');
-    if(split.length > 1){
-        newHref = newHref + '&' + split[1];
+    var splitted = linkElement.baseURI.split('?');
+
+    var qs = '';
+    if(splitted.length > 1){
+        newHref = newHref + '&' + splitted[1];
+        qs = splitted[1];
     }
+
+    //Set the history state for the browser.back button
+    var host = newHref.split('/')[4].split('#')[0];
+    var path = newHref.split('/')[4].split('#')[1].split('=')[1].split('&')[0];
+	var stateObj = {"host":host, "qs": qs, "path": path};
+	history.replaceState(stateObj, "SourcePIN", window.location.href);
+
     window.location.href= newHref
 }
 
@@ -138,7 +148,7 @@ function back2HostResults(linkElement){
     newHref = newHref + window.location.hash.replace('#','?');
     var currentHost = window.location.pathname.split('/')[2];
     newHref = newHref + '&current-host=' + currentHost;
-    window.location.href= newHref
+    window.location.href= newHref;
 }
 
 </script>

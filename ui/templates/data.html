@@ -56,6 +56,17 @@
 		}
 	</style>
 
+
+	<script>
+			//reload base on history
+			if (history.state != null){
+				var currentState = history.state;
+				history.replaceState(null, "SourcePIN", window.location.href);
+				window.location.href = window.location.origin +'/back?path=' + currentState.path + '&' + currentState.qs + '&current-host=' + currentState.host;
+			}
+
+
+	</script>
 </head>
 <!-- NAVBAR
 ================================================== -->
