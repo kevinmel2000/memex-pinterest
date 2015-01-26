@@ -243,11 +243,12 @@
 		$.ajax({
 			url: host_url,
 			success: function(host_html) {
-						if (host_html) {
+						if (host_html.trim()) {
 							$("#page-down").css("visibility", "hidden");
+							loaded_pages.push(page_to_load);
+							window.location.hash='';
 							setTimeout(function(){
 								$("section#blog-landing").append(host_html);
-								loaded_pages.push(page_to_load);
 								checkCollapse(false);
 								console.log("Loaded pages: " + String(loaded_pages));
 								setTimeout(function(){
@@ -285,9 +286,33 @@
 			margin_bottom : 50,
 			single_column_breakpoint : 700
 		});
-		
+
+
+		var pageNumber = getUrlLocationParameter('page-number');
+		if (pageNumber == null)
+			pageNumber = 0;
+		else
+			pageNumber = parseInt(pageNumber, 10);
+/*
+// to load just one page
+		for(var i=0; i<pageNumber; i++){
+			loaded_pages.push(i);
+		}
 		//remove this if scroll to page down is reimplemented
 		loadMore();
+*/
+
+// to load accumulative until the page
+		for(var i=0; i<=pageNumber; i++){
+			//loaded_pages.push(i);
+			loadMore();
+		}
+
+
+		//remove this if scroll to page down is reimplemented
+
+
+
 
 		//user scrolls up and hits top of page
 		$('#top-of-page').waypoint(function(direction) {
@@ -420,10 +445,19 @@
 
 			/////// SEARCH //////////
 			$('#search').keypress(function(e) {
-				if (e.which == 13) {
-					return searchDo(search);
+				if (e.which == 13 ) {
+					if ($("#search").val() != ""){
+						return searchDo(search);
+					}
+					else{
+						window.location.href =  window.location.href.split('?')[0];
+					}
 				}
 			});
+
+			if(getURLParameter('filter-field') == 'host'){
+				$("#search").val(getURLParameter('filter-regex'));
+			}
 
 			var searchDo = function(){
 				var search = $('#search').val();

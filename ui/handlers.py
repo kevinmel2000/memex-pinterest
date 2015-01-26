@@ -7,11 +7,13 @@ from mongoutils.validate import validate_url
 from ranker.rescore_mongo import train_and_score_mongo
 import re
 
+
 def get_screenshot_relative_path(real_path):
     try:
         return real_path.split("static/")[1]
     except IndexError:
         return None
+
 
 def request_wants_json():
 
@@ -21,21 +23,76 @@ def request_wants_json():
         request.accept_mimetypes[best] > \
         request.accept_mimetypes['text/html']
 
-def hosts_handler(page = 1, which_collection = "crawl-data", filter_field = None, filter_regex = None):
+
+def get_page_number_for_host(path, page_size, current_host, filter_field=None, filter_regex=None):
+
+    which_collection = get_collection_by_path(path)
+
+    mmu = MemexMongoUtils(which_collection=which_collection)
+
+    max_page_size = 100*100 # max results per page
+    host_dics = mmu.list_hosts(page=1, page_size=max_page_size, filter_field=filter_field, filter_regex=filter_regex)
+    i = 0
+    current_page = 0
+    for host_dic in host_dics:
+        if host_dic["host"] == current_host:
+            current_page = (i/page_size)
+            break
+        else:
+            i += 1
+
+    return current_page
+
+
+
+def get_collection_by_path(path):
+
+    if path == "data":
+        which_collection="crawl-data"
+    elif path == "known-data":
+        which_collection="known-data"
+    elif path == "cc-data":
+        which_collection="cc-crawl-data"
+    else:
+        return Exception("no valid path")
+
+    return which_collection
+
+
+def hosts_handler(page=1, page_size=10, current_host=None, which_collection="crawl-data", filter_field=None, filter_regex=None):
     """Put together host documents for use with hosts endpoint """
 
     mmu = MemexMongoUtils(which_collection = which_collection)
-    for host in mmu.get_hosts_filtered(filter_field = "host", filter_regex = "windows"):
-        print "b"
-        print host
-    
+    # for host in mmu.get_hosts_filtered(filter_field = "host", filter_regex = "windows"):
+    #     print "b"
+    #     print host
+
     khc = KnownHostsCompare()
 
-    host_dics = mmu.list_hosts(page = page, filter_field = filter_field, filter_regex = filter_regex)
+    if current_host:
+        current_page_size = page_size_max = 10*100 # max results per page
+        host_dics = mmu.list_hosts(page=page, page_size=current_page_size, filter_field=filter_field, filter_regex=filter_regex)
+        matched=False
+        i = 0
+        for host_dic in host_dics:
+            i += 1
+            if host_dic["host"] == current_host:
+                matched = True
+            if matched and (i % page_size == 0):
+                break
+
+        # clean the leftovers
+        n = len(host_dics)
+        for x in range(i, n):
+            host_dics.pop()
+
+    else:
+        host_dics = mmu.list_hosts(page=page, page_size=page_size, filter_field=filter_field, filter_regex=filter_regex)
+
 
     for host_dic in host_dics:
 
-        print host_dic
+        #print host_dic
         #host scoring is added here as is known hostedness
         host_dic.pop("_id")
         is_known_host = khc.is_known_host(host_dic["host"])
@@ -51,6 +108,7 @@ def hosts_handler(page = 1, which_collection = "crawl-data", filter_field = None
             host_dic["hsu_screenshot_path"] = None
 
     return host_dics
+
 
 def urls_handler(host = None, which_collection  = "crawl-data"):
     """Put together host documents for use with hosts endpoint """
@@ -68,6 +126,7 @@ def urls_handler(host = None, which_collection  = "crawl-data"):
 
     return url_dics
 
+
 def schedule_spider_handler(seed, spider_host = "localhost", spider_port = "6800"):
 
     mmu = MemexMongoUtils()
@@ -76,6 +135,7 @@ def schedule_spider_handler(seed, spider_host = "localhost", spider_port = "6800
     mmu.add_job(seed, job_id, project = "discovery-project", spider = "website_finder")
 
     return True
+
 
 def add_known_urls_handler(urls_raw):
 
@@ -98,6 +158,7 @@ def get_job_state_handler(url, spider_host = "localhost", spider_port = "6800"):
     scrapyd_util = ScrapydJob(spider_host, spider_port, project = project)
 
     return scrapyd_util.get_state(job_id)
+
 
 def discovery_handler():
 

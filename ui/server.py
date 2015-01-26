@@ -1,6 +1,7 @@
 import os
 from flask import Flask
 from flask import render_template, Response, request
+from flask import make_response, redirect, session, url_for
 from handlers import request_wants_json
 from mongoutils.memex_mongo_utils import MemexMongoUtils
 from handlers import hosts_handler, urls_handler, \
@@ -15,6 +16,7 @@ from handlers import add_known_urls_handler
 from handlers import get_score_handler, train_and_score_mongo
 from handlers import list_tags, save_tags, search_tags
 from handlers import save_display
+from handlers import get_page_number_for_host
 from auth import requires_auth
 from mongoutils.errors import DeletingSelectedWorkspaceError
 
@@ -25,6 +27,12 @@ server_path = os.path.dirname(os.path.realpath(__file__))
 app = Flask(__name__)
 app.config.from_object('settings')
 from bson.objectid import ObjectId
+
+
+class StaticSettings:
+    def __init__(self):
+        self.page_size = 10
+
 
 class JSONEncoder(json.JSONEncoder):
     def default(self, o):
@@ -42,15 +50,39 @@ def discovery():
         seed["url_hash"] = str(hashlib.md5(seed["url"]).hexdigest())
     return render_template('discovery.html', seeds=seeds)
 
+@app.route("/back")
+@requires_auth
+def back(page=1):
+
+    path = request.args.get('path')                     #mandatory
+    current_host = request.args.get('current-host')     #mandatory
+    filter_field = request.args.get('filter-field')
+    filter_regex = request.args.get('filter-regex')
+
+    redirect_to = path
+
+    if filter_regex and filter_field:
+        redirect_to = redirect_to + "?filter-field=" + filter_field + "&filter-regex=" + filter_regex
+
+    # if current_host:
+    page_number = get_page_number_for_host(path, StaticSettings().page_size, current_host, filter_field, filter_regex)
+    if page_number > 0 :
+        redirect_to = redirect_to  + "#page-number=" + str(page_number)
+
+
+    return redirect(redirect_to, code=302)
+    # "data#page-number=2"
+
 @app.route("/data")
-#@app.route("/")
 @requires_auth
 def data(page=1):
 
     filter_field = request.args.get('filter-field')
     filter_regex = request.args.get('filter-regex')
+    current_host = request.args.get('current-host')
 
-    hosts = hosts_handler(page=int(page))
+    hosts = hosts_handler(page=int(page), page_size=StaticSettings().page_size, current_host=current_host)
+
 
     return render_template('data.html', hosts=hosts, which_collection="crawl-data",
                            filter_field = filter_field, filter_regex = filter_regex, use_cc_data=False)
@@ -59,7 +91,7 @@ def data(page=1):
 @requires_auth
 def cc_data(page=1):
 
-    hosts = hosts_handler(page=int(page), which_collection="cc-crawl-data")
+    hosts = hosts_handler(page=int(page), page_size=StaticSettings().page_size, which_collection="cc-crawl-data")
 
     return render_template('data.html', hosts=hosts, use_cc_data=True)
 
@@ -67,7 +99,7 @@ def cc_data(page=1):
 @requires_auth
 def known_data(page=1):
 
-    hosts = hosts_handler(page=int(page), which_collection="known-data")
+    hosts = hosts_handler(page=int(page), page_size=StaticSettings().page_size, which_collection="known-data")
 
     return render_template('data.html', hosts=hosts, use_known_data=True)
 
@@ -79,7 +111,7 @@ def load_hosts(page=1):
     filter_field = request.args.get('filter-field')
     filter_regex = request.args.get('filter-regex')
 
-    hosts = hosts_handler(page=int(page) + 1, filter_field = filter_field, filter_regex = filter_regex)
+    hosts = hosts_handler(page=int(page) + 1, page_size=StaticSettings().page_size, filter_field = filter_field, filter_regex = filter_regex)
     for host_dic in hosts:
         host_dic["host_hash"] = str(hashlib.md5(host_dic["host"]).hexdigest())
         if "tags" in host_dic:
@@ -94,7 +126,7 @@ def load_hosts(page=1):
 @requires_auth
 def cc_load_hosts(page=1):
 
-    hosts = hosts_handler(page=int(page) + 1, which_collection="cc-crawl-data")
+    hosts = hosts_handler(page=int(page) + 1, page_size=StaticSettings().page_size, which_collection="cc-crawl-data")
 
     if request_wants_json():
         return Response(json.dumps(hosts), mimetype="application/json")
@@ -105,7 +137,7 @@ def cc_load_hosts(page=1):
 @requires_auth
 def known_load_hosts(page=1):
 
-    hosts = hosts_handler(page=int(page) + 1, which_collection="known-data")
+    hosts = hosts_handler(page=int(page) + 1, page_size=StaticSettings().page_size, which_collection="known-data")
 
     if request_wants_json():
         return Response(json.dumps(hosts), mimetype="application/json")
