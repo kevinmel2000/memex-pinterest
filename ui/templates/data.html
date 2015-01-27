@@ -56,6 +56,17 @@
 		}
 	</style>
 
+
+	<script>
+			//reload base on history
+			if (history.state != null){
+				var currentState = history.state;
+				history.replaceState(null, "SourcePIN", window.location.href);
+				window.location.href = window.location.origin +'/back?path=' + currentState.path + '&' + currentState.qs + '&current-host=' + currentState.host;
+			}
+
+
+	</script>
 </head>
 <!-- NAVBAR
 ================================================== -->
@@ -248,11 +259,14 @@
 							loaded_pages.push(page_to_load);
 							window.location.hash='';
 							setTimeout(function(){
+								var focusTo = $("section#blog-landing article:last-child");
 								$("section#blog-landing").append(host_html);
 								checkCollapse(false);
 								console.log("Loaded pages: " + String(loaded_pages));
 								setTimeout(function(){
-								checkDisabled();},10);
+									checkDisabled();
+									focusTo.focus();
+								},10);
 							},10);
 						} else {
 							console.log("No more pages to load!");
