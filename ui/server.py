@@ -406,6 +406,7 @@ def get_blur_page():
 @requires_auth
 def save_blur_page(level):
     save_blur_level(level)
+    return Response("{}", mimetype="application/json")
 
 
 

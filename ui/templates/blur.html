@@ -67,7 +67,7 @@
                         <br/>
                     <div style="float:left;width:73%">
                         <div style="float:left;width:80%">
-                            <input id="slider" type="range" name="points" min="0" max="100" step="10" style="width:100%"/>
+                            <input id="slider" type="range" name="points" min="0" max="200" step="20" style="width:100%"/>
                         </div>
                         <div style="float:right">
                             <input id="saveBlurLevel"type="button" class="btn-primary btn-md" value="Save"/>
@@ -92,32 +92,40 @@
 
 	<script>
 
+
         var blurUrl = '/api/blur/';
 		$(document).ready(function() {
 
+		var setBlurLevel = function(blurRadius){
+			stackBlurImage( 'srcimg', 'canvas', blurRadius, false );
+		}
+
             $("#slider").change(function(e) {
-				blurRadius = this.value *2;
-				stackBlurImage( 'srcimg', 'canvas', blurRadius, false );
-                $('#rangeText').text(rangeValues[$(this).val()]);
+				var blurRadius = this.value;
+				setBlurLevel(blurRadius);
             });
 
-			$('#slider').val(0);
+			setBlurLevel({{blur_level}});
+			$('#slider').val({{blur_level}})
             $('#slider').focus();
 
 
-            $("#saveBlurLevel").click(
+            $("#saveBlurLevel").click(function(e){
+
+				var blurLevel = $('#slider').val();
+				var url = blurUrl + blurLevel
 
                 $.ajax({
                     type : "POST",
-                    url : blurUrl + host,
+                    url : url,
                     contentType: 'application/json',
                     dataType: 'json',
                     data: $('#slider').val(),
                     success : function(data) {
-                        alert('saved');
+                        console.log('saved');
                     }
-                });
-
+                })
+			})
 		});
 		
 		
