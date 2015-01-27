@@ -20,10 +20,13 @@ Now start SourcePin from the repo root directory by typing ::
      
      $ sudo fig up
     
-This will take a little while, be patient. Then open up a web browser and go to http://localhost. You should
-see SourcePin running.
+This will take a little while, be patient. This will also attach to the console and allow you to
+see the applications running.
 
-In order to stop SourcePin go to the root directory of the cloned repo and type ::
+Then open up a web browser and go to http://localhost. You should see SourcePin running.
+
+In order to stop SourcePin go to the root directory of the cloned repo in a separate terminal 
+(not the one you did fig up from) and type ::
     
     $ sudo fig stop
     
@@ -31,9 +34,28 @@ To restart SourcePin type ::
 
     $ sudo fig start
     
-An important note: be careful with the sudo fig up command, it will clear your data and give you a clean
-instance of SourcePin. Instead, if you want to stop and start without clearing the database, use start/stop.
-This is important.
+This will not attach and will run SourcePin in the background, remember this could take a little while. We 
+currently do not have a working process for attaching to the console when restarting the app. An important note: 
+be careful with the fig up command, it will clear your data and give you a clean instance of SourcePin. Instead, 
+if you want to stop and start without clearing the database, use start/stop. This is important.
+
+Developers
+==========
+
+Using Docker/Fig as your dev installation can be immensely useful in saving you time getting set up and testing
+your code in an integrated manner. If you want to do this you can go ahead and make your changes in your feature
+branch and then rebuilt the SourcePin Docker image. You can then use fig up and get a fully working SourcePin
+version with your new code in it. Doing this is easy, simply replace the line in fig.yml that says ::
+
+    image: acaceres2176/sourcepin
+
+with a line that says ::
+
+    build: .
+
+The next time you use the fig up command, your docker instance will rebuild and you will have an instance of
+SourcePin with your changes in it. This is awesome.
+
 
 Using the API
 =============

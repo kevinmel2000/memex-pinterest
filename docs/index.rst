@@ -3,8 +3,8 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-Welcome to sourcefinder's documentation!
-========================================
+Welcome to SourcePin's documentation!
+=====================================
 
 Contents:
 
@@ -13,3 +13,4 @@ Contents:
 
    intro
    tutorial
+   changelog

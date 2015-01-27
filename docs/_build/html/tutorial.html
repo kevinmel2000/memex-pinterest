@@ -67,9 +67,11 @@
 <div class="highlight-python"><div class="highlight"><pre>$ sudo fig up
 </pre></div>
 </div>
-<p>This will take a little while, be patient. Then open up a web browser and go to <a class="reference external" href="http://localhost">http://localhost</a>. You should
-see SourcePin running.</p>
-<p>In order to stop SourcePin go to the root directory of the cloned repo and type</p>
+<p>This will take a little while, be patient. This will also attach to the console and allow you to
+see the applications running.</p>
+<p>Then open up a web browser and go to <a class="reference external" href="http://localhost">http://localhost</a>. You should see SourcePin running.</p>
+<p>In order to stop SourcePin go to the root directory of the cloned repo in a separate terminal
+(not the one you did fig up from) and type</p>
 <div class="highlight-python"><div class="highlight"><pre>$ sudo fig stop
 </pre></div>
 </div>
@@ -77,9 +79,10 @@ see SourcePin running.</p>
 <div class="highlight-python"><div class="highlight"><pre>$ sudo fig start
 </pre></div>
 </div>
-<p>An important note: be careful with the sudo fig up command, it will clear your data and give you a clean
-instance of SourcePin. Instead, if you want to stop and start without clearing the database, use start/stop.
-This is important.</p>
+<p>This will not attach and will run SourcePin in the background, remember this could take a little while. We
+currently do not have a working process for attaching to the console when restarting the app. An important note:
+be careful with the fig up command, it will clear your data and give you a clean instance of SourcePin. Instead,
+if you want to stop and start without clearing the database, use start/stop. This is important.</p>
 </div>
 <div class="section" id="using-the-api">
 <h2>Using the API<a class="headerlink" href="#using-the-api" title="Permalink to this headline">¶</a></h2>
