@@ -52,9 +52,10 @@ def data(page=1):
     filter_regex = request.args.get('filter-regex')
 
     hosts = hosts_handler(page=int(page))
+    blur_level = get_blur_level()
 
     return render_template('data.html', hosts=hosts, which_collection="crawl-data",
-                           filter_field = filter_field, filter_regex = filter_regex, use_cc_data=False)
+                           filter_field = filter_field, filter_regex = filter_regex, use_cc_data=False, blur_level=blur_level)
 
 @app.route("/cc-data")
 @requires_auth

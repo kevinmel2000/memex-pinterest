@@ -15,11 +15,11 @@
 			max-width: 100%;
 			width: 100%;
 		}
-		img {
-			width: 100%;
-			max-width: 100%;
-			height: auto;
-		}
+		<!--img {-->
+			<!--width: 100%;-->
+			<!--max-width: 100%;-->
+			<!--height: auto;-->
+		<!--}-->
 		.white-panel {
 			position: absolute;
 			background: white;
@@ -75,11 +75,11 @@
                     </div>
                     <br/>
                     <br/>
-                        <div id="imageHolder" style="position:absolute;left:10px; top:160px;text-align:center;font-size:10px;">
-                             <img id="srcimg" src="{{ url_for('static', filename='images/superman4.png') }}" style="border:10px solid white"><br>
+                        <div id="imageHolder">
+                             <img id="srcimg" src="{{ url_for('static', filename='images/superman4.png') }}" width="1" height="1"><br>
                         </div>
-                        <div id="canvasHolder" style="position:absolute;left:20px; top:170px;text-align:center;font-size:10px;">
-                             <canvas height="547" width="416" style="width: 547px; height: 416px;" id="canvas"></canvas>
+                        <div id="canvasHolder">
+                             <canvas id="canvas"></canvas>
                         </div>
 				</div><!-- /.col-lg-6 -->
 			</div><!-- /.row -->
@@ -96,9 +96,9 @@
         var blurUrl = '/api/blur/';
 		$(document).ready(function() {
 
-		var setBlurLevel = function(blurRadius){
-			stackBlurImage( 'srcimg', 'canvas', blurRadius, false );
-		}
+			var setBlurLevel = function(blurRadius){
+				stackBlurImage( 'srcimg', 'canvas', blurRadius, false );
+			}
 
             $("#slider").change(function(e) {
 				var blurRadius = this.value;
