@@ -432,4 +432,4 @@ if __name__ == "__main__":
     if app.config['DEBUG']:
         app.debug = True
 
-    app.run('0.0.0.0', port=5000, threaded=True)
+    app.run('0.0.0.0', port=80, threaded=True)
