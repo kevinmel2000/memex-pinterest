@@ -234,7 +234,8 @@
 
 	function loadMore() {
 		console.log("Loading more");
-		
+
+
 		if (loaded_pages.length !== 0) {
 			var page_to_load = loaded_pages[loaded_pages.length - 1] + 1;
 		} else {
@@ -251,21 +252,20 @@
 		host_url = host_url + "?filter-regex={{ filter_regex }}&filter-field={{ filter_field }}";
 		{% endif %}
 
+		var scrollHeight = $(document).scrollTop();
 		$.ajax({
 			url: host_url,
 			success: function(host_html) {
 						if (host_html.trim()) {
 							$("#page-down").css("visibility", "hidden");
 							loaded_pages.push(page_to_load);
-							window.location.hash='';
 							setTimeout(function(){
-								var focusTo = $("section#blog-landing article:last-child");
 								$("section#blog-landing").append(host_html);
 								checkCollapse(false);
 								console.log("Loaded pages: " + String(loaded_pages));
 								setTimeout(function(){
 									checkDisabled();
-									focusTo.focus();
+									$(document).scrollTop(scrollHeight);
 								},10);
 							},10);
 						} else {
