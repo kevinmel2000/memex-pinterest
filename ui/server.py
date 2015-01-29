@@ -35,8 +35,8 @@ class StaticSettings:
         self.page_size = 10
         self.host_img_width = 255
         self.host_img_height = 190
-        self.url_img_width = 100
-        self.url_img_height = 75
+        self.url_img_width = 650
+        self.url_img_height = 580
 
 
 class JSONEncoder(json.JSONEncoder):
