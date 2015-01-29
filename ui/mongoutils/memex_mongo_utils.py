@@ -299,7 +299,7 @@ class MemexMongoUtils(object):
         self.delete_urls_by_match(match, negative_match = negative_match)
         self.delete_hosts_by_match(match, negative_match = negative_match)
 
-#####################   workspace  #####################
+    #####################   workspace  #####################
 
     def list_workspace(self):
         docs = self.workspace_collection.find()
@@ -354,7 +354,7 @@ class MemexMongoUtils(object):
         print "Dropping %s" % ("seedinfo" + "-" + name)
         db["seedinfo" + "-" + name].drop()
 
-#####################   keyword  #####################
+    #####################   keyword  #####################
     def list_keyword(self):
         ws = self.get_workspace_selected()
 
@@ -370,7 +370,7 @@ class MemexMongoUtils(object):
         else:
             self.workspace_collection.update({"_id" : ObjectId(ws["_id"] )}, {'$set' : {"keyword" : keywords}})
 
-####################   search term  #####################
+    ####################   search term  #####################
     def list_search_term(self):
         ws = self.get_workspace_selected()
 
@@ -387,7 +387,7 @@ class MemexMongoUtils(object):
         else:
             self.workspace_collection.update({"_id" : ObjectId(ws["_id"] )}, {'$set' : {"searchterm" : search_terms}})
 
-############# HOST HELPERS ###########
+    ############# HOST HELPERS ###########
 
     def get_hosts(self):
         docs = self.hostinfo_collection.find({ "display": { "$ne": 0 } }).sort([("host_score", pymongo.DESCENDING),("_id", pymongo.ASCENDING)]) # sort by _id to have deterministic results
@@ -411,10 +411,7 @@ class MemexMongoUtils(object):
         docs = self.hostinfo_collection.find(query).sort(sort_order)
         return docs
 
-    # def get_host_until_page_of_host(self, host, pageSize):
-
-
-############# TAGS #############
+    ############# TAGS #############
 
     def save_tags(self, host, tags):
         self.hostinfo_collection.update({"host" : host}, {'$set' : {"tags" : tags}})
@@ -438,11 +435,30 @@ class MemexMongoUtils(object):
         else:
             return ws_doc['tags']
 
-############# Display Hosts #############
+    ############# Display Hosts #############
 
     def save_display(self, host, displayable):
         self.hostinfo_collection.update({"host" : host}, {'$set': {'display': displayable}})
         self.urlinfo_collection.update({"host" : host}, {'$set': {'display': displayable}}, multi=True)
+
+
+    ################ BLURRING #########################
+
+    def get_blur_level(self):
+        ws = self.get_workspace_selected()
+
+        if ws == None or "blur_level" not in ws or ws["blur_level"] == None:
+            return 0
+        else:
+            return ws["blur_level"]
+
+    def save_blur_level(self, level):
+        ws = self.get_workspace_selected()
+        if ws == None:
+            self.workspace_collection.upsert({"_id" : "_default"}, {'$set' : {"blur_level" : level}})
+        else:
+            self.workspace_collection.update({"_id" : ObjectId(ws["_id"] )}, {'$set' : {"blur_level" : level}})
+
 
 if __name__ == "__main__":
 

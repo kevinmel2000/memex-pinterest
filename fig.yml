@@ -11,8 +11,8 @@ splash:
 sourcepin:
 #  for developers- to build with your code changes, replace the image: block with the build: block below 
 #  then type sudo fig build followed by sudo fig up, your changes should now be in SourcePin
-#  build: .
-  image: acaceres2176/sourcepin
+  build: .
+#  image: acaceres2176/sourcepin
   volumes: 
     - /data/db:/data/db
   ports:

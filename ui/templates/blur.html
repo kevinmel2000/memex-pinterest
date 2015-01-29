@@ -1,0 +1,141 @@
+{% extends "layout.html" %}
+{% block content %}
+<head>
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<!--<link rel="stylesheet" href="http://netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css">-->
+	<style>
+		body {
+			background: #E9E9E9;
+		}
+		#blog-landing {
+			margin-top: 81px;
+			position: relative;
+			max-width: 100%;
+			width: 100%;
+		}
+		<!--img {-->
+			<!--width: 100%;-->
+			<!--max-width: 100%;-->
+			<!--height: auto;-->
+		<!--}-->
+		.white-panel {
+			position: absolute;
+			background: white;
+			box-shadow: 0px 1px 2px rgba(0,0,0,0.3);
+			padding: 10px;
+		}
+		.white-panel h1 {
+			font-size: 1em;
+		}
+		.white-panel h1 a {
+			color: #A92733;
+		}
+		.white-panel:hover {
+			box-shadow: 1px 1px 10px rgba(0,0,0,0.5);
+			margin-top: -5px;
+			-webkit-transition: all 0.3s ease-in-out;
+			-moz-transition: all 0.3s ease-in-out;
+			-o-transition: all 0.3s ease-in-out;
+			transition: all 0.3s ease-in-out;
+		}
+
+	</style>
+
+	<!--<link href="http://www.jqueryscript.net/css/jquerysctipttop.css" rel="stylesheet" type="text/css">-->
+</head>
+<!-- NAVBAR
+================================================== -->
+
+<body>
+	<div id="top-of-page"></div>
+	<div class="jquery-script-ads">
+		<script type="text/javascript"></script>
+	</div>
+	<!--25,300-->
+	<!-- <button id="page-up" style="width:100%; height:40px; position:absolute; display:none ;" class="btn btn-warning" onclick="loadPrevious();">PAGE UP</button> -->
+	<div class="jquery-script-clear"></div>
+	<div id="container">
+
+		<div class="container marketing">
+			<div class="row" >
+				<div class="col-lg-8">
+					<h1 style="margin-top:30px"> Select the image blur level
+                    <!--<a id="memtool" class="glyphicon glyphicon-question-sign" style="opacity:1; font-size:20px;"></a>-->
+                    </h1>
+                        <br/>
+                    <div style="float:left;width:73%">
+                        <div style="float:left;width:80%">
+                            <input id="slider" type="range" name="points" min="0" max="200" step="1" style="width:100%"/>
+                        </div>
+                        <div style="float:right">
+                            <input id="saveBlurLevel"type="button" class="btn-primary btn-md" value="Save"/>
+                        </div>
+                    </div>
+                    <br/>
+                    <br/>
+                        <div id="imageHolder">
+                             <img id="srcimg" src="{{ url_for('static', filename='images/superman4.png') }}" width="1" height="1">
+						</div>
+                        <div id="canvasHolder">
+                             <canvas id="canvas"></canvas>
+                        </div>
+				</div><!-- /.col-lg-6 -->
+			</div><!-- /.row -->
+		</div>
+	</div>
+
+	<!-- Bootstrap core JavaScript
+	================================================== -->
+	<!-- Placed at the end of the document so the pages load faster -->
+
+	<script>
+
+
+        var blurUrl = '/api/blur/';
+		$(document).ready(function() {
+
+
+			$("#srcimg").bind("load", function(e) {
+				stackBlurImage( 'srcimg', 'canvas', {{blur_level}}, false );
+			})
+
+			var setBlurLevel = function(blurRadius){
+				stackBlurImage( 'srcimg', 'canvas', blurRadius, false );
+			}
+
+            $("#slider").change(function(e) {
+				var blurRadius = this.value;
+				setBlurLevel(blurRadius);
+            });
+
+			$('#slider').val({{blur_level}})
+            $('#slider').focus();
+
+
+            $("#saveBlurLevel").click(function(e){
+
+				var blurLevel = $('#slider').val();
+				var url = blurUrl + blurLevel
+
+                $.ajax({
+                    type : "POST",
+                    url : url,
+                    contentType: 'application/json',
+                    dataType: 'json',
+                    data: $('#slider').val(),
+                    success : function(data) {
+                        console.log('saved');
+                    }
+                })
+			})
+		});
+		
+		
+
+	</script>
+</body>
+
+</html>
+{% endblock %}

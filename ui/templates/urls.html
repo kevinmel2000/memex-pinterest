@@ -7,69 +7,83 @@
       <!--<a href="/back" class="btn btn-success btn-sm" onclick="back2HostResults(this); return false">Back to Hosts</a>-->
     </div>
 
-    <table id="" class="table table-striped" style="margin-top:30px; font-size:12px">
-      <thead>
-        <tr>
-          <th>URL</th>
-          <th>Host</th>
-          <th>Score</th>
-          <th>Crawled at</th>
-          <th>Seed</th>
-          <th>Title</th>
-          <th>Screenshot</th>
-          <th></th>
-        </tr>
-      </thead>
-      <tbody>
-      {% for url_dic in urls %}
-          <tr>
-            <td>
-          <a href="{{ url_dic["url"] }}">{{ url_dic["url"][:40] }}</a>
-        </td>
-        {% if "host" in url_dic and url_dic["host"] %}
-              <td>{{ url_dic["host"] }}</td>
-            {% else %}
-              <td></td>
-        {% endif %}
+<table id="" class="table table-striped" style="margin-top:50px; font-size:12px">
+  <thead>
+    <tr>
+      <th>URL</th>
+      <th>Host</th>
+      <th>Score</th>
+      <th>Crawled at</th>
+      <th>Seed</th>
+      <th>Title</th>
+      <th>Screenshot</th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+  {% for url_dic in urls %}
+      <tr>
+        <td>
+	  <!--<span class="glyphicon glyphicon-screenshot"></span>-->
+	  &nbsp;<a href="{{ url_dic["url"] }}">{{ url_dic["url"][:40] }}</a>
+	</td>
+	{% if "host" in url_dic and url_dic["host"] %}
+          <td>{{ url_dic["host"] }}</td>
+        {% else %}
+          <td></td>
+	{% endif %}
 
-        {% if "score" in url_dic and url_dic["score"] %}
-              <td>{{ url_dic["score"] }}</td>
-            {% else %}
-              <td>N/A</td>
-        {% endif %}
+	{% if "score" in url_dic and url_dic["score"] %}
+          <td>{{ url_dic["score"] }}</td>
+        {% else %}
+          <td>N/A</td>
+	{% endif %}
 
-        {% if "crawled_at" in url_dic and url_dic["crawled_at"] %}
-              <td>{{ url_dic["crawled_at"]}}</td>
-            {% else %}
-              <td></td>
-        {% endif %}
+	{% if "crawled_at" in url_dic and url_dic["crawled_at"] %}
+          <td>{{ url_dic["crawled_at"]}}</td>
+        {% else %}
+          <td></td>
+	{% endif %}
 
-        {% if "is_seed" in url_dic and url_dic["is_seed"] %}
-              <td>{{ url_dic["is_seed"] }}</td>
-            {% else %}
-              <td>No</td>
-        {% endif %}
+	{% if "is_seed" in url_dic and url_dic["is_seed"] %}
+          <td>{{ url_dic["is_seed"] }}</td>
+        {% else %}
+          <td>No</td>
+	{% endif %}
 
-        {% if "title" in url_dic and url_dic["title"] %}
-              <td>{{ url_dic["title"] }}</td>
-            {% else %}
-              <td></td>
-        {% endif %}
+	{% if "title" in url_dic and url_dic["title"] %}
+          <td>{{ url_dic["title"] }}</td>
+        {% else %}
+          <td></td>
+	{% endif %}
 
-        {% if "screenshot_path" in url_dic %}
-          {% set screenshot_path = url_dic["screenshot_path"] %}
-              <td><img src="{{ url_for('static', filename=screenshot_path) }}"></img></td>
-            {% else %}
-              <td></td>
-        {% endif %}
-            <td><button class="btn btn-primary btn-sm" onclick="submitUrlForCrawl('{{ url_dic["url"] }}')">Crawl from here</button></td>
+    <td>
+    <div id="imageHolder_{{url_dic["url"].replace(".","_")}}"  style="left:0px; top:0px; height:0px">
+	{% if "screenshot_path" in url_dic %}
+	  {% set screenshot_path = url_dic["screenshot_path"] %}
+          <img id="image_{{url_dic["url"].replace(".","_")}}"
+          class="naked_image"
+          data-canvas='canvas_{{url_dic["url"].replace(".","_")}}'
+          src="{{ url_for('static', filename=screenshot_path) }}"
+          width=1
+          height=1
+          alt="ALT">
+    {% else %}
+      <!--  <img src="" alt="No Image Available">-->
+    {% endif %}
+    </div>
+    <div id="canvasHolder_{{url_dic["url"].replace(".","_")}}" style="left:10px; top:00px" >
+         <canvas id="canvas_{{url_dic["url"].replace(".","_")}}"   ></canvas>
+    </div>
 
-          </tr>
-      {% endfor %}
-      </tbody>
-    </table>
-  </section>
-</div>
+    </td>
+
+		<td><button class="btn btn-primary btn-sm" onclick="submitUrlForCrawl('{{ url_dic["url"] }}')">Crawl from here</button></td>
+
+      </tr>
+  {% endfor %}
+  </tbody>
+</table>
 
 <script>
 function markInterest(interest, url, url_hash, mark_as) {
@@ -113,8 +127,20 @@ $(document).ready(function() {
 	    // Disable caching of AJAX responses
 	    cache: false
 	});
+	blurAllImages();
 });
 
+	function blurAllImages(){
+		var blurLevel = {{blur_level}};
+		$(".naked_image").bind("load", function(e) {
+				stackBlurImage( this.id, this.dataset.canvas, blurLevel, false );
+		}).each(function(i,e) {
+		 if(this.complete){
+			 this.load();
+		 }
+		});
+
+	}
 
 </script>
 

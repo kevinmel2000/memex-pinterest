@@ -29,11 +29,11 @@
 			max-width: 100%;
 			width: 100%;
 		}
-		img {
-			width: 100%;
-			max-width: 100%;
-			height: auto;
-		}
+		<!--img {-->
+			<!--width: 100%;-->
+			<!--max-width: 100%;-->
+			<!--height: auto;-->
+		<!--}-->
 		.white-panel {
 			position: absolute;
 			background: white;
@@ -224,12 +224,33 @@
 				console.log("Loaded pages: " + String(loaded_pages));
 				checkCollapse(true);
 			}
+			blurAllImages();
 		});
 		$.ajaxSetup({
 			async : true
 		});
 		console.log("load previous");
 		checkDisabled();
+	}
+
+	function replaceAll(find, replace, str) {
+	  return str.replace(new RegExp(escapeRegExp(find), 'g'), escapeRegExp(replace));
+	}
+
+	function escapeRegExp(string) {
+		return string.replace(/([.*+?^=!:${}()|\[\]\/\\])/g, "\\$1");
+	}
+
+	function blurAllImages(){
+		var blurLevel = {{blur_level}};
+		$(".naked_image").bind("load", function(e) {
+				stackBlurImage( this.id, this.dataset.canvas, blurLevel, false );
+		}).each(function(i,e) {
+		 if(this.complete){
+			 this.load();
+		 }
+		});
+
 	}
 
 	function loadMore() {
@@ -261,12 +282,14 @@
 							loaded_pages.push(page_to_load);
 							setTimeout(function(){
 								$("section#blog-landing").append(host_html);
+								blurAllImages();
+								loaded_pages.push(page_to_load);
 								checkCollapse(false);
 								console.log("Loaded pages: " + String(loaded_pages));
 								setTimeout(function(){
 									checkDisabled();
 									$(document).scrollTop(scrollHeight);
-								},10);
+								},1);
 							},10);
 						} else {
 							console.log("No more pages to load!");

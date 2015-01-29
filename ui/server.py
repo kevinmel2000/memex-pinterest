@@ -17,6 +17,7 @@ from handlers import get_score_handler, train_and_score_mongo
 from handlers import list_tags, save_tags, search_tags
 from handlers import save_display
 from handlers import get_page_number_for_host
+from handlers import get_blur_level, save_blur_level
 from auth import requires_auth
 from mongoutils.errors import DeletingSelectedWorkspaceError
 
@@ -82,26 +83,29 @@ def data(page=1):
     current_host = request.args.get('current-host')
 
     hosts = hosts_handler(page=int(page), page_size=StaticSettings().page_size, current_host=current_host)
-
+    hosts = hosts_handler(page=int(page))
+    blur_level = get_blur_level()
 
     return render_template('data.html', hosts=hosts, which_collection="crawl-data",
-                           filter_field = filter_field, filter_regex = filter_regex, use_cc_data=False)
+                           filter_field = filter_field, filter_regex = filter_regex, use_cc_data=False, blur_level=blur_level)
 
 @app.route("/cc-data")
 @requires_auth
 def cc_data(page=1):
 
     hosts = hosts_handler(page=int(page), page_size=StaticSettings().page_size, which_collection="cc-crawl-data")
+    blur_level = get_blur_level()
 
-    return render_template('data.html', hosts=hosts, use_cc_data=True)
+    return render_template('data.html', hosts=hosts, use_cc_data=True, blur_level=blur_level)
 
 @app.route("/known-data")
 @requires_auth
 def known_data(page=1):
 
     hosts = hosts_handler(page=int(page), page_size=StaticSettings().page_size, which_collection="known-data")
+    blur_level = get_blur_level()
 
-    return render_template('data.html', hosts=hosts, use_known_data=True)
+    return render_template('data.html', hosts=hosts, use_known_data=True, blur_level=blur_level)
 
 # services
 @app.route("/hosts/<page>")
@@ -160,7 +164,9 @@ def urls(host=None):
             url_dic["screenshot_path"] = get_screenshot_relative_path(screenshot_path)
         url_dic["url_hash"] = str(hashlib.md5(url_dic["url"]).hexdigest())
 
-    return render_template("urls.html", urls=urls)
+    blur_level = get_blur_level()
+
+    return render_template("urls.html", urls=urls, blur_level=blur_level)
 
 @app.route("/cc-urls")
 @app.route("/cc-urls/<host>")
@@ -171,8 +177,10 @@ def cc_urls(host=None):
     if request_wants_json():
         return Response(json.dumps(urls), mimetype="application/json")
 
+    blur_level = get_blur_level()
+
     # change this
-    return render_template("urls.html", urls=urls, use_cc_data=True)
+    return render_template("urls.html", urls=urls, use_cc_data=True, blur_level=blur_level)
 
 @app.route("/known-urls")
 @app.route("/known-urls/<host>")
@@ -183,8 +191,10 @@ def known_urls(host=None):
     if request_wants_json():
         return Response(json.dumps(urls), mimetype="application/json")
 
+    blur_level = get_blur_level()
+
     # change this
-    return render_template("urls.html", urls=urls, use_known_data=True)
+    return render_template("urls.html", urls=urls, use_known_data=True, blur_level=blur_level)
 
 @app.route("/add-known", methods = ['GET', 'POST'])
 @requires_auth
@@ -424,10 +434,28 @@ def start_ranker():
         train_and_score_mongo()
         return Response("{}", mimetype="application/json")
 
+
+
+################ BLURRING #########################
+@app.route("/blur", methods = ["GET"])
+@requires_auth
+def get_blur_page():
+    blur_level = get_blur_level()
+    return render_template('blur.html', blur_level=blur_level)
+
+@app.route("/api/blur/<level>", methods = ["POST"])
+@requires_auth
+def save_blur_page(level):
+    save_blur_level(level)
+    return Response("{}", mimetype="application/json")
+
+
+
+
 if __name__ == "__main__":
 
-    if app.config["INIT_DB_ON_START"]:
-        MemexMongoUtils(init_db=True)
+    # if app.config["INIT_DB_ON_START"]:
+    #     MemexMongoUtils(init_db=True)
 
     if app.config['DEBUG']:
         app.debug = True

@@ -292,9 +292,17 @@ def rescore_db_handler():
 
     train_and_score_mongo()
 
+
+def get_blur_level():
+    mmu = MemexMongoUtils()
+    return mmu.get_blur_level()
+
+
+def save_blur_level(level):
+    mmu = MemexMongoUtils()
+    mmu.save_blur_level(level)
+
+
 if __name__ == "__main__":
 
     print hosts_handler(filter_field = "host", filter_regex=".*")
-    
-    
-    

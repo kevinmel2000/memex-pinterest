@@ -18,12 +18,25 @@
 <!--<span class="glyphicon glyphicon-ok-circle" style="cursor: pointer;"></span>
 <span class="glyphicon glyphicon-remove-circle" style="cursor: pointer; cursor: hand;"></span>-->
 
+
+    <div id="imageHolder_{{host_dic["host"].replace(".","_")}}"  style="left:0px; top:0px; height:0px">
 {% if 'hsu_screenshot_path' in host_dic and host_dic['hsu_screenshot_path'] %}
   {% set hsu_screenshot_path = host_dic['hsu_screenshot_path'] %}
-  <img src="{{ url_for('static', filename=hsu_screenshot_path) }}" alt="ALT">
+        <img id="image_{{host_dic["host"].replace(".","_")}}"
+        class="naked_image"
+        data-canvas='canvas_{{host_dic["host"].replace(".","_")}}'
+        src="{{ url_for('static', filename=hsu_screenshot_path) }}"
+        width=1
+        height=1
+        alt="ALT">
 {% else %}
-<!--  <img src="" alt="No Image Available">-->
+    <!--  <img src="" alt="No Image Available">-->
 {% endif %}
+    </div>
+
+    <div id="canvasHolder_{{host_dic["host"].replace(".","_")}}" style="left:10px; top:00px" >
+         <canvas id="canvas_{{host_dic["host"].replace(".","_")}}"  ></canvas>
+    </div>
 
 <span style="float:right; margin-right:5px;margin-left:5px; cursor: pointer; cursor: hand;" class="glyphicon glyphicon-remove check-no-interest" data-host='{{host_dic["host"]}}'></span>
 
