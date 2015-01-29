@@ -58,23 +58,36 @@
 	{% endif %}
 
     <td>
-    <div id="imageHolder_{{url_dic["url"].replace(".","_")}}"  style="left:0px; top:0px; height:0px">
-	{% if "screenshot_path" in url_dic %}
+ 	{% if "screenshot_path" in url_dic %}
 	  {% set screenshot_path = url_dic["screenshot_path"] %}
-          <img id="image_{{url_dic["url"].replace(".","_")}}"
+    <div id="imageHolder_{{url_dic["url"].replace(".","_")}}"  style="left:0px; top:0px; height:0px">
+         <img id="image_{{url_dic["url"].replace(".","_")}}"
           class="naked_image"
           data-canvas='canvas_{{url_dic["url"].replace(".","_")}}'
           src="{{ url_for('static', filename=screenshot_path) }}"
           width=1
           height=1
-          alt="ALT">
-    {% else %}
-      <!--  <img src="" alt="No Image Available">-->
-    {% endif %}
+          alt="ALT"/>
     </div>
     <div id="canvasHolder_{{url_dic["url"].replace(".","_")}}" style="left:10px; top:00px" >
          <canvas id="canvas_{{url_dic["url"].replace(".","_")}}"   ></canvas>
     </div>
+    {% else %}
+<!--
+    <div id="imageHolder_{{url_dic["url"].replace(".","_")}}"  style="left:0px; top:0px; height:0px">
+          <img id="image_{{url_dic["url"].replace(".","_")}}"
+          class="naked_image"
+          data-canvas='canvas_{{url_dic["url"].replace(".","_")}}'
+          src="{{ url_for('static', filename='images/superman5.png') }}"
+          width=1
+          height=1
+          alt="ALT"/>
+    </div>
+    <div id="canvasHolder_{{url_dic["url"].replace(".","_")}}" style="left:10px; top:00px" >
+         <canvas id="canvas_{{url_dic["url"].replace(".","_")}}"   ></canvas>
+    </div>
+-->
+    {% endif %}
 
     </td>
 
@@ -130,17 +143,21 @@ $(document).ready(function() {
 	blurAllImages();
 });
 
-	function blurAllImages(){
-		var blurLevel = {{blur_level}};
-		$(".naked_image").bind("load", function(e) {
-				stackBlurImage( this.id, this.dataset.canvas, blurLevel, false );
-		}).each(function(i,e) {
-		 if(this.complete){
-			 this.load();
-		 }
-		});
+function blurAllImages(){
 
-	}
+	var img_width= {{ img_width }};
+	var img_height= {{ img_height }};
+    var blurLevel = {{blur_level}};
+
+    $(".naked_image").one("load", function(e) {
+            stackBlurImage( this.id, this.dataset.canvas, img_width, img_height, blurLevel, false );
+    }).each(function(i,e) {
+     if(e.complete){
+        $(e).load();
+     }
+    });
+
+}
 
 </script>
 

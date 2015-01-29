@@ -33,6 +33,10 @@ from bson.objectid import ObjectId
 class StaticSettings:
     def __init__(self):
         self.page_size = 10
+        self.host_img_width = 255
+        self.host_img_height = 190
+        self.url_img_width = 100
+        self.url_img_height = 75
 
 
 class JSONEncoder(json.JSONEncoder):
@@ -87,7 +91,7 @@ def data(page=1):
     blur_level = get_blur_level()
 
     return render_template('data.html', hosts=hosts, which_collection="crawl-data",
-                           filter_field = filter_field, filter_regex = filter_regex, use_cc_data=False, blur_level=blur_level)
+                           filter_field = filter_field, filter_regex = filter_regex, use_cc_data=False, blur_level=blur_level, img_height=StaticSettings().host_img_height, img_width=StaticSettings().host_img_width)
 
 @app.route("/cc-data")
 @requires_auth
@@ -96,13 +100,13 @@ def cc_data(page=1):
     hosts = hosts_handler(page=int(page), page_size=StaticSettings().page_size, which_collection="cc-crawl-data")
     blur_level = get_blur_level()
 
-    return render_template('data.html', hosts=hosts, use_cc_data=True, blur_level=blur_level)
+    return render_template('data.html', hosts=hosts, use_cc_data=True, blur_level=blur_level, img_height=StaticSettings().host_img_height, img_width=StaticSettings().host_img_width)
 
 @app.route("/known-data")
 @requires_auth
 def known_data(page=1):
 
-    hosts = hosts_handler(page=int(page), page_size=StaticSettings().page_size, which_collection="known-data")
+    hosts = hosts_handler(page=int(page), page_size=StaticSettings().page_size, which_collection="known-data", img_height=StaticSettings().host_img_height, img_width=StaticSettings().host_img_width)
     blur_level = get_blur_level()
 
     return render_template('data.html', hosts=hosts, use_known_data=True, blur_level=blur_level)
@@ -166,7 +170,7 @@ def urls(host=None):
 
     blur_level = get_blur_level()
 
-    return render_template("urls.html", urls=urls, blur_level=blur_level)
+    return render_template("urls.html", urls=urls, blur_level=blur_level, img_height=StaticSettings().url_img_height, img_width=StaticSettings().url_img_width)
 
 @app.route("/cc-urls")
 @app.route("/cc-urls/<host>")
@@ -180,7 +184,7 @@ def cc_urls(host=None):
     blur_level = get_blur_level()
 
     # change this
-    return render_template("urls.html", urls=urls, use_cc_data=True, blur_level=blur_level)
+    return render_template("urls.html", urls=urls, use_cc_data=True, blur_level=blur_level, img_height=StaticSettings().url_img_height, img_width=StaticSettings().url_img_width)
 
 @app.route("/known-urls")
 @app.route("/known-urls/<host>")
@@ -194,7 +198,7 @@ def known_urls(host=None):
     blur_level = get_blur_level()
 
     # change this
-    return render_template("urls.html", urls=urls, use_known_data=True, blur_level=blur_level)
+    return render_template("urls.html", urls=urls, use_known_data=True, blur_level=blur_level, img_height=StaticSettings().url_img_height, img_width=StaticSettings().url_img_width)
 
 @app.route("/add-known", methods = ['GET', 'POST'])
 @requires_auth

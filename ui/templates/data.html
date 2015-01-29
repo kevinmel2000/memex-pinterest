@@ -157,6 +157,8 @@
 
 <script>
 	var loaded_pages = [];
+	var img_width= {{ img_width }};
+	var img_height= {{ img_height }};
 
 	//Nobody should be using this
 	function sleep(milliseconds) {
@@ -243,12 +245,12 @@
 
 	function blurAllImages(){
 		var blurLevel = {{blur_level}};
-		$(".naked_image").bind("load", function(e) {
-				stackBlurImage( this.id, this.dataset.canvas, blurLevel, false );
+		$(".naked_image").one("load", function(e) {
+			stackBlurImage( this.id, this.dataset.canvas, img_width, img_height, blurLevel, false );
 		}).each(function(i,e) {
-		 if(this.complete){
-			 this.load();
-		 }
+			 if(e.complete){
+				$(e).load();
+			 }
 		});
 
 	}

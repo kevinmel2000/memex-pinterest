@@ -96,13 +96,17 @@
         var blurUrl = '/api/blur/';
 		$(document).ready(function() {
 
+			var blurLevel = {{blur_level}};
 
 			$("#srcimg").bind("load", function(e) {
-				stackBlurImage( 'srcimg', 'canvas', {{blur_level}}, false );
-			})
+				setBlurLevel(blurLevel);
+			}).each(function(i,e) {
+			 if(this.complete){
+				 $("#srcimg").load();
+			 }});
 
-			var setBlurLevel = function(blurRadius){
-				stackBlurImage( 'srcimg', 'canvas', blurRadius, false );
+			function setBlurLevel(blurRadius){
+				stackBlurImageDefault( 'srcimg', 'canvas', blurRadius, false );
 			}
 
             $("#slider").change(function(e) {
@@ -110,7 +114,7 @@
 				setBlurLevel(blurRadius);
             });
 
-			$('#slider').val({{blur_level}})
+			$('#slider').val(blurLevel);
             $('#slider').focus();
 
 
