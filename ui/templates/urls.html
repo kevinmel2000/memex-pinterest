@@ -50,12 +50,32 @@
           <td></td>
 	{% endif %}
 
-	{% if "screenshot_path" in url_dic %}	  
+    <td>
+    <div id="imageHolder_{{url_dic["url"].replace(".","_")}}"  style="left:0px; top:0px; height:0px">
+	{% if "screenshot_path" in url_dic %}
 	  {% set screenshot_path = url_dic["screenshot_path"] %}
-          <td><img src="{{ url_for('static', filename=screenshot_path) }}"></img></td>
-        {% else %}
-          <td></td>
-	{% endif %}
+          <img id="image_{{url_dic["url"].replace(".","_")}}"
+          class="naked_image"
+          data-canvas='canvas_{{url_dic["url"].replace(".","_")}}'
+          src="{{ url_for('static', filename=screenshot_path) }}"
+          width=1
+          height=1
+          alt="ALT">
+    {% else %}
+      <!--  <img src="" alt="No Image Available">-->
+    {% endif %}
+    </div>
+    <div id="canvasHolder_{{url_dic["url"].replace(".","_")}}" style="left:10px; top:00px" >
+         <canvas id="canvas_{{url_dic["url"].replace(".","_")}}"    ></canvas>
+    </div>
+
+    </td>
+
+
+
+
+
+
 		<td><button class="btn btn-primary btn-sm" onclick="submitUrlForCrawl('{{ url_dic["url"] }}')">Crawl from here</button></td>
 
       </tr>
@@ -105,8 +125,20 @@ $(document).ready(function() {
 	    // Disable caching of AJAX responses
 	    cache: false
 	});
+	blurAllImages();
 });
 
+	function blurAllImages(){
+		var blurLevel = {{blur_level}};
+		$(".naked_image").bind("load", function(e) {
+				stackBlurImage( this.id, this.dataset.canvas, blurLevel, false );
+		}).each(function(i,e) {
+		 if(this.complete){
+			 this.load();
+		 }
+		});
+
+	}
 
 </script>
 

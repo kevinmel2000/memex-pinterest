@@ -16,24 +16,30 @@
 <span class="glyphicon glyphicon-remove-circle" style="cursor: pointer; cursor: hand;"></span>-->
 
 
-    <div id="imageHolder_{{host_dic["host"]}}"  width="200" height="200">
+    <div id="imageHolder_{{host_dic["host"].replace(".","_")}}"  style="left:0px; top:0px; height:0px">
 {% if 'hsu_screenshot_path' in host_dic and host_dic['hsu_screenshot_path'] %}
   {% set hsu_screenshot_path = host_dic['hsu_screenshot_path'] %}
-        <img id="image_{{host_dic["host"]}}" src="{{ url_for('static', filename=hsu_screenshot_path) }}" alt="ALT" width="200" height="300">
+        <img id="image_{{host_dic["host"].replace(".","_")}}"
+        class="naked_image"
+        data-canvas='canvas_{{host_dic["host"].replace(".","_")}}'
+        src="{{ url_for('static', filename=hsu_screenshot_path) }}"
+        width=1
+        height=1
+        alt="ALT">
 {% else %}
     <!--  <img src="" alt="No Image Available">-->
-
-        <!--<img id="image_{{host_dic["host"]}}" src="{{ url_for('static', filename='images/superman4.png') }}" alt="No Image Available" width="200" height="300" >-->
-        <img id="image_{{host_dic["host"]}}" src="http://i1.wp.com/mattfradd.com/wp-content/uploads/2013/06/superman-wallpapers_16515_1152x864.png?resize=300%2C225"
-alt="No Image Available" width="200" height="300" >
-
-
 {% endif %}
     </div>
-    <div id="canvasHolder_{{host_dic["host"]}}" >
-         <canvas id="canvas_{{host_dic["host"]}}" width="200" height="200"></canvas>
-    </div>
 
+    <div id="canvasHolder_{{host_dic["host"].replace(".","_")}}" style="left:10px; top:00px" >
+         <canvas id="canvas_{{host_dic["host"].replace(".","_")}}"    ></canvas>
+    </div>
+<!--
+    <div id="canvasHolder" style="position:absolute;left:20px; top:20px;text-align:center;font-size:10px;">
+			 <canvas  id="canvas" height="375" width="500" style="width: 500px; height: 375px;">
+             </canvas>
+    </div>
+-->
 <span style="float:right; margin-right:5px;margin-left:5px; cursor: pointer; cursor: hand;" class="glyphicon glyphicon-remove check-no-interest" data-host='{{host_dic["host"]}}'></span>
 
 {% if host_dic["display"] == 1 %}

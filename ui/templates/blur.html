@@ -67,7 +67,7 @@
                         <br/>
                     <div style="float:left;width:73%">
                         <div style="float:left;width:80%">
-                            <input id="slider" type="range" name="points" min="0" max="200" step="20" style="width:100%"/>
+                            <input id="slider" type="range" name="points" min="0" max="200" step="1" style="width:100%"/>
                         </div>
                         <div style="float:right">
                             <input id="saveBlurLevel"type="button" class="btn-primary btn-md" value="Save"/>
@@ -76,8 +76,8 @@
                     <br/>
                     <br/>
                         <div id="imageHolder">
-                             <img id="srcimg" src="{{ url_for('static', filename='images/superman4.png') }}" width="1" height="1"><br>
-                        </div>
+                             <img id="srcimg" src="{{ url_for('static', filename='images/superman4.png') }}" width="1" height="1">
+						</div>
                         <div id="canvasHolder">
                              <canvas id="canvas"></canvas>
                         </div>
@@ -96,6 +96,11 @@
         var blurUrl = '/api/blur/';
 		$(document).ready(function() {
 
+
+			$("#srcimg").bind("load", function(e) {
+				stackBlurImage( 'srcimg', 'canvas', {{blur_level}}, false );
+			})
+
 			var setBlurLevel = function(blurRadius){
 				stackBlurImage( 'srcimg', 'canvas', blurRadius, false );
 			}
@@ -105,7 +110,6 @@
 				setBlurLevel(blurRadius);
             });
 
-			setBlurLevel({{blur_level}});
 			$('#slider').val({{blur_level}})
             $('#slider').focus();
 

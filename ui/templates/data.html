@@ -213,6 +213,7 @@
 				console.log("Loaded pages: " + String(loaded_pages));
 				checkCollapse(true);
 			}
+			blurAllImages();
 		});
 		$.ajaxSetup({
 			async : true
@@ -221,10 +222,24 @@
 		checkDisabled();
 	}
 
+	function replaceAll(find, replace, str) {
+	  return str.replace(new RegExp(escapeRegExp(find), 'g'), escapeRegExp(replace));
+	}
+
+	function escapeRegExp(string) {
+		return string.replace(/([.*+?^=!:${}()|\[\]\/\\])/g, "\\$1");
+	}
+
 	function blurAllImages(){
-		console.log('blur_images');
-		debugger;
-        stackBlurImage( 'image_www.scytl.com', 'canvas_www.scytl.com', {{blur_level}}, false );
+		var blurLevel = {{blur_level}};
+		$(".naked_image").bind("load", function(e) {
+				stackBlurImage( this.id, this.dataset.canvas, blurLevel, false );
+		}).each(function(i,e) {
+		 if(this.complete){
+			 this.load();
+		 }
+		});
+
 	}
 
 	function loadMore() {
@@ -258,7 +273,8 @@
 								checkCollapse(false);
 								console.log("Loaded pages: " + String(loaded_pages));
 								setTimeout(function(){
-								checkDisabled();},10);
+									checkDisabled();
+								},1);
 							},10);
 						} else {
 							console.log("No more pages to load!");

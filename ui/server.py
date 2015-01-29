@@ -62,16 +62,18 @@ def data(page=1):
 def cc_data(page=1):
 
     hosts = hosts_handler(page=int(page), which_collection="cc-crawl-data")
+    blur_level = get_blur_level()
 
-    return render_template('data.html', hosts=hosts, use_cc_data=True)
+    return render_template('data.html', hosts=hosts, use_cc_data=True, blur_level=blur_level)
 
 @app.route("/known-data")
 @requires_auth
 def known_data(page=1):
 
     hosts = hosts_handler(page=int(page), which_collection="known-data")
+    blur_level = get_blur_level()
 
-    return render_template('data.html', hosts=hosts, use_known_data=True)
+    return render_template('data.html', hosts=hosts, use_known_data=True, blur_level=blur_level)
 
 # services
 @app.route("/hosts/<page>")
@@ -130,7 +132,9 @@ def urls(host=None):
             url_dic["screenshot_path"] = get_screenshot_relative_path(screenshot_path)
         url_dic["url_hash"] = str(hashlib.md5(url_dic["url"]).hexdigest())
 
-    return render_template("urls.html", urls=urls)
+    blur_level = get_blur_level()
+
+    return render_template("urls.html", urls=urls, blur_level=blur_level)
 
 @app.route("/cc-urls")
 @app.route("/cc-urls/<host>")
@@ -141,8 +145,10 @@ def cc_urls(host=None):
     if request_wants_json():
         return Response(json.dumps(urls), mimetype="application/json")
 
+    blur_level = get_blur_level()
+
     # change this
-    return render_template("urls.html", urls=urls, use_cc_data=True)
+    return render_template("urls.html", urls=urls, use_cc_data=True, blur_level=blur_level)
 
 @app.route("/known-urls")
 @app.route("/known-urls/<host>")
@@ -153,8 +159,10 @@ def known_urls(host=None):
     if request_wants_json():
         return Response(json.dumps(urls), mimetype="application/json")
 
+    blur_level = get_blur_level()
+
     # change this
-    return render_template("urls.html", urls=urls, use_known_data=True)
+    return render_template("urls.html", urls=urls, use_known_data=True, blur_level=blur_level)
 
 @app.route("/add-known", methods = ['GET', 'POST'])
 @requires_auth
