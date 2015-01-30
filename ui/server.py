@@ -106,10 +106,10 @@ def cc_data(page=1):
 @requires_auth
 def known_data(page=1):
 
-    hosts = hosts_handler(page=int(page), page_size=StaticSettings().page_size, which_collection="known-data", img_height=StaticSettings().host_img_height, img_width=StaticSettings().host_img_width)
+    hosts = hosts_handler(page=int(page), page_size=StaticSettings().page_size, which_collection="known-data")
     blur_level = get_blur_level()
 
-    return render_template('data.html', hosts=hosts, use_known_data=True, blur_level=blur_level)
+    return render_template('data.html', hosts=hosts, use_known_data=True, blur_level=blur_level, img_height=StaticSettings().host_img_height, img_width=StaticSettings().host_img_width)
 
 # services
 @app.route("/hosts/<page>")
