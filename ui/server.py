@@ -63,20 +63,24 @@ def back(page=1):
     current_host = request.args.get('current-host')     #mandatory
     filter_field = request.args.get('filter-field')
     filter_regex = request.args.get('filter-regex')
+    show_all = request.args.get('show-all')
 
     redirect_to = path
 
     if filter_regex and filter_field:
-        redirect_to = redirect_to + "?filter-field=" + filter_field + "&filter-regex=" + filter_regex
+        redirect_to += "?filter-field=" + filter_field + "&filter-regex=" + filter_regex
+        if show_all :
+            redirect_to += "&show-all=true"
+    else:
+        if show_all :
+            redirect_to += "?show-all=true"
 
     # if current_host:
-    page_number = get_page_number_for_host(path, StaticSettings().page_size, current_host, filter_field, filter_regex)
+    page_number = get_page_number_for_host(path, StaticSettings().page_size, current_host, filter_field, filter_regex, show_all)
     if page_number > 0 :
-        redirect_to = redirect_to  + "#page-number=" + str(page_number)
-
+        redirect_to += "#page-number=" + str(page_number)
 
     return redirect(redirect_to, code=302)
-    # "data#page-number=2"
 
 @app.route("/data")
 @requires_auth
@@ -84,32 +88,27 @@ def data(page=1):
 
     filter_field = request.args.get('filter-field')
     filter_regex = request.args.get('filter-regex')
-    current_host = request.args.get('current-host')
 
-    hosts = hosts_handler(page=int(page), page_size=StaticSettings().page_size, current_host=current_host)
-    hosts = hosts_handler(page=int(page))
     blur_level = get_blur_level()
 
-    return render_template('data.html', hosts=hosts, which_collection="crawl-data",
+    return render_template('data.html', hosts=None, which_collection="crawl-data",
                            filter_field = filter_field, filter_regex = filter_regex, use_cc_data=False, blur_level=blur_level, img_height=StaticSettings().host_img_height, img_width=StaticSettings().host_img_width)
 
 @app.route("/cc-data")
 @requires_auth
 def cc_data(page=1):
 
-    hosts = hosts_handler(page=int(page), page_size=StaticSettings().page_size, which_collection="cc-crawl-data")
     blur_level = get_blur_level()
 
-    return render_template('data.html', hosts=hosts, use_cc_data=True, blur_level=blur_level, img_height=StaticSettings().host_img_height, img_width=StaticSettings().host_img_width)
+    return render_template('data.html', hosts=None, use_cc_data=True, blur_level=blur_level, img_height=StaticSettings().host_img_height, img_width=StaticSettings().host_img_width)
 
 @app.route("/known-data")
 @requires_auth
 def known_data(page=1):
 
-    hosts = hosts_handler(page=int(page), page_size=StaticSettings().page_size, which_collection="known-data")
     blur_level = get_blur_level()
 
-    return render_template('data.html', hosts=hosts, use_known_data=True, blur_level=blur_level, img_height=StaticSettings().host_img_height, img_width=StaticSettings().host_img_width)
+    return render_template('data.html', hosts=None, use_known_data=True, blur_level=blur_level, img_height=StaticSettings().host_img_height, img_width=StaticSettings().host_img_width)
 
 # services
 @app.route("/hosts/<page>")
@@ -118,8 +117,9 @@ def load_hosts(page=1):
 
     filter_field = request.args.get('filter-field')
     filter_regex = request.args.get('filter-regex')
+    show_all = request.args.get('show-all')
 
-    hosts = hosts_handler(page=int(page) + 1, page_size=StaticSettings().page_size, filter_field = filter_field, filter_regex = filter_regex)
+    hosts = hosts_handler(page=int(page) + 1, page_size=StaticSettings().page_size, filter_field = filter_field, filter_regex = filter_regex, show_all=show_all)
     for host_dic in hosts:
         host_dic["host_hash"] = str(hashlib.md5(host_dic["host"]).hexdigest())
         if "tags" in host_dic:
@@ -128,13 +128,15 @@ def load_hosts(page=1):
     if request_wants_json():
         return Response(json.dumps(hosts), mimetype="application/json")
 
-    return render_template('hosts.html', hosts=hosts, use_cc_data=False, page = page)
+    return render_template('hosts.html', hosts=hosts, use_cc_data=False, page=page)
 
 @app.route("/cc-hosts/<page>")
 @requires_auth
 def cc_load_hosts(page=1):
 
-    hosts = hosts_handler(page=int(page) + 1, page_size=StaticSettings().page_size, which_collection="cc-crawl-data")
+    show_all = request.args.get('show-all')
+
+    hosts = hosts_handler(page=int(page) + 1, page_size=StaticSettings().page_size, which_collection="cc-crawl-data", show_all=show_all)
 
     if request_wants_json():
         return Response(json.dumps(hosts), mimetype="application/json")
@@ -145,7 +147,9 @@ def cc_load_hosts(page=1):
 @requires_auth
 def known_load_hosts(page=1):
 
-    hosts = hosts_handler(page=int(page) + 1, page_size=StaticSettings().page_size, which_collection="known-data")
+    show_all = request.args.get('show-all')
+
+    hosts = hosts_handler(page=int(page) + 1, page_size=StaticSettings().page_size, which_collection="known-data", show_all=show_all)
 
     if request_wants_json():
         return Response(json.dumps(hosts), mimetype="application/json")
