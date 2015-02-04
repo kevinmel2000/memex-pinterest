@@ -1,3 +1,4 @@
+import logging
 from flask import request
 from mongoutils.memex_mongo_utils import MemexMongoUtils
 from scrapyutils.scrapydutil import ScrapydJob
@@ -6,6 +7,9 @@ from mongoutils.known_hosts import KnownHostsCompare
 from mongoutils.validate import validate_url
 from ranker.rescore_mongo import train_and_score_mongo
 import re
+
+memex_logger = logging.getLogger('memex')
+
 
 def get_screenshot_relative_path(real_path):
     try:
@@ -75,6 +79,9 @@ def schedule_spider_handler(seed, spider_host = "localhost", spider_port = "6800
     job_id = scrapyd_util.schedule(seed)
     mmu.add_job(seed, job_id, project = "discovery-project", spider = "website_finder")
 
+    memex_logger.user('Scheduled spider for: %s' % seed,
+                      details={'job_id': job_id,
+                               'url': seed})
     return True
 
 def add_known_urls_handler(urls_raw):
@@ -108,6 +115,7 @@ def discovery_handler():
 def mark_interest_handler(interest, url):
 
     mmu = MemexMongoUtils()
+
     if interest:
         mmu.set_interest(url, True)
 
@@ -116,12 +124,14 @@ def mark_interest_handler(interest, url):
         mmu.set_interest(url, False)
 
         #!should we be doing this?
-#        mmu.set_score(url, 0)
+        # mmu.set_score(url, 0)
+    memex_logger.user('Marked as interesting: %s' % url)
 
 def set_score_handler(url, score):
     mmu = MemexMongoUtils()
     mmu.set_score(url, score)
 
+    memex_logger.user('Scored site: %s' % url)
 ##workspace    
 ############# TAGS #############
 
@@ -178,6 +188,7 @@ def list_workspace():
 def add_workspace(name):
     mmu = MemexMongoUtils()
     mmu.add_workspace(name)
+    memex_logger.user('Added workspace: %s' % name)
 
 def set_workspace_selected(id):
     mmu = MemexMongoUtils()
@@ -186,6 +197,7 @@ def set_workspace_selected(id):
 def delete_workspace(id):
     mmu = MemexMongoUtils()
     mmu.delete_workspace(id)
+    memex_logger.user('Deleted workspace: %s' % id)
 
 ##keyword
 def list_keyword():
@@ -234,6 +246,3 @@ def rescore_db_handler():
 if __name__ == "__main__":
 
     print hosts_handler(filter_field = "host", filter_regex=".*")
-    
-    
-    

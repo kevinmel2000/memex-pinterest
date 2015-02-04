@@ -1,8 +1,10 @@
 import os
+import logging
 from flask import Flask
 from flask import render_template, Response, request
 from handlers import request_wants_json
 from mongoutils.memex_mongo_utils import MemexMongoUtils
+from memex_logging.handler import MemexLogHandler
 from handlers import hosts_handler, urls_handler, \
 get_job_state_handler, schedule_spider_handler, \
 discovery_handler, mark_interest_handler, get_screenshot_relative_path
@@ -21,6 +23,7 @@ from mongoutils.errors import DeletingSelectedWorkspaceError
 from searchengine.pharma.spiders.basesearchengine import BaseSearchEngineSpider
 from searchengine.pharma.spiders.google_com import GoogleComSpider
 
+
 server_path = os.path.dirname(os.path.realpath(__file__))
 app = Flask(__name__)
 app.config.from_object('settings')
@@ -31,6 +34,23 @@ class JSONEncoder(json.JSONEncoder):
         if isinstance(o, ObjectId):
             return str(o)
         return json.JSONEncoder.default(self, o)
+
+
+def setup_memex_logger():
+    handler = MemexLogHandler(
+        api_url=app.config['MEMEX_LOGGING_URL'],
+        auth_token=app.config['MEMEX_LOGGING_TOKEN'],
+        api_version='3',
+        tool_name='SourcePin UI',
+        tool_version='0.1',  # TODO: add version
+        enabled=app.config['MEMEX_LOGGING_ENABLED']
+    )
+    logging.basicConfig(
+        format='%(asctime)s [%(levelname)s] %(name)s: %(message)s'
+    )
+    logging.getLogger().setLevel('INFO')
+    logger = logging.getLogger('memex')
+    return logger
 
 # ui
 @app.route("/discovery")
@@ -200,6 +220,7 @@ def mark_interest(interest):
         raise Exception("Interest must be either true or false")
 
     ret = mark_interest_handler(interest, url)
+
     return Response("OK")
 
 @app.route("/set-score/<score>/")
@@ -399,5 +420,9 @@ if __name__ == "__main__":
 
     if app.config['DEBUG']:
         app.debug = True
+    print 'AAA'
+
+    app.memex_logger = setup_memex_logger()
+    app.memex_logger.system('System starting', privacy='public', inferred=True)
 
     app.run('0.0.0.0', port=80, threaded=True)
