@@ -14,7 +14,7 @@
     {% set data_path = 'data' %}
 {% endif %}
 
-<article class="white-panel page-{{ page }} {% if host_dic["display"] == 0 %} article-hidden {% else %} article-visible {% endif %}" id="{{ host_dic["host"] }}" style="word-wrap:break-word;">
+<article class="white-panel page-{{ page }} {% if host_dic["display"] == 0 %} article-inactive {% else %} article-visible {% endif %}" id="{{ host_dic["host"] }}" style="word-wrap:break-word;">
 
 
 {% if 'hsu_screenshot_path' in host_dic and host_dic['hsu_screenshot_path'] %}
@@ -57,16 +57,23 @@
 {% endif %}
 
 
-
-<span id="{{ host_dic["host_hash"] }}"
-
-    {% if host_dic["display"] == 0 %}
-        class="glyphicon glyphicon-ok check-yes-interest"
-    {% else %}
-        class="glyphicon glyphicon-remove check-no-interest"
-    {% endif %}
+    <span id="{{ host_dic["host_hash"] }}_yes"
+        class="glyphicon glyphicon-remove check-no-interest
+        {% if host_dic["display"] == 0 %}
+            article-hidden
+        {% endif %}"
         style="float:right;cursor: pointer; cursor: hand;"
-        data-host='{{host_dic["host"]}}' data-hosthash='{{ host_dic["host_hash"] }}' data-display='{{ host_dic["display"]  }}'></span>
+        data-host='{{host_dic["host"]}}' data-hosthash='{{ host_dic["host_hash"] }}' data-display='{{ host_dic["display"] }}' data-opposite="{{ host_dic["host_hash"] }}_no" >
+    </span>
+
+    <span id="{{ host_dic["host_hash"] }}_no"
+        class="glyphicon glyphicon-ok check-yes-interest
+        {% if host_dic["display"] == 1 %}
+            article-hidden
+        {% endif %}"
+            style="float:right;cursor: pointer; cursor: hand;"
+            data-host='{{host_dic["host"]}}' data-hosthash='{{ host_dic["host_hash"] }}' data-display='{{ host_dic["display"] }}' data-opposite="{{ host_dic["host_hash"] }}_yes">
+    </span>
 
 <h1>Host: <a href="http://{{ host_dic["host"] }}" target="_blank">{{ host_dic["host"] }}</a></h1>
 

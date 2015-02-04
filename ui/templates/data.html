@@ -55,6 +55,9 @@
 			transition: all 0.3s ease-in-out;
 		}
 		.article-hidden {
+			display: none;
+		}
+		.article-inactive {
 			background: LightGray;
 		}
 	</style>
@@ -565,6 +568,22 @@
 				var displayHostUrl = '/api/host/display/';
 				var host = this.dataset.host;
 				var this_elem = this;
+
+				var targetArticle = $(document.getElementById(host))[0];
+				if(qsMap["show-all"]){
+					$(targetArticle).removeClass( "article-visible" );
+					$(targetArticle).addClass( "article-inactive" );
+
+					var targetSpan = $(document.getElementById(this_elem.id))[0];
+					var targetOppositeSpan =  $(document.getElementById(this_elem.dataset['opposite']))[0];
+					$(targetSpan).addClass("article-hidden");
+					$(targetSpan).removeClass("article-active");
+					$(targetOppositeSpan).addClass("article-active");
+					$(targetOppositeSpan).removeClass("article-hidden");
+				}
+				else{
+					$(targetArticle).remove();
+				}
 				$.ajax({
 					type: "PUT",
 					url: displayHostUrl + host,
@@ -573,13 +592,7 @@
 					data: '{"display": 0}',
 					async: false,
 					success: function(data){
-						var targetArticle = $(document.getElementById(host))[0];
-						$(targetArticle).removeClass( "article-visible" );
-						$(targetArticle).addClass( "article-hidden" );
 
-						var targetSpan = $(document.getElementById(this_elem.id))[0];
-						$(targetSpan).removeClass(" glyphicon-remove check-no-interest ");
-						$(targetSpan).addClass(" glyphicon-ok check-yes-interest ");
 					}
 				})
 			});
@@ -591,6 +604,18 @@
 				var host = this.dataset.host;
 				var hosthash = this.dataset.hosthash
 				var this_elem = this;
+
+				var targetArticle = $(document.getElementById(host))[0];
+				$(targetArticle).addClass( "article-visible" );
+				$(targetArticle).removeClass( "article-inactive" );
+
+				var targetSpan = $(document.getElementById(this_elem.id))[0];
+				var targetOppositeSpan =  $(document.getElementById(this_elem.dataset['opposite']))[0];
+				$(targetSpan).addClass("article-hidden");
+				$(targetSpan).removeClass("article-active");
+				$(targetOppositeSpan).addClass("article-active");
+				$(targetOppositeSpan).removeClass("article-hidden");
+
 				$.ajax({
 					type: "PUT",
 					url: displayHostUrl + host,
@@ -599,13 +624,6 @@
 					data: '{"display": 1}',
 					async: false,
 					success: function(data){
-						var targetArticle = $(document.getElementById(host))[0];
-						$(targetArticle).addClass( "article-visible" );
-						$(targetArticle).removeClass( "article-hidden" );
-
-						var targetSpan = $(document.getElementById(this_elem.id))[0];
-						$(targetSpan).addClass(" glyphicon-remove check-no-interest ");
-						$(targetSpan).removeClass(" glyphicon-ok check-yes-interest ");
 					}
 				})
 			});
