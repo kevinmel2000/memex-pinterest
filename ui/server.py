@@ -470,7 +470,7 @@ if __name__ == "__main__":
     #from yourapplication import app
     
     http_server = HTTPServer(WSGIContainer(app))
-    http_server.listen(5000)
+    http_server.listen(80)
     IOLoop.instance().start()
     
     #app.run('0.0.0.0', port=80, threaded=True)
