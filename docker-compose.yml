@@ -1,13 +1,16 @@
 mongodb:
   image: dockerfile/mongodb:latest
+  restart: always
 sourcetor:
    image: acaceres2176/sourcetor
+   restart: always
 splash:
   image: scrapinghub/splash
   volumes: 
     - "./torstuff/proxy-profiles:/etc/splash/proxy-profiles"
   links:
     - sourcetor
+  restart: always
 sourcepin:
 #  for developers- to build with your code changes, replace the image: block with the build: block below 
 #  then type sudo fig build followed by sudo fig up, your changes should now be in SourcePin
@@ -22,3 +25,5 @@ sourcepin:
     - mongodb
     - splash
     - sourcetor
+  restart: always
+    
