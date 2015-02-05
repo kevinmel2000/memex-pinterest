@@ -20,7 +20,8 @@ RUN pip install \
 	scrapy-inline-requests \
 	flask \
 	html2text \
-	tqdm
+	tqdm \
+	tornado
 
 RUN pip install numpy --upgrade
 RUN pip install scipy --upgrade
