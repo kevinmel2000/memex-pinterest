@@ -12,13 +12,13 @@ Install & Usage
 Download the `SourcePin source code <https://github.com/TeamHG-Memex/memex-pinterest>`_.
 
 SourcePin is Docker and Fig based. First you need to install docker, see instructions
-`here <https://docs.docker.com/installation/#installation>`_. Next install fig ::
+`here <https://docs.docker.com/installation/#installation>`_. Next install fig (fig has been renamed to docker-compose) ::
 
-    $ sudo pip install fig
+    $ sudo pip install docker-compose
     
 Now start SourcePin from the repo root directory by typing ::
      
-     $ sudo fig up
+     $ sudo docker-compose up
     
 This will take a little while, be patient. This will also attach to the console and allow you to
 see the applications running.
@@ -28,11 +28,11 @@ Then open up a web browser and go to http://localhost. You should see SourcePin 
 In order to stop SourcePin go to the root directory of the cloned repo in a separate terminal 
 (not the one you did fig up from) and type ::
     
-    $ sudo fig stop
+    $ sudo docker-compose stop
     
 To restart SourcePin type ::
 
-    $ sudo fig start
+    $ sudo docker-compose start
     
 This will not attach and will run SourcePin in the background, remember this could take a little while. We 
 currently do not have a working process for attaching to the console when restarting the app. An important note: 
