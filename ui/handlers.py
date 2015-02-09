@@ -24,14 +24,14 @@ def request_wants_json():
         request.accept_mimetypes['text/html']
 
 
-def get_page_number_for_host(path, page_size, current_host, filter_field=None, filter_regex=None):
+def get_page_number_for_host(path, page_size, current_host, filter_field=None, filter_regex=None, show_all=None):
 
     which_collection = get_collection_by_path(path)
 
     mmu = MemexMongoUtils(which_collection=which_collection)
 
     max_page_size = 100*100 # max results per page
-    host_dics = mmu.list_hosts(page=1, page_size=max_page_size, filter_field=filter_field, filter_regex=filter_regex)
+    host_dics = mmu.list_hosts(page=1, page_size=max_page_size, filter_field=filter_field, filter_regex=filter_regex, show_all=show_all)
     i = 0
     current_page = 0
     for host_dic in host_dics:
@@ -59,7 +59,7 @@ def get_collection_by_path(path):
     return which_collection
 
 
-def hosts_handler(page=1, page_size=10, current_host=None, which_collection="crawl-data", filter_field=None, filter_regex=None):
+def hosts_handler(page=1, page_size=10, current_host=None, which_collection="crawl-data", filter_field=None, filter_regex=None, show_all=None):
     """Put together host documents for use with hosts endpoint """
 
     mmu = MemexMongoUtils(which_collection = which_collection)
@@ -71,7 +71,7 @@ def hosts_handler(page=1, page_size=10, current_host=None, which_collection="cra
 
     if current_host:
         current_page_size = page_size_max = 10*100 # max results per page
-        host_dics = mmu.list_hosts(page=page, page_size=current_page_size, filter_field=filter_field, filter_regex=filter_regex)
+        host_dics = mmu.list_hosts(page=page, page_size=current_page_size, filter_field=filter_field, filter_regex=filter_regex, show_all=show_all)
         matched=False
         i = 0
         for host_dic in host_dics:
@@ -87,7 +87,7 @@ def hosts_handler(page=1, page_size=10, current_host=None, which_collection="cra
             host_dics.pop()
 
     else:
-        host_dics = mmu.list_hosts(page=page, page_size=page_size, filter_field=filter_field, filter_regex=filter_regex)
+        host_dics = mmu.list_hosts(page=page, page_size=page_size, filter_field=filter_field, filter_regex=filter_regex, show_all=show_all)
 
 
     for host_dic in host_dics:

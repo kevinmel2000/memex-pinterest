@@ -14,9 +14,7 @@
     {% set data_path = 'data' %}
 {% endif %}
 
-<article class="white-panel page-{{ page }}" id="{{ host_dic["host"] }}" style="word-wrap:break-word;">
-<!--<span class="glyphicon glyphicon-ok-circle" style="cursor: pointer;"></span>
-<span class="glyphicon glyphicon-remove-circle" style="cursor: pointer; cursor: hand;"></span>-->
+<article class="white-panel page-{{ page }} {% if host_dic["display"] == 0 %} article-inactive {% else %} article-visible {% endif %}" id="{{ host_dic["host"] }}" style="word-wrap:break-word;">
 
 
 {% if 'hsu_screenshot_path' in host_dic and host_dic['hsu_screenshot_path'] %}
@@ -58,13 +56,24 @@
     -->
 {% endif %}
 
-<span style="float:right; margin-right:5px;margin-left:5px; cursor: pointer; cursor: hand;" class="glyphicon glyphicon-remove check-no-interest" data-host='{{host_dic["host"]}}'></span>
 
-{% if host_dic["display"] == 1 %}
-  <span id="{{ host_dic["host_hash"] }}" style="float:right;cursor: pointer; cursor: hand; display:none;" class="glyphicon glyphicon-ok check-yes-interest" data-host='{{host_dic["host"]}}'  data-hosthash='{{ host_dic["host_hash"] }}'></span>
-{% else %}
-  <span id="{{ host_dic["host_hash"] }}" style="float:right;cursor: pointer; cursor: hand;" class="glyphicon glyphicon-ok check-yes-interest" data-host='{{host_dic["host"]}}'  data-hosthash='{{ host_dic["host_hash"] }}'></span>
-{% endif %}
+    <span id="{{ host_dic["host_hash"] }}_yes"
+        class="glyphicon glyphicon-remove check-no-interest
+        {% if host_dic["display"] == 0 %}
+            article-hidden
+        {% endif %}"
+        style="float:right;cursor: pointer; cursor: hand;"
+        data-host='{{host_dic["host"]}}' data-hosthash='{{ host_dic["host_hash"] }}' data-display='{{ host_dic["display"] }}' data-opposite="{{ host_dic["host_hash"] }}_no" >
+    </span>
+
+    <span id="{{ host_dic["host_hash"] }}_no"
+        class="glyphicon glyphicon-ok check-yes-interest
+        {% if host_dic["display"] == 1 %}
+            article-hidden
+        {% endif %}"
+            style="float:right;cursor: pointer; cursor: hand;"
+            data-host='{{host_dic["host"]}}' data-hosthash='{{ host_dic["host_hash"] }}' data-display='{{ host_dic["display"] }}' data-opposite="{{ host_dic["host_hash"] }}_yes">
+    </span>
 
 <h1>Host: <a href="http://{{ host_dic["host"] }}" target="_blank">{{ host_dic["host"] }}</a></h1>
 

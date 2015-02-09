@@ -108,12 +108,12 @@ class MemexMongoUtils(object):
 
         return list(docs)
 
-    def list_hosts(self, page=1, page_size=10, filter_regex = None, filter_field = None):
+    def list_hosts(self, page=1, page_size=10, filter_regex = None, filter_field = None, show_all=None):
 
         if filter_regex and filter_field:
-            docs = self.get_hosts_filtered(filter_field = filter_field, filter_regex = filter_regex)
+            docs = self.get_hosts_filtered(filter_field = filter_field, filter_regex = filter_regex, show_all=show_all)
         else:
-            docs = self.get_hosts()
+            docs = self.get_hosts(show_all=show_all)
 
         try:
             docs = docs.skip(page_size * (page - 1)).limit(page_size)
@@ -389,24 +389,44 @@ class MemexMongoUtils(object):
 
     ############# HOST HELPERS ###########
 
-    def get_hosts(self):
-        docs = self.hostinfo_collection.find({ "display": { "$ne": 0 } }).sort([("host_score", pymongo.DESCENDING),("_id", pymongo.ASCENDING)]) # sort by _id to have deterministic results
+    def get_hosts(self, show_all=None):
+        if show_all:
+            query = {}
+        else:
+            query = { "display": { "$ne": 0 } }
+
+        sort_order = [("host_score", pymongo.DESCENDING),("_id", pymongo.ASCENDING)]
+        docs = self.hostinfo_collection.find(query).sort(sort_order) # sort by _id to have deterministic results
         return docs
 
-    def get_hosts_filtered(self, filter_field, filter_regex):
-        query = {'$and' : [{'$or':[{filter_field:{'$regex':filter_regex}},{"tags":{'$regex':filter_regex}}]}, { "display": { "$ne": 0 }}]}
+    def get_hosts_filtered(self, filter_field, filter_regex, show_all=None):
+        if show_all:
+            query = {'$and' : [{'$or':[{filter_field:{'$regex':filter_regex}},{"tags":{'$regex':filter_regex}}]}]}
+        else:
+            query = {'$and' : [{'$or':[{filter_field:{'$regex':filter_regex}},{"tags":{'$regex':filter_regex}}]}, { "display": { "$ne": 0 }}]}
+
         sort_order = [("host_score", pymongo.DESCENDING),("_id", pymongo.ASCENDING)] # sort by _id to have deterministic results
         docs = self.hostinfo_collection.find(query).sort(sort_order)
         return docs
 
-    def get_hosts_by_tag_match(self, filter_regex):
-        query = {'$and' : [{"tags" : {'$regex' : filter_regex}}, { "display": { "$ne": 0 }}]}
+    def get_hosts_by_tag_match(self, filter_regex, show_all=None):
+
+        if show_all:
+            query = {'$and' : [{"tags" : {'$regex' : filter_regex}}]}
+        else:
+            query = {'$and' : [{"tags" : {'$regex' : filter_regex}}, { "display": { "$ne": 0 }}]}
+
         sort_order = [("host_score", pymongo.DESCENDING),("_id", pymongo.ASCENDING)] # sort by _id to have deterministic results
         docs = self.hostinfo_collection.find(query).sort(sort_order)
         return docs
 
-    def get_hosts_by_host_match(self, filter_regex):
-        query = {'$and' : [{"host" : {'$regex' : filter_regex}}, { "display": { "$ne": 0 }}]}
+    def get_hosts_by_host_match(self, filter_regex, show_all=None):
+
+        if show_all:
+            query = {'$and' : [{"host" : {'$regex' : filter_regex}}]}
+        else:
+            query = {'$and' : [{"host" : {'$regex' : filter_regex}}, { "display": { "$ne": 0 }}]}
+
         sort_order = [("host_score", pymongo.DESCENDING),("_id", pymongo.ASCENDING)] # sort by _id to have deterministic results
         docs = self.hostinfo_collection.find(query).sort(sort_order)
         return docs

@@ -54,6 +54,12 @@
 			-o-transition: all 0.3s ease-in-out;
 			transition: all 0.3s ease-in-out;
 		}
+		.article-hidden {
+			display: none;
+		}
+		.article-inactive {
+			background: LightGray;
+		}
 	</style>
 
 
@@ -72,7 +78,12 @@
 ================================================== -->
 
 <body>
-	<div id="top-of-page"><a id="memtool" class="glyphicon glyphicon-question-sign" style="opacity:1; font-size:20px;float:right;margin-right:240px;margin-top:50px;"></a></div>
+	<div id="top-of-page">
+		<div style="text-align:right; margin-top:15px; margin-right:20px" >
+			<a id="toggleShowAllButton" href="#" onclick="toggleShowAllButton; return false">placeholder</a>
+			<a id="memtool" class="glyphicon glyphicon-question-sign" style="opacity:1; font-size:20px; margin-left:20px"></a>
+		</div>
+	</div>
 	
 	<div class="jquery-script-ads">
 		<script type="text/javascript"></script>
@@ -211,9 +222,9 @@
 
 		console.log("Loading previous page " + String(page_to_load));
 		host_url = "{{ host_path }}/" + String(page_to_load);
-		{% if filter_regex and filter_field %}
-		host_url = host_url + "?filter-regex={{ filter_regex }}&filter-field={{ filter_field }}";
-		{% endif %}
+
+		if(window.location.href.indexOf('?') >= 0);
+			host_url = host_url + '?' + window.location.href.split('?')[1]
 
 		$.ajaxSetup({
 			async : false
@@ -252,12 +263,10 @@
 				$(e).load();
 			 }
 		});
-
 	}
 
 	function loadMore() {
 		console.log("Loading more");
-
 
 		if (loaded_pages.length !== 0) {
 			var page_to_load = loaded_pages[loaded_pages.length - 1] + 1;
@@ -271,9 +280,8 @@
 		}
 
 		host_url = "{{ host_path }}/" + page_to_load;
-		{% if filter_regex and filter_field %}
-		host_url = host_url + "?filter-regex={{ filter_regex }}&filter-field={{ filter_field }}";
-		{% endif %}
+		if(window.location.href.indexOf('?') >= 0);
+			host_url = host_url + '?' + window.location.href.split('?')[1]
 
 		var scrollHeight = $(document).scrollTop();
 		$.ajax({
@@ -285,7 +293,6 @@
 							setTimeout(function(){
 								$("section#blog-landing").append(host_html);
 								blurAllImages();
-								loaded_pages.push(page_to_load);
 								checkCollapse(false);
 								console.log("Loaded pages: " + String(loaded_pages));
 								setTimeout(function(){
@@ -447,6 +454,11 @@
 ///////////////////////////////////////////
 
 		$(document).ready(function() {
+
+			// CURRENT_URI
+			var currentURI = URI(window.location.href);
+			var qsMap = currentURI.search(true);
+
 			$('#addText').keypress(function(e) {
 				if (e.which == 13) {// enter pressed
 					newTag.apply();
@@ -485,29 +497,27 @@
 			/////// SEARCH //////////
 			$('#search').keypress(function(e) {
 				if (e.which == 13 ) {
-					if ($("#search").val() != ""){
-						return searchDo(search);
+					if ($("#search").val() == ""){
+						currentURI.removeSearch("filter-field");
+						currentURI.removeSearch("filter-regex");
+						window.location.href = currentURI.toString();
 					}
 					else{
-						window.location.href =  window.location.href.split('?')[0];
+						searchDoAuto($('#search').val());
 					}
 				}
 			});
 
-			if(getURLParameter('filter-field') == 'host'){
-				$("#search").val(getURLParameter('filter-regex'));
+			if(qsMap['filter-field'] && qsMap['filter-regex']){
+				var decoded = unescape(getURLParameter('filter-regex'));
+				$("#search").val(decoded);
 			}
 
-			var searchDo = function(){
-				var search = $('#search').val();
-				var search_url = "/data?filter-field=host&filter-regex=" + search;
-				window.location.replace(search_url);
-				return false;
-			};
-			
 			var searchDoAuto = function(search_term){
-				var search_url = "/data?filter-field=host&filter-regex=" + search_term;
-				window.location.replace(search_url);
+				currentURI.removeSearch("filter-field");
+				currentURI.removeSearch("filter-regex");
+				currentURI.addSearch({"filter-field":"host", "filter-regex": search_term});
+				window.location.href = currentURI.toString();
 				return false;
 			};
 
@@ -555,9 +565,25 @@
 
 			//  Display Hosts
 			$( document ).on( "click", ".check-no-interest", function() {
-				console.log(this);
 				var displayHostUrl = '/api/host/display/';
 				var host = this.dataset.host;
+				var this_elem = this;
+
+				var targetArticle = $(document.getElementById(host))[0];
+				if(qsMap["show-all"]){
+					$(targetArticle).removeClass( "article-visible" );
+					$(targetArticle).addClass( "article-inactive" );
+
+					var targetSpan = $(document.getElementById(this_elem.id))[0];
+					var targetOppositeSpan =  $(document.getElementById(this_elem.dataset['opposite']))[0];
+					$(targetSpan).addClass("article-hidden");
+					$(targetSpan).removeClass("article-active");
+					$(targetOppositeSpan).addClass("article-active");
+					$(targetOppositeSpan).removeClass("article-hidden");
+				}
+				else{
+					$(targetArticle).remove();
+				}
 				$.ajax({
 					type: "PUT",
 					url: displayHostUrl + host,
@@ -566,8 +592,7 @@
 					data: '{"display": 0}',
 					async: false,
 					success: function(data){
-						
-						document.getElementById(host).remove();
+
 					}
 				})
 			});
@@ -578,6 +603,19 @@
 				var displayHostUrl = '/api/host/display/';
 				var host = this.dataset.host;
 				var hosthash = this.dataset.hosthash
+				var this_elem = this;
+
+				var targetArticle = $(document.getElementById(host))[0];
+				$(targetArticle).addClass( "article-visible" );
+				$(targetArticle).removeClass( "article-inactive" );
+
+				var targetSpan = $(document.getElementById(this_elem.id))[0];
+				var targetOppositeSpan =  $(document.getElementById(this_elem.dataset['opposite']))[0];
+				$(targetSpan).addClass("article-hidden");
+				$(targetSpan).removeClass("article-active");
+				$(targetOppositeSpan).addClass("article-active");
+				$(targetOppositeSpan).removeClass("article-hidden");
+
 				$.ajax({
 					type: "PUT",
 					url: displayHostUrl + host,
@@ -586,17 +624,39 @@
 					data: '{"display": 1}',
 					async: false,
 					success: function(data){
-					    console.log(hosthash);
-						$("#" + hosthash).hide();
-						console.log("done disappearing");
-					    
 					}
 				})
 			});
 
+			///// TOGGLE SHOW ALL DISPLAY ////////////////
 
+			var showAll;
+			if(qsMap["show-all"]){
+				showAll=true;
+			}
+			else{
+				showAll=false;
+			}
 
+			if(showAll){
+				$("#toggleShowAllButton").text('Show only Actives');
+			}
+			else{
+				$("#toggleShowAllButton").text('Show All');
+			}
 
+			$("#toggleShowAllButton").click(function(){
+				var uriShowingAll = URI(window.location.href);
+				if(showAll){
+					$("#toggleShowAllButton").text('Show only Actives');
+					uriShowingAll.removeSearch("show-all");
+				}
+				else{
+					$("#toggleShowAllButton").text('Show All');
+					uriShowingAll.addSearch("show-all",true);
+				}
+				window.location.href = uriShowingAll.toString();
+			})
 		});
 
 </script>
