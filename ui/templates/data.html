@@ -80,7 +80,7 @@
 <body>
 	<div id="top-of-page">
 		<div style="text-align:right; margin-top:15px; margin-right:20px" >
-			<a id="toggleShowAllButton" href="#" onclick="toggleShowAllButton; return false">placeholder</a>
+			<a id="toggleShowAllButton" href="#" onclick="toggleShowAllButton; return false"></a>
 			<a id="memtool" class="glyphicon glyphicon-question-sign" style="opacity:1; font-size:20px; margin-left:20px"></a>
 		</div>
 	</div>
@@ -639,10 +639,10 @@
 			}
 
 			if(showAll){
-				$("#toggleShowAllButton").text('Show only Actives');
+				$("#toggleShowAllButton").text('Show only active pins');
 			}
 			else{
-				$("#toggleShowAllButton").text('Show All');
+				$("#toggleShowAllButton").text('Show all pins');
 			}
 
 			$("#toggleShowAllButton").click(function(){
