@@ -1,3 +1,4 @@
 pymongo==2.7.2
 flask==0.10.1
 python-scrapyd-api==0.1.0
+-e git+https://github.com/TeamHG-Memex/tldextract.git@f2cad3bb2532cd8becf2dc4e8f20d2f487d71007#egg=tldextract-master
