@@ -9,6 +9,7 @@ from urlparse import urlparse
 from pymongo.errors import DuplicateKeyError
 from bson.objectid import ObjectId
 from errors import DeletingSelectedWorkspaceError
+from ui.utils.url import extract_tld
 import re
 
 class MemexMongoUtils(object):
@@ -182,10 +183,8 @@ class MemexMongoUtils(object):
         '''
 
         url = kwargs["url"]
-        host = urlparse(url).netloc
-        if ":" in host:
-            host = host.split(":")[0]
-            
+        host = extract_tld(url)
+
         url_doc = kwargs
         url_doc["host"] = host
         
