@@ -183,7 +183,8 @@ class MemexMongoUtils(object):
         '''
 
         url = kwargs["url"]
-        host = extract_tld(url)
+        extracted = extract_tld(url)
+        host = extracted.domain + '.' + extracted.suffix
 
         url_doc = kwargs
         url_doc["host"] = host
