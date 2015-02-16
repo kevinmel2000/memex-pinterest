@@ -14,7 +14,7 @@ import re
 
 class MemexMongoUtils(object):
 
-    def __init__(self, init_db=False, address="mongodb", port=27017, which_collection="crawl-data"):
+    def __init__(self, init_db=False, address="localhost", port=27017, which_collection="crawl-data"):
         """This class  initializes a Memex Mongo object and rebuilds the db collections if you want.
 
         Warning: init_db will delete your collection when set to True
@@ -319,7 +319,7 @@ class MemexMongoUtils(object):
         db.create_collection(seed_collection_name)
 
         # create index and drop any dupes
-        db[url_collection_name].ensure_index("url", unique=True, drop_dups=True)
+        db[url_collection_name].ensure_index("_meta.fingerprint", unique=True, drop_dups=True)
         db[host_collection_name].ensure_index("host", unique=True, drop_dups=True)
         db[seed_collection_name].ensure_index("url", unique=True, drop_dups=True)
 
