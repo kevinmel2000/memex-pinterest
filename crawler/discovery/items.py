@@ -20,7 +20,7 @@ class WebpageItem(scrapy.Item):
     referrer_url = scrapy.Field()  # URL of a referrer page
     is_seed = scrapy.Field()  # this is True for pages from seed websites
     screenshot_path = scrapy.Field()
-    # score = scrapy.Field()
+    crawler_score = scrapy.Field()
 
 
 class WebpageItemLoader(ItemLoader):

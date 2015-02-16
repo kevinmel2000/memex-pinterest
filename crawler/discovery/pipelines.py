@@ -43,7 +43,6 @@ class SourcePinPipeline(object):
 
     def open_spider(self, spider):
         self.mongo_address, self.mongo_port = self.mongo_uri.split(":")
-        print self.mongo_address, self.mongo_port
         self.mmu = MemexMongoUtils(address = self.mongo_address, port = int(self.mongo_port))
 
     def close_spider(self, spider):

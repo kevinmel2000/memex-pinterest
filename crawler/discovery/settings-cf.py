@@ -3,7 +3,6 @@ SPIDER_MODULES = ['discovery.spiders']
 NEWSPIDER_MODULE = 'discovery.spiders'
 
 SPIDER_MIDDLEWARES = {
-    'crawlfrontier.contrib.scrapy.middlewares.seeds.file.SourcePinSeedLoader': 1,
     'crawlfrontier.contrib.scrapy.middlewares.schedulers.SchedulerSpiderMiddleware': 1000,
 }
 
@@ -32,9 +31,9 @@ SPLASH_PROXY_URL = 'http://splash:8051'
 
 MONGO_URI = "localhost:27017"
 MONGO_DATABASE = 'MemexHack'
-ITEM_PIPELINES = {
-    'discovery.pipelines.SourcePinPipeline': 100,
-}
+#ITEM_PIPELINES = {
+#    'discovery.pipelines.SourcePinPipeline': 100,
+#}
 
 HTTPCACHE_ENABLED = True
 
@@ -54,7 +53,7 @@ logging.getLogger("tldextract").setLevel(logging.INFO)
 
 #USER_AGENT = 'crawler (+http://www.yourdomain.com)'
 
-FRONTIER_SETTINGS = 'frontier.settings'
+FRONTIER_SETTINGS = 'discovery.frontier.settings'
 SCHEDULER = 'crawlfrontier.contrib.scrapy.schedulers.frontier.CrawlFrontierScheduler'
 
 # TODO concurrency and performance
