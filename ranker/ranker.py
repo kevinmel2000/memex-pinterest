@@ -42,6 +42,10 @@ class Ranker(object):
     def load(cls, path=MODEL):
         return Ranker(joblib.load(path))
 
+    def score_html(self, html_utf8):
+        X = [prepare_htmltext(html_utf8)]
+        return self.pipe.predict_proba(X)[0][1]
+
     def score_doc(self, doc):
         X = [prepare_doc(doc)]
         return self.pipe.predict_proba(X)[0][1]
