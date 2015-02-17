@@ -5,7 +5,7 @@ sourcetor:
    image: acaceres2176/sourcetor
    restart: always
 splash:
-  image: scrapinghub/splash
+  image: scrapinghub/splash:latest
   volumes: 
     - "./torstuff/proxy-profiles:/etc/splash/proxy-profiles"
   links:

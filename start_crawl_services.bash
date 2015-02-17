@@ -1,7 +1,10 @@
 #!/bin/bash
 cd "$(dirname "$0")"
 export PYTHONPATH=`pwd`
-scrapyd &
+echo "Starting scrapyd..."
+ps aux
+rm /memex-pinterest/twistd.pid | true
+scrapyd --pidfile=/memex-pinterest/twistd.pid &
 sleep 5
 cd searchengine
 scrapyd-deploy scrapyd -p searchengine-project

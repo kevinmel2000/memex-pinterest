@@ -4,7 +4,12 @@ from scrapyutils.scrapydutil import ScrapydJob
 from ui.settings import SCREENSHOT_DIR
 from mongoutils.known_hosts import KnownHostsCompare
 from mongoutils.validate import validate_url
-from ranker.rescore_mongo import train_and_score_mongo
+import traceback
+try:
+    from ranker.rescore_mongo import train_and_score_mongo
+except:
+    print "****Warning: Scoring is disabled because: ****"
+    traceback.print_exc()
 import re
 
 

@@ -13,7 +13,14 @@ from handlers import set_score_handler
 from handlers import list_workspace, add_workspace, set_workspace_selected, delete_workspace
 from handlers import list_keyword, save_keyword, schedule_spider_searchengine_handler, list_search_term, save_search_term
 from handlers import add_known_urls_handler
-from handlers import get_score_handler, train_and_score_mongo
+from handlers import get_score_handler
+import traceback
+try:
+    from handlers import train_and_score_mongo
+except:
+    print "****Warning: Scoring is disabled because: ****"
+    traceback.print_exc()
+
 from handlers import list_tags, save_tags, search_tags
 from handlers import save_display
 from handlers import get_page_number_for_host
