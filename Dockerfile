@@ -34,6 +34,7 @@ RUN python setup.py install
 ADD . /memex-pinterest
 RUN cp /memex-pinterest/ui/memexpin.conf /etc/apache2/sites-available/
 RUN chmod 644 /etc/apache2/sites-available/memexpin.conf
+RUN a2dissite 000-default.conf
 RUN a2ensite memexpin.conf
 
 EXPOSE 80
